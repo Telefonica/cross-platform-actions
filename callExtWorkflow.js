@@ -14,8 +14,8 @@ try {
     const id = '1234'
 
     // `project` input defined in action metadata file
-    const project = core.getInput('who-to-call', { required: true })
-    console.log("Calling " + project);
+    const project = core.getInput('project', { required: true })
+    console.log("Deploying " + project);
 
     const token = core.getInput('token')
 
