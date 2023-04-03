@@ -7,7 +7,7 @@ function sleep(time) {
 
 try {
     const SLEEP_DELAY = 3000
-    const workflow_id = 'printID.yml'
+    const workflow_id = 'deploy.yml'
     const owner = 'Telefonica'
     let targetJob = null
     // TODO: Generate a random ID
@@ -18,6 +18,8 @@ try {
     console.log("Deploying " + project);
 
     const token = core.getInput('token')
+
+    const environment = core.getInput('environment', { required: true })
 
     // Format YYYY-MM-DDTHH:MM
     const run_date_filter = new Date().toJSON().slice(0, 16)
@@ -32,7 +34,8 @@ try {
         workflow_id: workflow_id,
         ref: 'main',
         inputs: {
-            id: id
+            id: id,
+            environment: environment
         },
         headers: {
             'X-GitHub-Api-Version': '2022-11-28'
