@@ -9,6 +9,7 @@ try {
     const SLEEP_DELAY = 3000
     const workflow_id = 'deploy.yml'
     const owner = 'Telefonica'
+    const ref = 'main'
     let targetJob = null
     // TODO: Generate a random ID
     const id = '1234'
@@ -17,7 +18,7 @@ try {
     const project = core.getInput('project', { required: true })
     console.log("Deploying " + project);
 
-    const token = core.getInput('token')
+    const token = core.getInput('token', { required: true })
 
     const environment = core.getInput('environment', { required: true })
 
@@ -32,7 +33,7 @@ try {
         owner: owner,
         repo: project,
         workflow_id: workflow_id,
-        ref: 'main',
+        ref: ref,
         inputs: {
             id: id,
             environment: environment
@@ -72,7 +73,15 @@ try {
     }
     console.log(targetJob)
 
-    // TODO: wait for the workflow to end and recover the output
+    // In case the target job has more than 1 artifact, we will have to filter by name
+    let artifact = await octokit.request('GET /repos/{owner}/{repo}/actions/runs/{run_id}/artifacts', {
+        owner: owner,
+        repo: whoToCall,
+        run_id: targetJob['run_id']
+    }).then(response => response.data.artifacts[0])
+
+    core.setOutput("deploy-artifact", artifact['archive_download_url'])
+
 } catch (error) {
     core.setFailed(error.message);
 
