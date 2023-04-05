@@ -11,7 +11,7 @@ try {
     const owner = 'Telefonica'
     const ref = 'main'
     let targetJob = null
-    // TODO: Generate a random ID
+    // TODO: Generate a random ID or get it from the action input
     const id = '1234'
 
     // `project` input defined in action metadata file
@@ -71,9 +71,8 @@ try {
             await sleep(SLEEP_DELAY)
         }
     }
-    console.log(targetJob)
 
-    // In case the target job has more than 1 artifact, we will have to filter by name
+    // In case the target job has more than 1 artifact, we will have to filter by name. From now on, we will assume that there is only one artifact.
     let artifact = await octokit.request('GET /repos/{owner}/{repo}/actions/runs/{run_id}/artifacts', {
         owner: owner,
         repo: whoToCall,
