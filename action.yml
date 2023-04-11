@@ -1,11 +1,13 @@
 name: 'Deploy a project'
 description: 'Deploy a given project and returns an artifact of the deploy'
 inputs:
-  environment:
-    description: 'Environment where deploy'
   project:  # id of input
     description: 'Project to deploy'
     required: true
+  environment:
+    description: 'Environment where deploy'
+    required: true
+    default: 'DEV'
   token: 
     description: 'Access token required to call the workflow'
     required: true
@@ -14,4 +16,4 @@ inputs:
       description: 'Artifact of deployment'
 runs:
   using: 'node16'
-  main: 'callExtWorkflow.js'
+  main: 'dist/index.js'
