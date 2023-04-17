@@ -1,5 +1,6 @@
 import { Octokit } from 'octokit';
 import * as core from '@actions/core'
+import { v4 as uuidv4 } from 'uuid';
 
 function sleep(time) {
     return new Promise(r => setTimeout(r, time));
@@ -11,8 +12,7 @@ try {
     const owner = 'Telefonica'
     const ref = 'main'
     let targetJob = null
-    // TODO: Generate a random ID or get it from the action input
-    const id = '1234'
+    const id = uuidv4();
 
     // `project` input defined in action metadata file
     const project = core.getInput('project', { required: true })
