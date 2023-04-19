@@ -16,6 +16,7 @@ function getJsonFromZip(zipFiles) {
     })
     .catch((error) => {
       core.setFailed(error.message);
+      return Promise.reject(error);
     });
 }
 
