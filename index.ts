@@ -16,7 +16,7 @@ try {
   const idName = `Set ID (${id})`;
 
   // `project` input defined in action metadata file
-  const project = core.getInput("project", { required: true }) + "-platform";
+  const project = `${core.getInput("project", { required: true })}-platform`;
 
   const token = core.getInput("token", { required: true });
 
