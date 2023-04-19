@@ -1,6 +1,6 @@
 import * as core from "@actions/core";
 import { Octokit } from "octokit";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 
 function sleep(time) {
   return new Promise((r) => setTimeout(r, time));
@@ -13,9 +13,10 @@ try {
   const ref = "main";
   let targetJob = null;
   const id = uuidv4();
+  const idName = `Set ID (${id})`;
 
   // `project` input defined in action metadata file
-  const project = core.getInput("project", { required: true });
+  const project = core.getInput("project", { required: true }) + "-platform";
 
   const token = core.getInput("token", { required: true });
 
@@ -62,7 +63,7 @@ try {
           repo: project,
           id: run["id"],
         });
-        targetJob = jobs.data.jobs.find((job) => job.steps.find((step) => step.name === id));
+        targetJob = jobs.data.jobs.find((job) => job.steps.find((step) => step.name === idName));
         // If the target job is found go outside the loop
         if (targetJob !== undefined) break;
       }
