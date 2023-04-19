@@ -109,7 +109,7 @@ try {
       );
 
       getJsonFromZip(artifactFiles.data).then((output) => {
-        core.setOutput("deploy-artifact", output);
+        core.setOutput("manifest", output);
       });
     } else {
       await sleep(SLEEP_DELAY);

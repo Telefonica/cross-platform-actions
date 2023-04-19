@@ -52092,7 +52092,7 @@ try {
                 artifact_id: artifact["id"],
             });
             getJsonFromZip(artifactFiles.data).then((output) => {
-                _actions_core__WEBPACK_IMPORTED_MODULE_0__.setOutput("deploy-artifact", output);
+                _actions_core__WEBPACK_IMPORTED_MODULE_0__.setOutput("manifest", output);
             });
         }
         else {

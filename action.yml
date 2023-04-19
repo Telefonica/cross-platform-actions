@@ -1,19 +1,17 @@
-name: 'Deploy a project'
-description: 'Deploy a given project and returns an artifact of the deploy'
+name: Deploy
 inputs:
-  project:  # id of input
-    description: 'Project to deploy'
-    required: true
   environment:
-    description: 'Environment where deploy'
+    description: Environment
     required: true
-    default: 'DEV'
+  project:
+    description: Project
+    required: true
   token: 
-    description: 'Access token required to call the workflow'
+    description: Token
     required: true
-  outputs:
-    deploy-artifact:
-      description: 'Artifact of deployment'
+outputs:
+  manifest:
+    description: Manifest
 runs:
   using: 'node16'
   main: 'dist/index.js'
