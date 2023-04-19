@@ -87,27 +87,34 @@ try {
     }
   }
 
-  // In case the target job has more than 1 artifact, we will have to filter by name. From now on, we will assume that there is only one artifact.
-  const artifact = await octokit
-    .request("GET /repos/{owner}/{repo}/actions/runs/{run_id}/artifacts", {
-      owner: owner,
-      repo: project,
-      run_id: targetJob["run_id"],
-    })
-    .then((response) => response.data.artifacts[0]);
+  let artifact = undefined;
+  while (artifact === undefined) {
+    // In case the target job has more than 1 artifact, we will have to filter by name. From now on, we will assume that there is only one artifact.
+    artifact = await octokit
+      .request("GET /repos/{owner}/{repo}/actions/runs/{run_id}/artifacts", {
+        owner: owner,
+        repo: project,
+        run_id: targetJob["run_id"],
+      })
+      .then((response) => response.data.artifacts[0]);
 
-  const artifactFiles = await octokit.request(
-    "GET /repos/{owner}/{repo}/actions/artifacts/{artifact_id}/zip",
-    {
-      owner: owner,
-      repo: project,
-      artifact_id: artifact["id"],
+    if (artifact !== undefined) {
+      const artifactFiles = await octokit.request(
+        "GET /repos/{owner}/{repo}/actions/artifacts/{artifact_id}/zip",
+        {
+          owner: owner,
+          repo: project,
+          artifact_id: artifact["id"],
+        }
+      );
+
+      getJsonFromZip(artifactFiles.data).then((output) => {
+        core.setOutput("deploy-artifact", output);
+      });
+    } else {
+      await sleep(SLEEP_DELAY);
     }
-  );
-
-  getJsonFromZip(artifactFiles.data).then((output) => {
-    core.setOutput("deploy-artifact", output);
-  });
+  }
 } catch (error) {
   core.setFailed(error.message);
 }
