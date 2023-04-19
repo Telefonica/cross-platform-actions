@@ -1,9 +1,22 @@
 import * as core from "@actions/core";
+import * as JSZip from "jszip";
 import { Octokit } from "octokit";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 
 function sleep(time) {
   return new Promise((r) => setTimeout(r, time));
+}
+
+function getJsonFromZip(zipFiles) {
+  const zip = new JSZip();
+  return zip
+    .loadAsync(zipFiles)
+    .then((zipLoaded: JSZip) => {
+      return Object.values(zipLoaded.files)[0].async("string");
+    })
+    .catch((error) => {
+      core.setFailed(error.message);
+    });
 }
 
 try {
@@ -81,7 +94,18 @@ try {
     })
     .then((response) => response.data.artifacts[0]);
 
-  core.setOutput("deploy-artifact", artifact["archive_download_url"]);
+  const artifactFiles = await octokit.request(
+    "GET /repos/{owner}/{repo}/actions/artifacts/{artifact_id}/zip",
+    {
+      owner: owner,
+      repo: project,
+      artifact_id: artifact["id"],
+    }
+  );
+
+  getJsonFromZip(artifactFiles.data).then((output) => {
+    core.setOutput("deploy-artifact", output);
+  });
 } catch (error) {
   core.setFailed(error.message);
 }
