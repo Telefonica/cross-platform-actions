@@ -37,7 +37,10 @@ try {
   const environment = core.getInput("environment", { required: true });
 
   // Format YYYY-MM-DDTHH:MM
-  const run_date_filter = new Date().toJSON().slice(0, 16);
+  const run_date_filter_raw = new Date();
+  const run_date_filter = run_date_filter_raw.toJSON().slice(0, 13);
+  run_date_filter_raw.setHours(run_date_filter_raw.getHours() + 1);
+  const run_date_filter_aux = run_date_filter_raw.toJSON().slice(0, 13);
 
   const octokit = new Octokit({
     auth: token,
@@ -69,7 +72,20 @@ try {
         },
       }
     );
-    const runs = response.data.workflow_runs.filter((run) => run.status === "completed");
+    const response2 = await octokit.request(
+      "GET /repos/{owner}/{repo}/actions/runs?created={run_date_filter_aux}",
+      {
+        owner: owner,
+        repo: project,
+        run_date_filter: run_date_filter_aux,
+        headers: {
+          "X-GitHub-Api-Version": "2022-11-28",
+        },
+      }
+    );
+    const runs = response.data.workflow_runs
+      .concat(response2.data.workflow_runs)
+      .filter((run) => run.status === "completed");
     if (runs.length > 0) {
       for (const run of runs) {
         const jobs = await octokit.request("GET /repos/{owner}/{repo}/actions/runs/{id}/jobs", {
