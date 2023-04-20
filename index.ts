@@ -57,9 +57,9 @@ try {
     },
   });
 
-  while (targetJob === undefined || targetJob === null) {
+  while (!targetJob) {
     const response = await octokit.request(
-      "GET /repos/{owner}/{repo}/actions/runs?created={run_date_filter}",
+      "GET /repos/{owner}/{repo}/actions/runs?created>={run_date_filter}",
       {
         owner: owner,
         repo: project,
@@ -79,40 +79,43 @@ try {
         });
         targetJob = jobs.data.jobs.find((job) => job.steps.find((step) => step.name === idName));
         // If the target job is found go outside the loop
-        if (targetJob !== undefined) break;
+        if (targetJob) break;
       }
     }
-    if (targetJob === undefined || targetJob === null) {
+    if (!targetJob) {
       await sleep(SLEEP_DELAY);
     }
   }
-
-  let artifact = undefined;
-  while (artifact === undefined) {
-    // In case the target job has more than 1 artifact, we will have to filter by name. From now on, we will assume that there is only one artifact.
-    artifact = await octokit
-      .request("GET /repos/{owner}/{repo}/actions/runs/{run_id}/artifacts", {
-        owner: owner,
-        repo: project,
-        run_id: targetJob["run_id"],
-      })
-      .then((response) => response.data.artifacts[0]);
-
-    if (artifact !== undefined) {
-      const artifactFiles = await octokit.request(
-        "GET /repos/{owner}/{repo}/actions/artifacts/{artifact_id}/zip",
-        {
+  if (targetJob.conclusion !== "success") {
+    core.setFailed(`Job ${targetJob.name} failed`);
+  } else {
+    let artifact = undefined;
+    while (!artifact) {
+      // In case the target job has more than 1 artifact, we will have to filter by name. From now on, we will assume that there is only one artifact.
+      artifact = await octokit
+        .request("GET /repos/{owner}/{repo}/actions/runs/{run_id}/artifacts", {
           owner: owner,
           repo: project,
-          artifact_id: artifact["id"],
-        }
-      );
+          run_id: targetJob["run_id"],
+        })
+        .then((response) => response.data.artifacts[0]);
 
-      getJsonFromZip(artifactFiles.data).then((output) => {
-        core.setOutput("manifest", output);
-      });
-    } else {
-      await sleep(SLEEP_DELAY);
+      if (artifact) {
+        const artifactFiles = await octokit.request(
+          "GET /repos/{owner}/{repo}/actions/artifacts/{artifact_id}/zip",
+          {
+            owner: owner,
+            repo: project,
+            artifact_id: artifact["id"],
+          }
+        );
+
+        getJsonFromZip(artifactFiles.data).then((output) => {
+          core.setOutput("manifest", output);
+        });
+      } else {
+        await sleep(SLEEP_DELAY);
+      }
     }
   }
 } catch (error) {
