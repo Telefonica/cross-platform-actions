@@ -22,6 +22,7 @@ function getJsonFromZip(zipFiles) {
 
 try {
   const SLEEP_DELAY = 3000;
+  const TIMEOUT_DELAY = 60000;
   const workflow_id = "deploy.yml";
   const owner = "Telefonica";
   const ref = "main";
@@ -38,6 +39,9 @@ try {
 
   // Format YYYY-MM-DDTHH:MM
   const run_date_filter = new Date().toJSON().slice(0, 16);
+  const timeout = setTimeout(() => {
+    core.setFailed(`Time run out waiting for workflow to finish`);
+  }, TIMEOUT_DELAY);
 
   const octokit = new Octokit({
     auth: token,
@@ -113,6 +117,8 @@ try {
         getJsonFromZip(artifactFiles.data).then((output) => {
           core.setOutput("manifest", output);
         });
+
+        clearTimeout(timeout);
       } else {
         await sleep(SLEEP_DELAY);
       }
