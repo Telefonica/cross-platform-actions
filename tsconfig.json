@@ -1,7 +1,20 @@
 {
-    "compilerOptions": {
-      "module": "esnext",
-      "target": "es2022",
-      "moduleResolution": "node"
-    }
+  "compilerOptions": {
+    "rootDir": ".",
+    "outDir": "dist",
+    "declaration": true,
+    "target": "ES2022",
+    "strict": true,
+    "strictNullChecks": true,
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "module": "commonjs",
+    "useDefineForClassFields": true,
+    "importsNotUsedAsValues": "remove",
+    "forceConsistentCasingInFileNames": true,
+    "noUnusedParameters": true,
+    "isolatedModules": true,
+    "strictPropertyInitialization": false,
+    "baseUrl": ".",
+  }
 }
