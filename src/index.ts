@@ -44,7 +44,7 @@ async function run() {
     });
 
     const artifact = await workflows.downloadJobFirstArtifact(targetJob);
-    const artifactJson = await getJsonFromZip(artifact.data);
+    const artifactJson = await getJsonFromZip(artifact.data as ArrayBuffer);
     core.setOutput(OUTPUT_VARS.MANIFEST, artifactJson);
   } catch (error) {
     core.setFailed(error.message);

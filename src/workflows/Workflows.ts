@@ -7,6 +7,7 @@ import type {
   GetRunJobResponse,
   GetRunResponse,
   StepUUID,
+  DownloadRunArtifactResponse,
 } from "./Github.types";
 import type {
   WorkflowsConstructor,
@@ -125,7 +126,9 @@ export const Workflows: WorkflowsConstructor = class Workflows implements Workfl
     return targetJob;
   }
 
-  public downloadJobFirstArtifact(jobData) {
+  public downloadJobFirstArtifact(
+    jobData: GetRunJobResponse
+  ): Promise<DownloadRunArtifactResponse> {
     let checkTimeout: NodeJS.Timeout;
     return new Promise((resolve, reject) => {
       const rejectTimeout = setTimeout(() => {

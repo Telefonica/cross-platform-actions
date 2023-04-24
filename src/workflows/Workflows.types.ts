@@ -1,4 +1,10 @@
-import { GithubConstructorOptions, StepUUID, GetRunJobResponse } from "./Github.types";
+import {
+  GithubConstructorOptions,
+  StepUUID,
+  GetRunJobResponse,
+  DownloadRunArtifactResponse,
+  DispatchOptions,
+} from "./Github.types";
 
 export interface WorkflowsConstructorOptions extends GithubConstructorOptions {
   /** Time to wait before considering that job is not going to complete */
@@ -22,6 +28,8 @@ export interface WaitForTargetJobOptions {
 
 /** Workflows interface */
 export interface WorkflowsInterface {
+  dispatch(options: DispatchOptions): Promise<void>;
   waitForTargetJobToComplete(options: WaitForTargetJobOptions): Promise<GetRunJobResponse>;
   waitForTargetJobToSuccess(options: WaitForTargetJobOptions): Promise<GetRunJobResponse>;
+  downloadJobFirstArtifact(jobData: GetRunJobResponse): Promise<DownloadRunArtifactResponse>;
 }

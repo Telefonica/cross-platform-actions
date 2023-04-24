@@ -12,6 +12,7 @@ import type {
   GetRunArtifactsOptions,
   DownloadRunArtifactOptions,
   GetRunResponse,
+  GetRunJobResponse,
   GetRunJobsResponse,
   GetRunArtifactsResponse,
   DownloadRunArtifactResponse,
@@ -19,11 +20,11 @@ import type {
 
 const SUCCESSFUL_JOB_CONCLUSION = "success";
 
-function jobIsSuccessful(job) {
+function jobIsSuccessful(job: GetRunJobResponse): boolean {
   return job.conclusion === SUCCESSFUL_JOB_CONCLUSION;
 }
 
-export function throwIfJobFailed(job) {
+export function throwIfJobFailed(job: GetRunJobResponse): void | never {
   if (!jobIsSuccessful(job)) {
     throw new Error(`Job ${job.name} failed`);
   }
