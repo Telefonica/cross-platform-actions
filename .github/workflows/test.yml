@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - CROSS-499/test/e2e
   pull_request:
 
 jobs:
@@ -59,3 +60,21 @@ jobs:
             exit 1
           fi
         id: diff
+  test-component:
+    runs-on: cdorunner-cross-standard
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - id: deploy
+        name: Launch deploy action
+        uses: ./
+        with:
+          environment: 'foo-environment'
+          project: 'cross-platform-actions'
+          repo-suffix: ''
+          token: ${{ secrets.GITHUB_TOKEN }}
+          workflow-id: 'deploy-test.yml'
+          ref: ${{ github.head_ref || github.ref_name }}
+      - name: Check deployment manifest
+        run: |
+          echo '${{ steps.deploy.outputs.manifest }}' | jq -r '.registry.server' | grep 'foo-server' || echo "Manifest is wrong" && exit 1
