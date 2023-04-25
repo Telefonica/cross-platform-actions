@@ -1,5 +1,6 @@
 import JSZip from "jszip";
 
+import { getLogger } from "../support/mocks/Logger";
 import { octokit } from "../support/mocks/Octokit";
 import { uuid } from "../support/mocks/Uuid";
 import { actionsCore } from "../support/mocks/ActionsCore";
@@ -32,13 +33,15 @@ const CONFIG = {
 describe("Deploy module", () => {
   const EXPECTED_ARTIFACT_JSON = { foo: "bar" };
   const STEP_UUID = "foo-step-uuid";
-  let zipFile;
+  let zipFile, logger;
 
   beforeEach(async () => {
     const zip = new JSZip();
     zipFile = await zip
       .file("foo.json", JSON.stringify(EXPECTED_ARTIFACT_JSON))
       .generateAsync({ type: "arraybuffer" });
+
+    logger = getLogger();
 
     // Successful case
     uuid.v4.mockReturnValue(STEP_UUID);
@@ -59,7 +62,7 @@ describe("Deploy module", () => {
   describe("deployAndGetArtifact method", () => {
     describe("when it is success", () => {
       it("should return artifact content as stringified JSON", async () => {
-        const artifactJson = await deployAndGetArtifact(CONFIG);
+        const artifactJson = await deployAndGetArtifact(CONFIG, logger);
         expect(JSON.parse(artifactJson)).toEqual(EXPECTED_ARTIFACT_JSON);
       });
     });
@@ -81,7 +84,7 @@ describe("Deploy module", () => {
       });
 
       it("should throw with timeout message", async () => {
-        await expect(() => deployAndGetArtifact(CONFIG)).rejects.toThrow(
+        await expect(() => deployAndGetArtifact(CONFIG, logger)).rejects.toThrow(
           "Timed out while waiting for target job to complete"
         );
       });
@@ -89,7 +92,7 @@ describe("Deploy module", () => {
       it("should throw after time run out", async () => {
         const now = Date.now();
 
-        await expect(() => deployAndGetArtifact(CONFIG)).rejects.toThrow();
+        await expect(() => deployAndGetArtifact(CONFIG, logger)).rejects.toThrow();
         const elapsed = Date.now() - now;
         expect(elapsed).toBeGreaterThanOrEqual(CONFIG.timeoutJobCompleted);
       });
@@ -97,7 +100,7 @@ describe("Deploy module", () => {
 
     describe("when sending params to Github API", () => {
       it("should send provided owner when dispatching workflow", async () => {
-        await deployAndGetArtifact(CONFIG);
+        await deployAndGetArtifact(CONFIG, logger);
         expect(octokit.request.mock.calls[0][0]).toEqual(DISPATCH_WORKFLOW_PATH);
         expect(octokit.request.mock.calls[0][1].owner).toEqual(CONFIG.githubOwner);
       });
@@ -124,10 +127,23 @@ describe("Deploy module", () => {
 
       it('should send repoName from action input "project" adding "-platform" when dispatching workflow', async () => {
         const FOO_REPO_NAME = "foo-repo-name";
-        actionsCore.getInput.mockReturnValue(FOO_REPO_NAME);
+        actionsCore.getInput.mockImplementation((inputName) => {
+          if (inputName === "project") return FOO_REPO_NAME;
+        });
         await runDeployAndGetArtifactAction();
         expect(octokit.request.mock.calls[0][0]).toEqual(DISPATCH_WORKFLOW_PATH);
         expect(octokit.request.mock.calls[0][1].repo).toEqual(`${FOO_REPO_NAME}-platform`);
+      });
+
+      it('should add custom suffix from action input "repo-suffix" to repo name when dispatching workflow', async () => {
+        const FOO_REPO_NAME = "foo-repo-name";
+        actionsCore.getInput.mockImplementation((inputName) => {
+          if (inputName === "project") return FOO_REPO_NAME;
+          if (inputName === "repo-suffix") return "-custom-suffix";
+        });
+        await runDeployAndGetArtifactAction();
+        expect(octokit.request.mock.calls[0][0]).toEqual(DISPATCH_WORKFLOW_PATH);
+        expect(octokit.request.mock.calls[0][1].repo).toEqual(`${FOO_REPO_NAME}-custom-suffix`);
       });
     });
   });
