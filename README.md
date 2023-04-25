@@ -29,6 +29,9 @@ This action receives a project name, launches a deploy workflow in the correspon
 - `project` - Project name. This action will launch the deploy workflow in a repository with the name `${project}-platform`.
 - `environment` - Environment where to deploy. It will be passed as an input to the deploy workflow.
 - `token` - Github token to get access to the repository workflows
+- `ref` - _Optional_. Branch or tag in which to run the deploy workflow. If not specified, the `main` branch will be used.
+- `repo-suffix` - _Optional_. Suffix to append to the project name to get the platform repository name. If not specified, `-platform` will be used.
+- `workflow-id` - _Optional_. ID of the workflow to launch. If not specified, the first workflow with the name `deploy.yml` will be used.
 
 ## Outputs
 
