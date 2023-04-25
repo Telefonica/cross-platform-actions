@@ -22,7 +22,7 @@ jobs:
         uses: actions/checkout@v3
       - name: Create fake deployment manifest
         run: |
-          echo "{\"finished\":true,\"registry\":{\"server\":\"foo-server\"}}" > deployment.json
+          echo "{\"finished\":true,\"registry\":{\"server\":\"foo-sdsdsderver\"}}" > deployment.json
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
