@@ -1,0 +1,20 @@
+name: Deploy workflow for E2E tests
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment: environment
+        required: true
+        type: string
+        description: Environment to deploy
+      id:
+        required: true
+        type: string
+        description: Id for the identifier step
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set ID ${{github.event.inputs.id}}
+        run: echo "The id of this workflow is ${{github.event.inputs.id}}"
