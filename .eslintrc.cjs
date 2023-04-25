@@ -1,3 +1,5 @@
+const path = require("path");
+
 module.exports = {
   root: true,
   env: {
@@ -36,6 +38,7 @@ module.exports = {
             parser: "typescript",
           },
         ],
+        "no-shadow": [2, { builtinGlobals: true, hoist: "all" }],
         "import/no-relative-packages": [2],
         "@typescript-eslint/no-unused-vars": [2],
         "import/order": [
@@ -64,6 +67,41 @@ module.exports = {
           typescript: true,
           node: true,
         },
+      },
+    },
+    {
+      files: ["test/**/*.ts"],
+      parser: "@typescript-eslint/parser",
+      plugins: ["prettier", "@typescript-eslint", "import", "jest"],
+      extends: [
+        "eslint:recommended",
+        "prettier",
+        "plugin:@typescript-eslint/eslint-recommended",
+        "plugin:@typescript-eslint/recommended",
+        "plugin:import/recommended",
+        "plugin:import/typescript",
+        "plugin:jest/recommended",
+      ],
+      rules: {
+        "@typescript-eslint/ban-ts-comment": [0],
+        "import/order": [
+          0,
+          {
+            groups: ["builtin", "external", "internal", "parent", "sibling", "index"],
+            pathGroups: [
+              {
+                pattern: "**/support/mocks/**/*.*",
+                group: "internal",
+                position: "before",
+              },
+            ],
+            "newlines-between": "always",
+            alphabetize: {
+              order: "asc" /* sort in ascending order. Options: ['ignore', 'asc', 'desc'] */,
+              caseInsensitive: true /* ignore case. Options: [true, false] */,
+            },
+          },
+        ],
       },
     },
   ],
