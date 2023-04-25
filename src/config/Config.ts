@@ -3,7 +3,7 @@ import * as core from "@actions/core";
 import type { Config } from "./Config.types";
 
 const INPUT_VARS = {
-  PROJECT: "project-foo-var",
+  PROJECT: "project",
   TOKEN: "token",
   ENVIRONMENT: "environment",
 };
