@@ -11,10 +11,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: My first step
+      - name: Launch deploy action
         uses: ./
         with:
           environment: 'foo-environment'
           project: 'cross-platform-actions'
           token: ${{ secrets.GITHUB_TOKEN }}
-          

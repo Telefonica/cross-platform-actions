@@ -53243,7 +53243,7 @@ async function runDeployAndGetArtifactAction() {
         core.setOutput(Config_1.OUTPUT_VARS.MANIFEST, artifactJson);
     }
     catch (error) {
-        logger.error(`Action failed with error: ${error.message}`);
+        logger.debug(`Action failed with error: ${error.message}`);
         core.setFailed(error.message);
         throw error;
     }
@@ -53447,8 +53447,8 @@ const Github = class Github {
             });
         }
         catch (error) {
-            this._logger.error(`Error dispatching Github workflow: ${error.message}`);
-            throw error;
+            this._logger.debug(`dispatchWorkflow error: ${error.stack}`);
+            throw new Error(`Error dispatching Github workflow: ${error.message}`);
         }
     }
     async getRuns({ runDateFilter }) {
