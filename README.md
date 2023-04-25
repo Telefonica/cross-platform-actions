@@ -12,6 +12,7 @@
   * [Check types](#check-types)
   * [Unit tests](#unit-tests)
   * [Build](#build)
+  * [Component tests](#component-tests)
 
 
 # Usage
@@ -107,3 +108,7 @@ npm run build
 ```
 
 ⚠️ __IMPORTANT__: For the moment, the project has to be built locally on every change, and the `dist` folder has to be committed to the repository. This is something that we will improve in the future. But, for now, there is a step in the test workflow that checks that the `dist` folder is up to date. So, remember to build the project before pushing your changes, otherwise the tests will fail.
+
+## Component tests
+
+Component tests are executed in a real environment, using the GitHub Actions Runner. The action is executed in the workflow, and it dispatches the `deploy-test.yml` workflow in this same repository. The `deploy-test.yml` workflow is a simple workflow that just uploads a fake manifest. The component tests check that the manifest is correctly downloaded by the action and passed as an output.
