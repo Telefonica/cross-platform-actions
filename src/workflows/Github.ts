@@ -46,22 +46,27 @@ export const Github: GithubConstructor = class Github implements GithubInterface
   }
 
   public async dispatchWorkflow({ workflowId, ref, stepUUID, environment }: DispatchOptions) {
-    await this._octokit.request(
-      "POST /repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches",
-      {
-        owner: this._owner,
-        repo: this._project,
-        workflow_id: workflowId,
-        ref: ref,
-        inputs: {
-          id: stepUUID,
-          environment: environment,
-        },
-        headers: {
-          "X-GitHub-Api-Version": "2022-11-28",
-        },
-      }
-    );
+    try {
+      await this._octokit.request(
+        "POST /repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches",
+        {
+          owner: this._owner,
+          repo: this._project,
+          workflow_id: workflowId,
+          ref: ref,
+          inputs: {
+            id: stepUUID,
+            environment: environment,
+          },
+          headers: {
+            "X-GitHub-Api-Version": "2022-11-28",
+          },
+        }
+      );
+    } catch (error) {
+      this._logger.error(`Error dispatching workflow: ${(error as Error).message}`);
+      throw error;
+    }
   }
 
   public async getRuns({ runDateFilter }: GetRunsOptions): Promise<GetRunResponse> {

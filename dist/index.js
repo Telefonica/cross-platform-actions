@@ -53430,19 +53430,25 @@ const Github = class Github {
         this._logger = logger;
     }
     async dispatchWorkflow({ workflowId, ref, stepUUID, environment }) {
-        await this._octokit.request("POST /repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches", {
-            owner: this._owner,
-            repo: this._project,
-            workflow_id: workflowId,
-            ref: ref,
-            inputs: {
-                id: stepUUID,
-                environment: environment,
-            },
-            headers: {
-                "X-GitHub-Api-Version": "2022-11-28",
-            },
-        });
+        try {
+            await this._octokit.request("POST /repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches", {
+                owner: this._owner,
+                repo: this._project,
+                workflow_id: workflowId,
+                ref: ref,
+                inputs: {
+                    id: stepUUID,
+                    environment: environment,
+                },
+                headers: {
+                    "X-GitHub-Api-Version": "2022-11-28",
+                },
+            });
+        }
+        catch (error) {
+            this._logger.error(`Error dispatching workflow: ${error.message}`);
+            throw (error);
+        }
     }
     async getRuns({ runDateFilter }) {
         const response = (await this._octokit.request(`GET /repos/{owner}/{repo}/actions/runs?created>={run_date_filter}`, {
