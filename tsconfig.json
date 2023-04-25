@@ -16,5 +16,6 @@
     "isolatedModules": true,
     "strictPropertyInitialization": false,
     "baseUrl": ".",
-  }
+  },
+  "include": ["src/**/*"],
 }

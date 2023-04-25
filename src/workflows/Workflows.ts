@@ -59,6 +59,7 @@ export const Workflows: WorkflowsConstructor = class Workflows implements Workfl
     workflowRuns: GetRunResponse["data"]["workflow_runs"],
     stepUUID: StepUUID
   ): Promise<GetRunJobResponse | undefined> {
+    // TODO, check that the workflow is also successful?
     const completedRuns = workflowRuns.filter((run) => run.status === "completed");
 
     const runsJobsFound = await Promise.all(
