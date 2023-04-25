@@ -3,7 +3,7 @@ name: Deploy workflow for E2E tests
 on:
   workflow_dispatch:
     inputs:
-      environment: environment
+      environment:
         required: true
         type: string
         description: Environment to deploy
