@@ -13,7 +13,6 @@ export interface WorkflowsConstructorOptions extends GithubConstructorOptions {
   timeoutArtifactAvailable: number;
   /** Time to wait between requests to Github API */
   requestInterval: number;
-  repoNameSuffix?: string;
 }
 
 /** Returns Workflows interface */
