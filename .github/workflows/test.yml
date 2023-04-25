@@ -77,4 +77,4 @@ jobs:
           ref: ${{ github.head_ref || github.ref_name }}
       - name: Check deployment manifest
         run: |
-          echo '${{ steps.deploy.outputs.manifest }}' | jq -r '.registry.server' | grep 'foo-server' || echo "Manifest is wrong" && exit 1
+          echo '${{ steps.deploy.outputs.manifest }}' | jq -r '.registry.server' | grep 'foo-server' || (echo "Manifest is wrong" && exit 1)
