@@ -11,7 +11,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Launch deploy action
+      - id: deploy
+        name: Launch deploy action
         uses: ./
         with:
           environment: 'foo-environment'
