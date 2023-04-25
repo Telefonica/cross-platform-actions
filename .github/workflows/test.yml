@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - CROSS-499/test/e2e
   pull_request:
 
 jobs:
