@@ -4,6 +4,7 @@
   "description": "Github action receiving a repo name, launching a deploy workflow there, waiting for the result, and returning the deploy artifact",
   "scripts": {
     "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "lint-staged": "lint-staged",
     "test": "jest --config jest.config.js",
     "check:types": "tsc --noEmit",
