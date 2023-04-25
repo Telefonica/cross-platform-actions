@@ -53210,7 +53210,6 @@ const Logger_1 = __nccwpck_require__(1631);
 const Zip_1 = __nccwpck_require__(498);
 const Workflows_1 = __nccwpck_require__(7734);
 async function deployAndGetArtifact({ timeoutJobCompleted, timeoutArtifactAvailable, repoName, repoRef, workflowId, githubOwner, githubToken, environment, requestInterval, }, logger) {
-    // customStepUUID is used for testing purpose
     const stepUUID = (0, uuid_1.v4)();
     const executedFrom = (0, Date_1.formattedNow)();
     const workflows = new Workflows_1.Workflows({

@@ -23,7 +23,6 @@ export async function deployAndGetArtifact(
   }: Config,
   logger: Logger
 ): Promise<string> {
-  // customStepUUID is used for testing purpose
   const stepUUID = uuidv4();
   const executedFrom = formattedNow();
 
