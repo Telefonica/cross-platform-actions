@@ -9,4 +9,6 @@ __Please provide enough information and context so that others can review your p
 ## Check list
 
 * [ ] Unit tests have been executed locally
+* [ ] Build has been executed locally
+* [ ] The dist folder has been updated
 * [ ] The documentation has been updated
