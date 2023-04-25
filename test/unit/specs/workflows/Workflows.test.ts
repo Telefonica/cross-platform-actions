@@ -80,6 +80,8 @@ describe("Workflows module", () => {
         });
 
         expect(result).toEqual({
+          conclusion: "success",
+          name: "foo-job-name",
           id: "foo-job-id",
           steps: [
             {
