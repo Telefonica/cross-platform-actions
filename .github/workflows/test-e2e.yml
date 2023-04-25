@@ -6,7 +6,7 @@ on:
       - CROSS-499/test/e2e
 
 jobs:
-  test:
+  test-e2e:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -16,4 +16,5 @@ jobs:
         with:
           environment: 'foo-environment'
           project: 'cross-platform-actions'
+          repo-suffix: ''
           token: ${{ secrets.GITHUB_TOKEN }}
