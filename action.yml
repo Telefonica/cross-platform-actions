@@ -11,6 +11,10 @@ inputs:
     required: true
   repo-suffix:
     description: Custom suffix for the deploy repo name. Defaults to "-platform"
+  workflow-id:
+    description: ID of the workflow to trigger. Defaults to "deploy.yml"
+  ref:
+    description: Ref to trigger the workflow. Defaults to "main"
 outputs:
   manifest:
     description: Manifest downloaded from the deploy workflow artifact

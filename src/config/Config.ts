@@ -7,6 +7,8 @@ const INPUT_VARS = {
   TOKEN: "token",
   ENVIRONMENT: "environment",
   REPO_SUFFIX: "repo-suffix",
+  WORKFLOW_ID: "workflow-id",
+  REF: "ref",
 };
 
 export const OUTPUT_VARS = {
@@ -27,13 +29,15 @@ export function getConfig(): Config {
   );
   const token = core.getInput(INPUT_VARS.TOKEN, { required: true });
   const environment = core.getInput(INPUT_VARS.ENVIRONMENT, { required: true });
+  const workflowId = core.getInput(INPUT_VARS.WORKFLOW_ID) || "deploy.yml";
+  const repoRef = core.getInput(INPUT_VARS.REF) || "main";
 
   return {
     timeoutJobCompleted: 600000,
     timeoutArtifactAvailable: 10000,
     repoName,
-    repoRef: "main",
-    workflowId: "deploy.yml",
+    repoRef,
+    workflowId: workflowId,
     githubOwner: "Telefonica",
     githubToken: token,
     environment,

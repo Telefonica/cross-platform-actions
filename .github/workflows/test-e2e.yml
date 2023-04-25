@@ -18,3 +18,5 @@ jobs:
           project: 'cross-platform-actions'
           repo-suffix: ''
           token: ${{ secrets.GITHUB_TOKEN }}
+          workflow-id: 'deploy-test.yml'
+          ref: ${{ github.head_ref || github.ref_name }}
