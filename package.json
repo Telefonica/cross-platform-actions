@@ -7,6 +7,7 @@
     "lint-staged": "lint-staged",
     "test": "jest --config jest.config.js",
     "check:types": "tsc --noEmit",
+    "build": "ncc build src/index.ts -o dist --source-map",
     "prepare": "husky install"
   },
   "keywords": [],
@@ -29,6 +30,7 @@
     "@types/jest": "29.5.1",
     "@types/uuid": "9.0.1",
     "@typescript-eslint/eslint-plugin": "5.58.0",
+    "@vercel/ncc": "0.36.1",
     "babel-jest": "29.5.0",
     "eslint": "8.38.0",
     "eslint-config-prettier": "8.8.0",
