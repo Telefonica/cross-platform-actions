@@ -26,4 +26,4 @@ jobs:
           echo "The deployment manifest is ${{ steps.deploy.outputs.manifest }}"
       - name: Check deployment manifest
         run: |
-          echo "${{ steps.deploy.outputs.manifest }}" | jq -r '.registry.server' | grep 'foo-server' || exit 1
+          echo '${{ steps.deploy.outputs.manifest }}' | jq -r '.registry.server' | grep 'foo-server' || exit 1
