@@ -20,3 +20,9 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           workflow-id: 'deploy-test.yml'
           ref: ${{ github.head_ref || github.ref_name }}
+      - name: Trace deployment manifest
+        run: |
+          echo "The deployment manifest is ${{ steps.deploy.outputs.manifest }}"
+      - name: Check deployment manifest
+        run: |
+          echo ${{ steps.deploy.outputs.manifest }} | jq -r '.registry.server' | grep 'foo-server' || exit 1
