@@ -64,7 +64,7 @@ export const Github: GithubConstructor = class Github implements GithubInterface
         }
       );
     } catch (error) {
-      this._logger.error(`Error dispatching workflow: ${(error as Error).message}`);
+      this._logger.error(`Error dispatching Github workflow: ${(error as Error).message}`);
       throw error;
     }
   }

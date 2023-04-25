@@ -53209,10 +53209,10 @@ const Date_1 = __nccwpck_require__(6645);
 const Logger_1 = __nccwpck_require__(1631);
 const Zip_1 = __nccwpck_require__(498);
 const Workflows_1 = __nccwpck_require__(7734);
-async function deployAndGetArtifact({ timeoutJobCompleted, timeoutArtifactAvailable, repoName, repoRef, workflowId, githubOwner, githubToken, environment, requestInterval, }) {
+async function deployAndGetArtifact({ timeoutJobCompleted, timeoutArtifactAvailable, repoName, repoRef, workflowId, githubOwner, githubToken, environment, requestInterval, }, logger) {
+    // customStepUUID is used for testing purpose
     const stepUUID = (0, uuid_1.v4)();
     const executedFrom = (0, Date_1.formattedNow)();
-    const logger = (0, Logger_1.getLogger)();
     const workflows = new Workflows_1.Workflows({
         token: githubToken,
         owner: githubOwner,
@@ -53236,13 +53236,14 @@ async function deployAndGetArtifact({ timeoutJobCompleted, timeoutArtifactAvaila
 }
 exports.deployAndGetArtifact = deployAndGetArtifact;
 async function runDeployAndGetArtifactAction() {
+    const logger = (0, Logger_1.getLogger)();
     try {
-        // customStepUUID is used for testing purpose
         const config = (0, Config_1.getConfig)();
-        const artifactJson = await deployAndGetArtifact(config);
+        const artifactJson = await deployAndGetArtifact(config, logger);
         core.setOutput(Config_1.OUTPUT_VARS.MANIFEST, artifactJson);
     }
     catch (error) {
+        logger.error(`Action failed with error: ${error.message}`);
         core.setFailed(error.message);
         throw error;
     }
@@ -53446,8 +53447,8 @@ const Github = class Github {
             });
         }
         catch (error) {
-            this._logger.error(`Error dispatching workflow: ${error.message}`);
-            throw (error);
+            this._logger.error(`Error dispatching Github workflow: ${error.message}`);
+            throw error;
         }
     }
     async getRuns({ runDateFilter }) {
