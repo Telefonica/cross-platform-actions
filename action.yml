@@ -1,17 +1,19 @@
 name: Deploy
 inputs:
   environment:
-    description: Environment
+    description: Environment to deploy. It will be passed as input to the deploy workflow
     required: true
   project:
-    description: Project
+    description: Project to which the deploy containing the deploy action belongs
     required: true
   token: 
-    description: Token
+    description: Github token
     required: true
+  repo-suffix:
+    description: Custom suffix for the deploy repo name. Defaults to "-platform"
 outputs:
   manifest:
-    description: Manifest
+    description: Manifest downloaded from the deploy workflow artifact
 runs:
   using: 'node16'
   main: 'dist/index.js'
