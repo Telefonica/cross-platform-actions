@@ -47,21 +47,23 @@ export const Github: GithubConstructor = class Github implements GithubInterface
 
   public async dispatchWorkflow({ workflowId, ref, stepUUID, environment }: DispatchOptions) {
     try {
+      const dataToSend = {
+        owner: this._owner,
+        repo: this._project,
+        workflow_id: workflowId,
+        ref: ref,
+        inputs: {
+          id: stepUUID,
+          environment: environment,
+        },
+        headers: {
+          "X-GitHub-Api-Version": "2022-11-28",
+        },
+      };
+      this._logger.info(`Dispatching Github workflow: ${JSON.stringify({ dataToSend })}`);
       await this._octokit.request(
         "POST /repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches",
-        {
-          owner: this._owner,
-          repo: this._project,
-          workflow_id: workflowId,
-          ref: ref,
-          inputs: {
-            id: stepUUID,
-            environment: environment,
-          },
-          headers: {
-            "X-GitHub-Api-Version": "2022-11-28",
-          },
-        }
+        dataToSend
       );
     } catch (error) {
       throw new Error(`Error dispatching Github workflow: ${(error as Error).message}`);
