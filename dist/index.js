@@ -53288,16 +53288,19 @@ const INPUT_VARS = {
     PROJECT: "project",
     TOKEN: "token",
     ENVIRONMENT: "environment",
+    REPO_SUFFIX: "repo-suffix",
 };
 exports.OUTPUT_VARS = {
     MANIFEST: "manifest",
 };
-function getRepoName(repoBaseName) {
-    return `${repoBaseName}-platform`;
+const DEFAULT_REPO_SUFFIX = "-platform";
+function getRepoName(repoBaseName, customRepoSuffix) {
+    const suffix = customRepoSuffix !== undefined ? customRepoSuffix : DEFAULT_REPO_SUFFIX;
+    return `${repoBaseName}${suffix}`;
 }
 exports.getRepoName = getRepoName;
 function getConfig() {
-    const repoName = getRepoName(core.getInput(INPUT_VARS.PROJECT, { required: true }));
+    const repoName = getRepoName(core.getInput(INPUT_VARS.PROJECT, { required: true }), core.getInput(INPUT_VARS.REPO_SUFFIX));
     const token = core.getInput(INPUT_VARS.TOKEN, { required: true });
     const environment = core.getInput(INPUT_VARS.ENVIRONMENT, { required: true });
     return {
@@ -53432,7 +53435,7 @@ const Github = class Github {
     }
     async dispatchWorkflow({ workflowId, ref, stepUUID, environment }) {
         try {
-            await this._octokit.request("POST /repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches", {
+            const dataToSend = {
                 owner: this._owner,
                 repo: this._project,
                 workflow_id: workflowId,
@@ -53444,10 +53447,11 @@ const Github = class Github {
                 headers: {
                     "X-GitHub-Api-Version": "2022-11-28",
                 },
-            });
+            };
+            this._logger.info(`Dispatching Github workflow: ${JSON.stringify({ dataToSend })}`);
+            await this._octokit.request("POST /repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches", dataToSend);
         }
         catch (error) {
-            this._logger.debug(`dispatchWorkflow error: ${error.stack}`);
             throw new Error(`Error dispatching Github workflow: ${error.message}`);
         }
     }
