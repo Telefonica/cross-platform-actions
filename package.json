@@ -7,6 +7,7 @@
     "lint:fix": "eslint . --fix",
     "lint-staged": "lint-staged",
     "test": "jest --config jest.config.js",
+    "check:spelling": "cspell \"**/*\"",
     "check:types:test": "tsc --noEmit --project ./test/unit/tsconfig.json",
     "check:types:lib": "tsc --noEmit",
     "check:types": "npm run check:types:test && npm run check:types:lib",
@@ -14,7 +15,7 @@
     "prepare": "husky install"
   },
   "keywords": [],
-  "author": "",
+  "author": "Telefónica",
   "license": "ISC",
   "dependencies": {
     "@actions/core": "1.10.0",
@@ -36,6 +37,7 @@
     "@vercel/ncc": "0.36.1",
     "babel-jest": "29.5.0",
     "babel-plugin-module-resolver": "5.0.0",
+    "cspell": "6.31.1",
     "eslint": "8.38.0",
     "eslint-config-prettier": "8.8.0",
     "eslint-config-standard-with-typescript": "34.0.1",
@@ -55,6 +57,7 @@
   "lint-staged": {
     "**/*.js": "eslint",
     "**/*.ts": "eslint",
-    "**/*.json": "eslint"
+    "**/*.json": "eslint",
+    "**/*.*": "cspell --no-must-find-files"
   }
 }
