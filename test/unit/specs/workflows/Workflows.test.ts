@@ -8,7 +8,12 @@ import {
   GET_RUNS_PATH,
   GET_RUN_JOBS_PATH,
   DISPATCH_WORKFLOW_PATH,
+  DOWNLOAD_RUN_ARTIFACT_PATH,
+  GET_RUN_ARTIFACTS_PATH,
+  getRunArtifactsResponse,
+  downloadRunArtifactResponse,
 } from "../../support/fixtures/Octokit";
+import JSZip from "jszip";
 
 describe("Workflows module", () => {
   describe("Workflows class", () => {
@@ -19,6 +24,7 @@ describe("Workflows module", () => {
     const TIMEOUT_JOB = 1000;
     const TIMEOUT_ARTIFACT = 500;
     const REQUEST_INTERVAL = 100;
+    const STEP_UUID = "foo-step-uuid";
 
     beforeEach(() => {
       logger = getLogger();
@@ -37,7 +43,6 @@ describe("Workflows module", () => {
       it("should call to Github sdk to dispatch a workflow", async () => {
         const WORKFLOW_ID = "foo-workflow-id";
         const REF = "foo-ref";
-        const STEP_UUID = "foo-step-uuid";
         const ENVIRONMENT = "foo-environment";
 
         await workflows.dispatch({
@@ -63,8 +68,6 @@ describe("Workflows module", () => {
     });
 
     describe("waitForTargetJobToComplete method", () => {
-      const STEP_UUID = "foo-step-uuid";
-
       it("should return the data of the target job", async () => {
         octokit.request.mockImplementation((requestPath) => {
           if (requestPath === GET_RUNS_PATH) {
@@ -150,6 +153,65 @@ describe("Workflows module", () => {
             executedFrom: "foo-executed-from",
           })
         ).rejects.toThrowError("Timed out while waiting for target job to complete");
+      });
+    });
+    describe("waitForTargetJobToSuccess method", () => {
+      it("should return the data of the target job", async () => {
+        octokit.request.mockImplementation((requestPath) => {
+          if (requestPath === GET_RUNS_PATH) {
+            return getRunsResponse();
+          } else if (requestPath === GET_RUN_JOBS_PATH) {
+            return getRunJobsResponse(STEP_UUID);
+          }
+        });
+
+        const result = await workflows.waitForTargetJobToSuccess({
+          stepUUID: STEP_UUID,
+          executedFrom: "foo-executed-from",
+        });
+
+        expect(result).toEqual({
+          conclusion: "success",
+          name: "foo-job-name",
+          id: "foo-job-id",
+          steps: [
+            {
+              name: `Set ID (${STEP_UUID})`,
+            },
+          ],
+        });
+      });
+    });
+    describe("downloadJobFirstArtifact method", () => {
+      it("should return the artifact uploaded for the target job", async () => {
+        const EXPECTED_ARTIFACT_JSON = { foo: "bar" };
+        const zip = new JSZip();
+        const zipFile = await zip
+          .file("foo.json", JSON.stringify(EXPECTED_ARTIFACT_JSON))
+          .generateAsync({ type: "arraybuffer" });
+
+        octokit.request.mockImplementation((requestPath) => {
+          if (requestPath === GET_RUN_ARTIFACTS_PATH) {
+            return getRunArtifactsResponse();
+          } else if (requestPath === DOWNLOAD_RUN_ARTIFACT_PATH) {
+            return downloadRunArtifactResponse(zipFile);
+          }
+        });
+
+        const result = await workflows.downloadJobFirstArtifact(getRunJobsResponse(STEP_UUID).data.jobs[0]);
+        expect(result.data).toEqual(zipFile);
+      });
+      it("should throw when timeout is reached and no artifact was found", async () => {
+        octokit.request.mockImplementation((requestPath) => {
+          if (requestPath === GET_RUN_ARTIFACTS_PATH) {
+            return getRunArtifactsResponse(true);
+          } else if (requestPath === DOWNLOAD_RUN_ARTIFACT_PATH) {
+            return downloadRunArtifactResponse(null);
+          }
+        });
+        await expect(() =>
+          workflows.downloadJobFirstArtifact(getRunJobsResponse(STEP_UUID).data.jobs[0])
+        ).rejects.toThrowError("Timed out while trying to download artifact");
       });
     });
   });

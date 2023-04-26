@@ -51,7 +51,6 @@ export async function deployAndGetArtifact({
 
 export async function runDeployAndGetArtifactAction(): Promise<void> {
   try {
-    // customStepUUID is used for testing purpose
     const config = getConfig();
     const artifactJson = await deployAndGetArtifact(config);
     core.setOutput(OUTPUT_VARS.MANIFEST, artifactJson);

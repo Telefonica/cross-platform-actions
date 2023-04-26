@@ -3,6 +3,7 @@ import JSZip from "jszip";
 import { octokit } from "../support/mocks/Octokit";
 import { uuid } from "../support/mocks/Uuid";
 import { actionsCore } from "../support/mocks/ActionsCore";
+import { getConfig } from "../support/mocks/Config";
 
 import { deployAndGetArtifact, runDeployAndGetArtifactAction } from "../../../src/Deploy";
 import {
@@ -20,7 +21,7 @@ import {
 const CONFIG = {
   timeoutJobCompleted: 500,
   timeoutArtifactAvailable: 500,
-  repoName: "foo-repo-name",
+  repoName: "foo-repo-name-platform",
   repoRef: "foo-repo-ref",
   workflowId: "foo-workflow-id",
   githubOwner: "foo-github-owner",
@@ -105,6 +106,9 @@ describe("Deploy module", () => {
   });
 
   describe("runDeployAndGetArtifactAction method", () => {
+    beforeEach(() => {
+      getConfig.mockImplementation(() => CONFIG);
+    });
     describe("when it is success", () => {
       it('should set "manifest" action output with artifact content as stringified JSON', async () => {
         await runDeployAndGetArtifactAction();
@@ -119,7 +123,7 @@ describe("Deploy module", () => {
       it("should send provided owner when dispatching workflow", async () => {
         await runDeployAndGetArtifactAction();
         expect(octokit.request.mock.calls[0][0]).toEqual(DISPATCH_WORKFLOW_PATH);
-        expect(octokit.request.mock.calls[0][1].owner).toEqual("Telefonica");
+        expect(octokit.request.mock.calls[0][1].owner).toEqual("foo-github-owner");
       });
 
       it('should send repoName from action input "project" adding "-platform" when dispatching workflow', async () => {
@@ -128,6 +132,28 @@ describe("Deploy module", () => {
         await runDeployAndGetArtifactAction();
         expect(octokit.request.mock.calls[0][0]).toEqual(DISPATCH_WORKFLOW_PATH);
         expect(octokit.request.mock.calls[0][1].repo).toEqual(`${FOO_REPO_NAME}-platform`);
+      });
+    });
+
+    describe("when it does not found a successful workflow job containing a step with the provided stepUUID", () => {
+      beforeEach(() => {
+        octokit.request.mockImplementation((requestPath) => {
+          switch (requestPath) {
+            case GET_RUNS_PATH:
+              return getRunsResponse();
+            case GET_RUN_JOBS_PATH:
+              return getRunJobsResponse("foo-wrong-step-uuid");
+            case GET_RUN_ARTIFACTS_PATH:
+              return getRunArtifactsResponse();
+            case DOWNLOAD_RUN_ARTIFACT_PATH:
+              return downloadRunArtifactResponse(zipFile);
+          }
+        });
+      });
+      it("should throw with timeout message", async () => {
+        await expect(() => runDeployAndGetArtifactAction()).rejects.toThrow(
+          "Timed out while waiting for target job to complete"
+        );
       });
     });
   });

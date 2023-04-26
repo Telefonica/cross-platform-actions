@@ -2,14 +2,26 @@ import * as core from "@actions/core";
 
 import type { Config } from "./Config.types";
 
-const INPUT_VARS = {
+export const INPUT_VARS = {
   PROJECT: "project",
   TOKEN: "token",
   ENVIRONMENT: "environment",
 };
 
+export const TIMEOUT_VARS = {
+  JOB_COMPLETED: 600000,
+  ARTIFACT_AVAILABLE: 10000,
+  REQUEST_INTERVAL: 2000,
+};
+
 export const OUTPUT_VARS = {
   MANIFEST: "manifest",
+};
+
+export const DEFAULT_VARS = {
+  GITHUB_OWNER: "Telefonica",
+  REPO_REF: "main",
+  WORKFLOW_ID: "deploy.yml",
 };
 
 export function getRepoName(repoBaseName: string): string {
@@ -22,14 +34,14 @@ export function getConfig(): Config {
   const environment = core.getInput(INPUT_VARS.ENVIRONMENT, { required: true });
 
   return {
-    timeoutJobCompleted: 600000,
-    timeoutArtifactAvailable: 10000,
+    timeoutJobCompleted: TIMEOUT_VARS.JOB_COMPLETED,
+    timeoutArtifactAvailable: TIMEOUT_VARS.ARTIFACT_AVAILABLE,
     repoName,
-    repoRef: "main",
-    workflowId: "deploy.yml",
-    githubOwner: "Telefonica",
+    repoRef: DEFAULT_VARS.REPO_REF,
+    workflowId: DEFAULT_VARS.WORKFLOW_ID,
+    githubOwner: DEFAULT_VARS.GITHUB_OWNER,
     githubToken: token,
     environment,
-    requestInterval: 2000,
+    requestInterval: TIMEOUT_VARS.REQUEST_INTERVAL,
   };
 }

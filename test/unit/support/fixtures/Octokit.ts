@@ -46,8 +46,8 @@ export function getRunJobsResponse(
   };
 }
 
-export function getRunArtifactsResponse() {
-  return {
+export function getRunArtifactsResponse(voidArtifact?: boolean) {
+  return voidArtifact ? { data: { artifacts: [] } } : {
     data: {
       artifacts: [
         {
