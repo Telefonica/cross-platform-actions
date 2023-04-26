@@ -1,18 +1,19 @@
-import { getLogger } from "../../support/mocks/Logger";
-import { octokit } from "../../support/mocks/Octokit";
+import { getLogger } from "@support/mocks/Logger";
+import { octokit } from "@support/mocks/Octokit";
 
-import { Workflows } from "../../../../src/workflows/Workflows";
+import { Workflows } from "@src/workflows/Workflows";
+import type { WorkflowsInterface } from "@src/workflows/Workflows.types";
 import {
   getRunsResponse,
   getRunJobsResponse,
   GET_RUNS_PATH,
   GET_RUN_JOBS_PATH,
   DISPATCH_WORKFLOW_PATH,
-} from "../../support/fixtures/Octokit";
+} from "@support/fixtures/Octokit";
 
 describe("Workflows module", () => {
   describe("Workflows class", () => {
-    let workflows, logger;
+    let workflows: WorkflowsInterface, logger;
     const OWNER = "foo-owner";
     const PROJECT = "foo-project";
     const TOKEN = "foo-token";

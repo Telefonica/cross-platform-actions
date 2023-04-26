@@ -101,6 +101,19 @@ module.exports = {
           },
         ],
       },
+      settings: {
+        "import/resolver": {
+          typescript: true,
+          node: true,
+          alias: {
+            map: [
+              ["@src", "./src"],
+              ["@support", "./test/unit/support"],
+            ],
+            extensions: [".ts", ".js", ".jsx", ".json"],
+          },
+        },
+      },
     },
   ],
 };
