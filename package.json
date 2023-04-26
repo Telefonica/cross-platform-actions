@@ -58,6 +58,6 @@
     "**/*.js": "eslint",
     "**/*.ts": "eslint",
     "**/*.json": "eslint",
-    "**/*": "cspell --no-must-find-files"
+    "**/*.*": "cspell --no-must-find-files"
   }
 }
