@@ -1,9 +1,3 @@
-import { getLogger } from "@support/mocks/Logger";
-import { octokit } from "@support/mocks/Octokit";
-
-import { Github, throwIfJobFailed } from "@src/workflows/Github";
-import { GithubInterface, GetRunJobResponse } from "@src/workflows/Github.types";
-
 import {
   GET_RUNS_PATH,
   GET_RUN_JOBS_PATH,
@@ -11,6 +5,11 @@ import {
   GET_RUN_ARTIFACTS_PATH,
   DOWNLOAD_RUN_ARTIFACT_PATH,
 } from "@support/fixtures/Octokit";
+import { getLogger } from "@support/mocks/Logger";
+import { octokit } from "@support/mocks/Octokit";
+
+import { Github, throwIfJobFailed } from "@src/workflows/Github";
+import { GithubInterface, GetRunJobResponse } from "@src/workflows/Github.types";
 
 describe("Github module", () => {
   describe("Github class", () => {

@@ -1,8 +1,3 @@
-import { getLogger } from "@support/mocks/Logger";
-import { octokit } from "@support/mocks/Octokit";
-
-import { Workflows } from "@src/workflows/Workflows";
-import type { WorkflowsInterface } from "@src/workflows/Workflows.types";
 import {
   getRunsResponse,
   getRunJobsResponse,
@@ -10,6 +5,11 @@ import {
   GET_RUN_JOBS_PATH,
   DISPATCH_WORKFLOW_PATH,
 } from "@support/fixtures/Octokit";
+import { getLogger } from "@support/mocks/Logger";
+import { octokit } from "@support/mocks/Octokit";
+
+import { Workflows } from "@src/workflows/Workflows";
+import type { WorkflowsInterface } from "@src/workflows/Workflows.types";
 
 describe("Workflows module", () => {
   describe("Workflows class", () => {

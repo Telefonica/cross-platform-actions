@@ -83,14 +83,19 @@ module.exports = {
       rules: {
         "@typescript-eslint/ban-ts-comment": [0],
         "import/order": [
-          0,
+          2,
           {
             groups: ["builtin", "external", "internal", "parent", "sibling", "index"],
             pathGroups: [
               {
-                pattern: "**/support/mocks/**/*.*",
+                pattern: "@support/**",
                 group: "internal",
                 position: "before",
+              },
+              {
+                pattern: "@src/**",
+                group: "internal",
+                position: "after",
               },
             ],
             "newlines-between": "always",
