@@ -1,5 +1,6 @@
-import { getConfig, INPUT_VARS, TIMEOUT_VARS, DEFAULT_VARS } from "../../../../src/config/Config";
-import { actionsCore } from "../../support/mocks/ActionsCore";
+import { actionsCore } from "@support/mocks/ActionsCore";
+
+import { getConfig, INPUT_VARS, TIMEOUT_VARS, DEFAULT_VARS } from "@src/config/Config";
 
 describe("Config Module", () => {
   it("should return the expected config", () => {
