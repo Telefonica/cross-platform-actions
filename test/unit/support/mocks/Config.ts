@@ -1,6 +1,6 @@
-jest.mock("../../../../src/config/Config");
+jest.mock("@src/config/Config");
 
-import * as Config from "../../../../src/config/Config";
+import * as Config from "@src/config/Config";
 
 export const getConfig = jest.fn().mockReturnValue({});
 
