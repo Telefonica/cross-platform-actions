@@ -1,11 +1,5 @@
 import JSZip from "jszip";
 
-import { octokit } from "../support/mocks/Octokit";
-import { uuid } from "../support/mocks/Uuid";
-import { actionsCore } from "../support/mocks/ActionsCore";
-import { getConfig } from "../support/mocks/Config";
-
-import { deployAndGetArtifact, runDeployAndGetArtifactAction } from "../../../src/Deploy";
 import {
   getRunsResponse,
   getRunJobsResponse,
@@ -16,7 +10,14 @@ import {
   DOWNLOAD_RUN_ARTIFACT_PATH,
   downloadRunArtifactResponse,
   DISPATCH_WORKFLOW_PATH,
-} from "../support/fixtures/Octokit";
+} from "@support/fixtures/Octokit";
+import { actionsCore } from "@support/mocks/ActionsCore";
+import { octokit } from "@support/mocks/Octokit";
+import { uuid } from "@support/mocks/Uuid";
+import { getConfig } from "@support/mocks/Config";
+
+
+import { deployAndGetArtifact, runDeployAndGetArtifactAction } from "@src/Deploy";
 
 const CONFIG = {
   timeoutJobCompleted: 500,
@@ -33,7 +34,7 @@ const CONFIG = {
 describe("Deploy module", () => {
   const EXPECTED_ARTIFACT_JSON = { foo: "bar" };
   const STEP_UUID = "foo-step-uuid";
-  let zipFile;
+  let zipFile: ArrayBuffer;
 
   beforeEach(async () => {
     const zip = new JSZip();

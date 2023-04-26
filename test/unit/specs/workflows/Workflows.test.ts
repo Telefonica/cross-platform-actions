@@ -1,7 +1,4 @@
-import { getLogger } from "../../support/mocks/Logger";
-import { octokit } from "../../support/mocks/Octokit";
-
-import { Workflows } from "../../../../src/workflows/Workflows";
+import JSZip from "jszip";
 import {
   getRunsResponse,
   getRunJobsResponse,
@@ -12,12 +9,16 @@ import {
   GET_RUN_ARTIFACTS_PATH,
   getRunArtifactsResponse,
   downloadRunArtifactResponse,
-} from "../../support/fixtures/Octokit";
-import JSZip from "jszip";
+} from "@support/fixtures/Octokit";
+import { getLogger } from "@support/mocks/Logger";
+import { octokit } from "@support/mocks/Octokit";
+
+import { Workflows } from "@src/workflows/Workflows";
+import type { WorkflowsInterface } from "@src/workflows/Workflows.types";
 
 describe("Workflows module", () => {
   describe("Workflows class", () => {
-    let workflows, logger;
+    let workflows: WorkflowsInterface, logger;
     const OWNER = "foo-owner";
     const PROJECT = "foo-project";
     const TOKEN = "foo-token";

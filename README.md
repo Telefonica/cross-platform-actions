@@ -9,6 +9,7 @@
   * [Requirements](#requirements)
   * [Installation](#installation)
   * [Lint](#lint)
+  * [Check spelling](#check-spelling)
   * [Check types](#check-types)
   * [Unit tests](#unit-tests)
   * [Build](#build)
@@ -77,6 +78,16 @@ It is recommended to install the [ESLint extension](https://marketplace.visualst
 
 Eslint errors can be automatically fixed with `npm run lint:fix`.
 
+## Check spelling
+
+This project uses [cspell](https://github.com/streetsidesoftware/cspell) to check spelling in the code and documentation. To run it, execute:
+
+```sh
+npm run check:spelling
+```
+
+You can install the [CSpell extension](https://marketplace.visualstudio.com/items?itemName=streetsidesoftware.code-spell-checker) for Visual Studio Code to get spell checking in your editor.
+
 ## Check types
 
 This project uses [TypeScript](https://www.typescriptlang.org/). You can check types with:
@@ -97,10 +108,15 @@ The coverage report will be generated in the `coverage` folder.
 
 ## Build
 
-To build the project, execute:
+⚠️ __IMPORTANT__: For the moment, the project has to be built locally on every change, and the `dist` folder has to be committed to the repository. This is something that we will improve in the future. But, for now, there is a step in the test workflow that checks that the `dist` folder is up to date. So, remember to build the project before pushing your changes, otherwise the tests will fail.
+
+To build the project and add the dist folder, execute:
 
 ```sh
 npm run build
+
+# Remember to add the built files!!
+git add dist
 ```
 
-⚠️ __IMPORTANT__: For the moment, the project has to be built locally on every change, and the `dist` folder has to be committed to the repository. This is something that we will improve in the future. But, for now, there is a step in the test workflow that checks that the `dist` folder is up to date. So, remember to build the project before pushing your changes, otherwise the tests will fail.
+

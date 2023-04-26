@@ -58,7 +58,7 @@ export function getRunArtifactsResponse(voidArtifact?: boolean) {
   };
 }
 
-export function downloadRunArtifactResponse(zipFile) {
+export function downloadRunArtifactResponse(zipFile: ArrayBuffer) {
   return {
     data: zipFile,
   };

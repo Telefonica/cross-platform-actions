@@ -6,6 +6,18 @@ module.exports = (api) => {
         ["@babel/preset-env", { targets: { node: "current" } }],
         "@babel/preset-typescript",
       ],
+      plugins: [
+        [
+          "module-resolver",
+          {
+            root: ["."],
+            alias: {
+              "@src": "./src",
+              "@support": "./test/unit/support",
+            },
+          },
+        ],
+      ],
     };
   }
 };
