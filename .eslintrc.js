@@ -9,7 +9,7 @@ module.exports = {
     sourceType: "module",
   },
   plugins: ["prettier"],
-  extends: ["eslint:recommended", "prettier", "plugin:json/recommended"],
+  extends: ["eslint:recommended", "prettier"],
   rules: {
     "prettier/prettier": [
       2,
@@ -24,6 +24,11 @@ module.exports = {
     "no-unused-vars": [2, { vars: "all", args: "after-used", ignoreRestSiblings: false }],
   },
   overrides: [
+    {
+      files: ["**/*.json", "*.json"],
+      plugins: ["prettier", "json"],
+      extends: ["eslint:recommended", "prettier", "plugin:json/recommended"],
+    },
     {
       files: ["**/*.ts", "**/*.tsx"],
       parser: "@typescript-eslint/parser",
