@@ -22,7 +22,9 @@ jobs:
         run: npm ci
       - name: Lint
         run: npm run lint
-      - name: Check:types
+      - name: Check spelling
+        run: npm run check:spelling
+      - name: Check Types
         run: npm run check:types
   test-unit:
     # runs-on: cdorunner-cross-standard

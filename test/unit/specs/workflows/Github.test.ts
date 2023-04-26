@@ -1,20 +1,19 @@
-import { getLogger } from "../../support/mocks/Logger";
-import { octokit } from "../../support/mocks/Octokit";
-
-import { Github, throwIfJobFailed } from "../../../../src/workflows/Github";
-import { GetRunJobResponse } from "../../../../src/workflows/Github.types";
-
 import {
   GET_RUNS_PATH,
   GET_RUN_JOBS_PATH,
   DISPATCH_WORKFLOW_PATH,
   GET_RUN_ARTIFACTS_PATH,
   DOWNLOAD_RUN_ARTIFACT_PATH,
-} from "../../support/fixtures/Octokit";
+} from "@support/fixtures/Octokit";
+import { getLogger } from "@support/mocks/Logger";
+import { octokit } from "@support/mocks/Octokit";
+
+import { Github, throwIfJobFailed } from "@src/workflows/Github";
+import { GithubInterface, GetRunJobResponse } from "@src/workflows/Github.types";
 
 describe("Github module", () => {
   describe("Github class", () => {
-    let github, logger;
+    let github: GithubInterface, logger;
     const OWNER = "foo-owner";
     const PROJECT = "foo-project";
     const TOKEN = "foo-token";
@@ -83,7 +82,7 @@ describe("Github module", () => {
     });
 
     describe("getRunJobs method", () => {
-      const RUN_ID = "foo-run-id";
+      const RUN_ID = 1234;
       const WORKFLOW_RUN_JOBS = { data: "foo-data" };
 
       it("should call to Github sdk to get workflow run jobs", async () => {
@@ -103,7 +102,7 @@ describe("Github module", () => {
     });
 
     describe("getRunArtifacts method", () => {
-      const RUN_ID = "foo-run-id";
+      const RUN_ID = 1234;
       const WORKFLOW_RUN_ARTIFACTS = [{ data: "foo-data" }];
 
       it("should call to Github sdk to get workflow run artifacts", async () => {
@@ -123,7 +122,7 @@ describe("Github module", () => {
     });
 
     describe("downloadRunArtifact method", () => {
-      const ARTIFACT_ID = "foo-artifact-id";
+      const ARTIFACT_ID = 54321;
       const DOWNLOADED_ARTIFACTS = [
         {
           data: "foo-data",

@@ -9,7 +9,7 @@ module.exports = {
     sourceType: "module",
   },
   plugins: ["prettier"],
-  extends: ["eslint:recommended", "prettier", "plugin:json/recommended"],
+  extends: ["eslint:recommended", "prettier"],
   rules: {
     "prettier/prettier": [
       2,
@@ -24,6 +24,11 @@ module.exports = {
     "no-unused-vars": [2, { vars: "all", args: "after-used", ignoreRestSiblings: false }],
   },
   overrides: [
+    {
+      files: ["**/*.json", "*.json"],
+      plugins: ["prettier", "json"],
+      extends: ["eslint:recommended", "prettier", "plugin:json/recommended"],
+    },
     {
       files: ["**/*.ts", "**/*.tsx"],
       parser: "@typescript-eslint/parser",
@@ -83,14 +88,19 @@ module.exports = {
       rules: {
         "@typescript-eslint/ban-ts-comment": [0],
         "import/order": [
-          0,
+          2,
           {
             groups: ["builtin", "external", "internal", "parent", "sibling", "index"],
             pathGroups: [
               {
-                pattern: "**/support/mocks/**/*.*",
+                pattern: "@support/**",
                 group: "internal",
                 position: "before",
+              },
+              {
+                pattern: "@src/**",
+                group: "internal",
+                position: "after",
               },
             ],
             "newlines-between": "always",
@@ -100,6 +110,19 @@ module.exports = {
             },
           },
         ],
+      },
+      settings: {
+        "import/resolver": {
+          typescript: true,
+          node: true,
+          alias: {
+            map: [
+              ["@src", "./src"],
+              ["@support", "./test/unit/support"],
+            ],
+            extensions: [".ts", ".js", ".jsx", ".json"],
+          },
+        },
       },
     },
   ],
