@@ -1,0 +1,31 @@
+name: Deploy workflow for component tests
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        required: true
+        type: string
+        description: Environment to deploy
+      id:
+        required: true
+        type: string
+        description: Id for the identifier step
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set ID (${{github.event.inputs.id}})
+        run: echo "The id of this workflow is ${{github.event.inputs.id}}"
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Create fake deployment manifest
+        run: |
+          echo "{\"finished\":true,\"registry\":{\"server\":\"foo-server\"}}" > deployment.json
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: deployment
+          path: deployment.json
+          expiration-days: 1

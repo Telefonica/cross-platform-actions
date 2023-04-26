@@ -46,9 +46,8 @@ export const Github: GithubConstructor = class Github implements GithubInterface
   }
 
   public async dispatchWorkflow({ workflowId, ref, stepUUID, environment }: DispatchOptions) {
-    await this._octokit.request(
-      "POST /repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches",
-      {
+    try {
+      const dataToSend = {
         owner: this._owner,
         repo: this._project,
         workflow_id: workflowId,
@@ -60,8 +59,15 @@ export const Github: GithubConstructor = class Github implements GithubInterface
         headers: {
           "X-GitHub-Api-Version": "2022-11-28",
         },
-      }
-    );
+      };
+      this._logger.info(`Dispatching Github workflow: ${JSON.stringify({ dataToSend })}`);
+      await this._octokit.request(
+        "POST /repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches",
+        dataToSend
+      );
+    } catch (error) {
+      throw new Error(`Error dispatching Github workflow: ${(error as Error).message}`);
+    }
   }
 
   public async getRuns({ runDateFilter }: GetRunsOptions): Promise<GetRunResponse> {

@@ -53209,10 +53209,9 @@ const Date_1 = __nccwpck_require__(6645);
 const Logger_1 = __nccwpck_require__(1631);
 const Zip_1 = __nccwpck_require__(498);
 const Workflows_1 = __nccwpck_require__(7734);
-async function deployAndGetArtifact({ timeoutJobCompleted, timeoutArtifactAvailable, repoName, repoRef, workflowId, githubOwner, githubToken, environment, requestInterval, }) {
+async function deployAndGetArtifact({ timeoutJobCompleted, timeoutArtifactAvailable, repoName, repoRef, workflowId, githubOwner, githubToken, environment, requestInterval, }, logger) {
     const stepUUID = (0, uuid_1.v4)();
     const executedFrom = (0, Date_1.formattedNow)();
-    const logger = (0, Logger_1.getLogger)();
     const workflows = new Workflows_1.Workflows({
         token: githubToken,
         owner: githubOwner,
@@ -53236,9 +53235,10 @@ async function deployAndGetArtifact({ timeoutJobCompleted, timeoutArtifactAvaila
 }
 exports.deployAndGetArtifact = deployAndGetArtifact;
 async function runDeployAndGetArtifactAction() {
+    const logger = (0, Logger_1.getLogger)();
     try {
         const config = (0, Config_1.getConfig)();
-        const artifactJson = await deployAndGetArtifact(config);
+        const artifactJson = await deployAndGetArtifact(config, logger);
         core.setOutput(Config_1.OUTPUT_VARS.MANIFEST, artifactJson);
     }
     catch (error) {
@@ -53286,6 +53286,9 @@ exports.INPUT_VARS = {
     PROJECT: "project",
     TOKEN: "token",
     ENVIRONMENT: "environment",
+    REPO_SUFFIX: "repo-suffix",
+    WORKFLOW_ID: "workflow-id",
+    REF: "ref",
 };
 exports.TIMEOUT_VARS = {
     JOB_COMPLETED: 600000,
@@ -53299,21 +53302,25 @@ exports.DEFAULT_VARS = {
     GITHUB_OWNER: "Telefonica",
     REPO_REF: "main",
     WORKFLOW_ID: "deploy.yml",
+    REPO_SUFFIX: "-platform",
 };
-function getRepoName(repoBaseName) {
-    return `${repoBaseName}-platform`;
+function getRepoName(repoBaseName, customRepoSuffix) {
+    const suffix = customRepoSuffix !== undefined ? customRepoSuffix : exports.DEFAULT_VARS.REPO_SUFFIX;
+    return `${repoBaseName}${suffix}`;
 }
 exports.getRepoName = getRepoName;
 function getConfig() {
-    const repoName = getRepoName(core.getInput(exports.INPUT_VARS.PROJECT, { required: true }));
+    const repoName = getRepoName(core.getInput(exports.INPUT_VARS.PROJECT, { required: true }), core.getInput(exports.INPUT_VARS.REPO_SUFFIX));
     const token = core.getInput(exports.INPUT_VARS.TOKEN, { required: true });
     const environment = core.getInput(exports.INPUT_VARS.ENVIRONMENT, { required: true });
+    const workflowId = core.getInput(exports.INPUT_VARS.WORKFLOW_ID) || exports.DEFAULT_VARS.WORKFLOW_ID;
+    const repoRef = core.getInput(exports.INPUT_VARS.REF) || exports.DEFAULT_VARS.REPO_REF;
     return {
         timeoutJobCompleted: exports.TIMEOUT_VARS.JOB_COMPLETED,
         timeoutArtifactAvailable: exports.TIMEOUT_VARS.ARTIFACT_AVAILABLE,
         repoName,
-        repoRef: exports.DEFAULT_VARS.REPO_REF,
-        workflowId: exports.DEFAULT_VARS.WORKFLOW_ID,
+        repoRef,
+        workflowId,
         githubOwner: exports.DEFAULT_VARS.GITHUB_OWNER,
         githubToken: token,
         environment,
@@ -53440,19 +53447,26 @@ const Github = class Github {
         this._logger = logger;
     }
     async dispatchWorkflow({ workflowId, ref, stepUUID, environment }) {
-        await this._octokit.request("POST /repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches", {
-            owner: this._owner,
-            repo: this._project,
-            workflow_id: workflowId,
-            ref: ref,
-            inputs: {
-                id: stepUUID,
-                environment: environment,
-            },
-            headers: {
-                "X-GitHub-Api-Version": "2022-11-28",
-            },
-        });
+        try {
+            const dataToSend = {
+                owner: this._owner,
+                repo: this._project,
+                workflow_id: workflowId,
+                ref: ref,
+                inputs: {
+                    id: stepUUID,
+                    environment: environment,
+                },
+                headers: {
+                    "X-GitHub-Api-Version": "2022-11-28",
+                },
+            };
+            this._logger.info(`Dispatching Github workflow: ${JSON.stringify({ dataToSend })}`);
+            await this._octokit.request("POST /repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches", dataToSend);
+        }
+        catch (error) {
+            throw new Error(`Error dispatching Github workflow: ${error.message}`);
+        }
     }
     async getRuns({ runDateFilter }) {
         const response = (await this._octokit.request(`GET /repos/{owner}/{repo}/actions/runs?created>={run_date_filter}`, {
