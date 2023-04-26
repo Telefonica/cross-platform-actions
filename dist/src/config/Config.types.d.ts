@@ -4,7 +4,7 @@ export interface Config {
     timeoutJobCompleted: number;
     /** Milliseconds to wait before considering that a job artifact can't be downloaded */
     timeoutArtifactAvailable: number;
-    /** Name of the repository in which to launch the deploy workflow */
+    /** Prefix name of the repository in which to launch the deploy workflow. Repository will be `${prefix}-platform` */
     repoName: string;
     /** Name of the branch in which to launch the deploy workflow */
     repoRef: string;

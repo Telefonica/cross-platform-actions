@@ -5,23 +5,26 @@ import { OUTPUT_VARS, getConfig } from "./config/Config";
 import type { Config } from "./config/Config.types";
 import { formattedNow } from "./support/Date";
 import { getLogger } from "./support/Logger";
+import { Logger } from "./support/Logger.types";
 import { getJsonFromZip } from "./support/Zip";
 import { Workflows } from "./workflows/Workflows";
 
-export async function deployAndGetArtifact({
-  timeoutJobCompleted,
-  timeoutArtifactAvailable,
-  repoName,
-  repoRef,
-  workflowId,
-  githubOwner,
-  githubToken,
-  environment,
-  requestInterval,
-}: Config): Promise<string> {
+export async function deployAndGetArtifact(
+  {
+    timeoutJobCompleted,
+    timeoutArtifactAvailable,
+    repoName,
+    repoRef,
+    workflowId,
+    githubOwner,
+    githubToken,
+    environment,
+    requestInterval,
+  }: Config,
+  logger: Logger
+): Promise<string> {
   const stepUUID = uuidV4();
   const executedFrom = formattedNow();
-  const logger = getLogger();
 
   const workflows = new Workflows({
     token: githubToken,
@@ -50,10 +53,10 @@ export async function deployAndGetArtifact({
 }
 
 export async function runDeployAndGetArtifactAction(): Promise<void> {
+  const logger = getLogger();
   try {
-    // customStepUUID is used for testing purpose
     const config = getConfig();
-    const artifactJson = await deployAndGetArtifact(config);
+    const artifactJson = await deployAndGetArtifact(config, logger);
     core.setOutput(OUTPUT_VARS.MANIFEST, artifactJson);
   } catch (error) {
     core.setFailed((error as Error).message);
