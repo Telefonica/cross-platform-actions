@@ -59,7 +59,6 @@ export async function runDeployAndGetArtifactAction(): Promise<void> {
     const artifactJson = await deployAndGetArtifact(config, logger);
     core.setOutput(OUTPUT_VARS.MANIFEST, artifactJson);
   } catch (error) {
-    logger.debug(`Action failed with error: ${(error as Error).message}`);
     core.setFailed((error as Error).message);
     throw error;
   }

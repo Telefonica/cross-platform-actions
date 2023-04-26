@@ -53242,7 +53242,6 @@ async function runDeployAndGetArtifactAction() {
         core.setOutput(Config_1.OUTPUT_VARS.MANIFEST, artifactJson);
     }
     catch (error) {
-        logger.debug(`Action failed with error: ${error.message}`);
         core.setFailed(error.message);
         throw error;
     }
