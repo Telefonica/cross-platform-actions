@@ -1,5 +1,5 @@
 import * as core from "@actions/core";
-import { v4 as uuidv4 } from "uuid";
+import { v4 as uuidV4 } from "uuid";
 
 import { OUTPUT_VARS, getConfig } from "./config/Config";
 import type { Config } from "./config/Config.types";
@@ -19,7 +19,7 @@ export async function deployAndGetArtifact({
   environment,
   requestInterval,
 }: Config): Promise<string> {
-  const stepUUID = uuidv4();
+  const stepUUID = uuidV4();
   const executedFrom = formattedNow();
   const logger = getLogger();
 
