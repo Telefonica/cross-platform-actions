@@ -9,6 +9,7 @@
   * [Requirements](#requirements)
   * [Installation](#installation)
   * [Lint](#lint)
+  * [Check spelling](#check-spelling)
   * [Check types](#check-types)
   * [Unit tests](#unit-tests)
   * [Build](#build)
@@ -76,6 +77,16 @@ npm run lint
 It is recommended to install the [ESLint extension](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) for Visual Studio Code.
 
 Eslint errors can be automatically fixed with `npm run lint:fix`.
+
+## Check spelling
+
+This project uses [cspell](https://github.com/streetsidesoftware/cspell) to check spelling in the code and documentation. To run it, execute:
+
+```sh
+npm run check:spelling
+```
+
+You can install the [CSpell extension](https://marketplace.visualstudio.com/items?itemName=streetsidesoftware.code-spell-checker) for Visual Studio Code to get spell checking in your editor.
 
 ## Check types
 
