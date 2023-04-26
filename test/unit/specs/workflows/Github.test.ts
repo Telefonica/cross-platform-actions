@@ -29,12 +29,12 @@ describe("Github module", () => {
     });
 
     describe("dispatchWorkflow method", () => {
-      it("should call to Github sdk to dispatch a workflow", async () => {
-        const WORKFLOW_ID = "foo-workflow-id";
-        const REF = "foo-ref";
-        const STEP_UUID = "foo-step-uuid";
-        const ENVIRONMENT = "foo-environment";
+      const WORKFLOW_ID = "foo-workflow-id";
+      const REF = "foo-ref";
+      const STEP_UUID = "foo-step-uuid";
+      const ENVIRONMENT = "foo-environment";
 
+      it("should call to Github sdk to dispatch a workflow", async () => {
         await github.dispatchWorkflow({
           workflowId: WORKFLOW_ID,
           ref: REF,
@@ -54,6 +54,23 @@ describe("Github module", () => {
             "X-GitHub-Api-Version": "2022-11-28",
           },
         });
+      });
+
+      it("should throw an error if workflow dispatch fails", async () => {
+        octokit.request.mockImplementation((inputValue) => {
+          if (inputValue === DISPATCH_WORKFLOW_PATH) {
+            throw new Error("foo-error");
+          }
+        });
+
+        await expect(() =>
+          github.dispatchWorkflow({
+            workflowId: WORKFLOW_ID,
+            ref: REF,
+            stepUUID: STEP_UUID,
+            environment: ENVIRONMENT,
+          })
+        ).rejects.toThrow(`Error dispatching Github workflow: foo-error`);
       });
     });
 

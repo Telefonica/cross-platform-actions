@@ -12,11 +12,11 @@ import {
   DISPATCH_WORKFLOW_PATH,
 } from "@support/fixtures/Octokit";
 import { actionsCore } from "@support/mocks/ActionsCore";
-import { getConfig } from "@support/mocks/Config";
 import { getLogger } from "@support/mocks/Logger";
 import { octokit } from "@support/mocks/Octokit";
 import { uuid } from "@support/mocks/Uuid";
 
+import * as Config from "@src/config/Config";
 import { deployAndGetArtifact, runDeployAndGetArtifactAction } from "@src/Deploy";
 import { Logger } from "@src/support/Logger.types";
 
@@ -110,9 +110,6 @@ describe("Deploy module", () => {
   });
 
   describe("runDeployAndGetArtifactAction method", () => {
-    beforeEach(() => {
-      getConfig.mockImplementation(() => CONFIG);
-    });
     describe("when it is success", () => {
       it('should set "manifest" action output with artifact content as stringified JSON', async () => {
         await runDeployAndGetArtifactAction();
@@ -127,7 +124,7 @@ describe("Deploy module", () => {
       it("should send provided owner when dispatching workflow", async () => {
         await runDeployAndGetArtifactAction();
         expect(octokit.request.mock.calls[0][0]).toEqual(DISPATCH_WORKFLOW_PATH);
-        expect(octokit.request.mock.calls[0][1].owner).toEqual("foo-github-owner");
+        expect(octokit.request.mock.calls[0][1].owner).toEqual("Telefonica");
       });
 
       it('should send repoName from action input "project" adding "-platform" when dispatching workflow', async () => {
@@ -154,6 +151,9 @@ describe("Deploy module", () => {
 
     describe("when it does not found a successful workflow job containing a step with the provided stepUUID", () => {
       beforeEach(() => {
+        jest.mock("@src/config/Config");
+        const getConfig = jest.spyOn(Config, "getConfig");
+        getConfig.mockReturnValue(CONFIG);
         octokit.request.mockImplementation((requestPath) => {
           switch (requestPath) {
             case GET_RUNS_PATH:
