@@ -53237,7 +53237,6 @@ async function deployAndGetArtifact({ timeoutJobCompleted, timeoutArtifactAvaila
 exports.deployAndGetArtifact = deployAndGetArtifact;
 async function runDeployAndGetArtifactAction() {
     try {
-        // customStepUUID is used for testing purpose
         const config = (0, Config_1.getConfig)();
         const artifactJson = await deployAndGetArtifact(config);
         core.setOutput(Config_1.OUTPUT_VARS.MANIFEST, artifactJson);
@@ -53281,34 +53280,44 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getConfig = exports.getRepoName = exports.OUTPUT_VARS = void 0;
+exports.getConfig = exports.getRepoName = exports.DEFAULT_VARS = exports.OUTPUT_VARS = exports.TIMEOUT_VARS = exports.INPUT_VARS = void 0;
 const core = __importStar(__nccwpck_require__(2186));
-const INPUT_VARS = {
+exports.INPUT_VARS = {
     PROJECT: "project",
     TOKEN: "token",
     ENVIRONMENT: "environment",
 };
+exports.TIMEOUT_VARS = {
+    JOB_COMPLETED: 600000,
+    ARTIFACT_AVAILABLE: 10000,
+    REQUEST_INTERVAL: 2000,
+};
 exports.OUTPUT_VARS = {
     MANIFEST: "manifest",
+};
+exports.DEFAULT_VARS = {
+    GITHUB_OWNER: "Telefonica",
+    REPO_REF: "main",
+    WORKFLOW_ID: "deploy.yml",
 };
 function getRepoName(repoBaseName) {
     return `${repoBaseName}-platform`;
 }
 exports.getRepoName = getRepoName;
 function getConfig() {
-    const repoName = getRepoName(core.getInput(INPUT_VARS.PROJECT, { required: true }));
-    const token = core.getInput(INPUT_VARS.TOKEN, { required: true });
-    const environment = core.getInput(INPUT_VARS.ENVIRONMENT, { required: true });
+    const repoName = getRepoName(core.getInput(exports.INPUT_VARS.PROJECT, { required: true }));
+    const token = core.getInput(exports.INPUT_VARS.TOKEN, { required: true });
+    const environment = core.getInput(exports.INPUT_VARS.ENVIRONMENT, { required: true });
     return {
-        timeoutJobCompleted: 600000,
-        timeoutArtifactAvailable: 10000,
+        timeoutJobCompleted: exports.TIMEOUT_VARS.JOB_COMPLETED,
+        timeoutArtifactAvailable: exports.TIMEOUT_VARS.ARTIFACT_AVAILABLE,
         repoName,
-        repoRef: "main",
-        workflowId: "deploy.yml",
-        githubOwner: "Telefonica",
+        repoRef: exports.DEFAULT_VARS.REPO_REF,
+        workflowId: exports.DEFAULT_VARS.WORKFLOW_ID,
+        githubOwner: exports.DEFAULT_VARS.GITHUB_OWNER,
         githubToken: token,
         environment,
-        requestInterval: 2000,
+        requestInterval: exports.TIMEOUT_VARS.REQUEST_INTERVAL,
     };
 }
 exports.getConfig = getConfig;

@@ -1,4 +1,5 @@
 import JSZip from "jszip";
+
 import {
   getRunsResponse,
   getRunJobsResponse,
@@ -199,7 +200,9 @@ describe("Workflows module", () => {
           }
         });
 
-        const result = await workflows.downloadJobFirstArtifact(getRunJobsResponse(STEP_UUID).data.jobs[0]);
+        const result = await workflows.downloadJobFirstArtifact(
+          getRunJobsResponse(STEP_UUID).data.jobs[0]
+        );
         expect(result.data).toEqual(zipFile);
       });
       it("should throw when timeout is reached and no artifact was found", async () => {

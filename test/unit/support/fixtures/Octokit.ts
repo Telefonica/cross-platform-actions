@@ -47,15 +47,17 @@ export function getRunJobsResponse(
 }
 
 export function getRunArtifactsResponse(voidArtifact?: boolean) {
-  return voidArtifact ? { data: { artifacts: [] } } : {
-    data: {
-      artifacts: [
-        {
-          id: "foo-artifact-id",
+  return voidArtifact
+    ? { data: { artifacts: [] } }
+    : {
+        data: {
+          artifacts: [
+            {
+              id: "foo-artifact-id",
+            },
+          ],
         },
-      ],
-    },
-  };
+      };
 }
 
 export function downloadRunArtifactResponse(zipFile: ArrayBuffer) {

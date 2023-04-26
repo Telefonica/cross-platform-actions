@@ -12,10 +12,9 @@ import {
   DISPATCH_WORKFLOW_PATH,
 } from "@support/fixtures/Octokit";
 import { actionsCore } from "@support/mocks/ActionsCore";
+import { getConfig } from "@support/mocks/Config";
 import { octokit } from "@support/mocks/Octokit";
 import { uuid } from "@support/mocks/Uuid";
-import { getConfig } from "@support/mocks/Config";
-
 
 import { deployAndGetArtifact, runDeployAndGetArtifactAction } from "@src/Deploy";
 
