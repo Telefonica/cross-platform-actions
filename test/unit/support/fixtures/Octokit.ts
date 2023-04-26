@@ -32,7 +32,7 @@ export function getRunJobsResponse(
     data: {
       jobs: [
         {
-          id: "foo-job-id",
+          id: 1234,
           name: "foo-job-name",
           steps: [
             {

@@ -14,6 +14,7 @@ import {
 import { getLogger } from "@support/mocks/Logger";
 import { octokit } from "@support/mocks/Octokit";
 
+import { GetRunJobResponse } from "@src/workflows/Github.types";
 import { Workflows } from "@src/workflows/Workflows";
 import type { WorkflowsInterface } from "@src/workflows/Workflows.types";
 
@@ -87,7 +88,7 @@ describe("Workflows module", () => {
         expect(result).toEqual({
           conclusion: "success",
           name: "foo-job-name",
-          id: "foo-job-id",
+          id: 1234,
           steps: [
             {
               name: `Set ID (${STEP_UUID})`,
@@ -175,7 +176,7 @@ describe("Workflows module", () => {
         expect(result).toEqual({
           conclusion: "success",
           name: "foo-job-name",
-          id: "foo-job-id",
+          id: 1234,
           steps: [
             {
               name: `Set ID (${STEP_UUID})`,
@@ -201,7 +202,7 @@ describe("Workflows module", () => {
         });
 
         const result = await workflows.downloadJobFirstArtifact(
-          getRunJobsResponse(STEP_UUID).data.jobs[0]
+          getRunJobsResponse(STEP_UUID).data.jobs[0] as GetRunJobResponse
         );
         expect(result.data).toEqual(zipFile);
       });
@@ -209,12 +210,12 @@ describe("Workflows module", () => {
         octokit.request.mockImplementation((requestPath) => {
           if (requestPath === GET_RUN_ARTIFACTS_PATH) {
             return getRunArtifactsResponse(true);
-          } else if (requestPath === DOWNLOAD_RUN_ARTIFACT_PATH) {
-            return downloadRunArtifactResponse(null);
           }
         });
         await expect(() =>
-          workflows.downloadJobFirstArtifact(getRunJobsResponse(STEP_UUID).data.jobs[0])
+          workflows.downloadJobFirstArtifact(
+            getRunJobsResponse(STEP_UUID).data.jobs[0] as GetRunJobResponse
+          )
         ).rejects.toThrowError("Timed out while trying to download artifact");
       });
     });
