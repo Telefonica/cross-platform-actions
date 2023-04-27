@@ -53600,6 +53600,8 @@ const Workflows = class Workflows {
                     runId: jobData.run_id,
                 })
                     .then((response) => {
+                    if (response.data.total_count > 1)
+                        this._logger.warning("We have encountered more than one artifact for this workflow. We will download the first one.");
                     const artifact = response.data.artifacts[0];
                     if (artifact) {
                         return this._githubClient.downloadRunArtifact({

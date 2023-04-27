@@ -1,4 +1,3 @@
-// import * as core from "@actions/core";
 import JSZip from "jszip";
 
 import {
@@ -21,7 +20,7 @@ import type { WorkflowsInterface } from "@src/workflows/Workflows.types";
 
 describe("Workflows module", () => {
   describe("Workflows class", () => {
-    let workflows: WorkflowsInterface, logger;
+    let workflows: WorkflowsInterface, logger: ReturnType<typeof getLogger>;
     const OWNER = "foo-owner";
     const PROJECT = "foo-project";
     const TOKEN = "foo-token";
@@ -227,6 +226,7 @@ describe("Workflows module", () => {
       describe("when there is more than one artifact", () => {
         const multipleArtifactsResponse = {
           data: {
+            total_count: 2,
             artifacts: [
               {
                 id: 1,
@@ -256,25 +256,25 @@ describe("Workflows module", () => {
           expect(result.data).toEqual(zipFile);
         });
 
-        // it("should log a warning message", async () => {
-        //   const zipFile = await zip
-        //     .file("foo.json", JSON.stringify(EXPECTED_ARTIFACT_JSON))
-        //     .generateAsync({ type: "arraybuffer" });
-        //   octokit.request.mockImplementation((requestPath) => {
-        //     if (requestPath === GET_RUN_ARTIFACTS_PATH) {
-        //       return multipleArtifactsResponse;
-        //     } else if (requestPath === DOWNLOAD_RUN_ARTIFACT_PATH) {
-        //       return downloadRunArtifactResponse(zipFile);
-        //     }
-        //   });
+        it("should log a warning message", async () => {
+          const zipFile = await zip
+            .file("foo.json", JSON.stringify(EXPECTED_ARTIFACT_JSON))
+            .generateAsync({ type: "arraybuffer" });
+          octokit.request.mockImplementation((requestPath) => {
+            if (requestPath === GET_RUN_ARTIFACTS_PATH) {
+              return multipleArtifactsResponse;
+            } else if (requestPath === DOWNLOAD_RUN_ARTIFACT_PATH) {
+              return downloadRunArtifactResponse(zipFile);
+            }
+          });
 
-        //   await workflows.downloadJobFirstArtifact(
-        //     getRunJobsResponse(STEP_UUID).data.jobs[0] as GetRunJobResponse
-        //   );
-        //   expect(core.warning).toHaveBeenCalledWith(
-        //     "We have encountered more than one artifact for this workflow. We will download the first one."
-        //   );
-        // });
+          await workflows.downloadJobFirstArtifact(
+            getRunJobsResponse(STEP_UUID).data.jobs[0] as GetRunJobResponse
+          );
+          expect(logger.warning).toHaveBeenCalledWith(
+            "We have encountered more than one artifact for this workflow. We will download the first one."
+          );
+        });
       });
     });
   });
