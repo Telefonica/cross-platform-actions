@@ -167,6 +167,7 @@ describe("Deploy module", () => {
           }
         });
       });
+
       it("should throw with timeout message", async () => {
         await expect(() => runDeployAndGetArtifactAction()).rejects.toThrow(
           "Timed out while waiting for target job to complete"
