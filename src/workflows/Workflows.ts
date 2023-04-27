@@ -150,7 +150,7 @@ export const Workflows: WorkflowsConstructor = class Workflows implements Workfl
           .then((response) => {
             if (response.data.total_count > 1)
               this._logger.warning(
-                "Caution!, there are more than one artifact, downloading the first one"
+                "Caution!, there are more than one artifact uploaded for this workflow, downloading the first one"
               );
             const artifact = response.data.artifacts[0];
             if (artifact) {

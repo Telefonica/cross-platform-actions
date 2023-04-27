@@ -272,7 +272,7 @@ describe("Workflows module", () => {
             getRunJobsResponse(STEP_UUID).data.jobs[0] as GetRunJobResponse
           );
           expect(logger.warning).toHaveBeenCalledWith(
-            "We have encountered more than one artifact for this workflow. We will download the first one."
+            "Caution!, there are more than one artifact uploaded for this workflow, downloading the first one"
           );
         });
       });
