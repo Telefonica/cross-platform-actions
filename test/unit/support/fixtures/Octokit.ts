@@ -46,14 +46,14 @@ export function getRunJobsResponse(
   };
 }
 
-export function getRunArtifactsResponse(Options: { voidArtifact?: boolean } = {}) {
-  return Options.voidArtifact
+export function getRunArtifactsResponse(options: { voidArtifact?: boolean } = {}) {
+  return options.voidArtifact
     ? { data: { artifacts: [] } }
     : {
         data: {
           artifacts: [
             {
-              id: "foo-artifact-id",
+              id: 1,
             },
           ],
         },

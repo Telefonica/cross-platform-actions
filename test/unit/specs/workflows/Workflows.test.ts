@@ -1,3 +1,4 @@
+// import * as core from "@actions/core";
 import JSZip from "jszip";
 
 import {
@@ -188,9 +189,10 @@ describe("Workflows module", () => {
     });
 
     describe("downloadJobFirstArtifact method", () => {
+      const EXPECTED_ARTIFACT_JSON = { foo: "bar" };
+      const zip = new JSZip();
+
       it("should return the first artifact uploaded for the target job", async () => {
-        const EXPECTED_ARTIFACT_JSON = { foo: "bar" };
-        const zip = new JSZip();
         const zipFile = await zip
           .file("foo.json", JSON.stringify(EXPECTED_ARTIFACT_JSON))
           .generateAsync({ type: "arraybuffer" });
@@ -220,6 +222,59 @@ describe("Workflows module", () => {
             getRunJobsResponse(STEP_UUID).data.jobs[0] as GetRunJobResponse
           )
         ).rejects.toThrowError("Timed out while trying to download artifact");
+      });
+
+      describe("when there is more than one artifact", () => {
+        const multipleArtifactsResponse = {
+          data: {
+            artifacts: [
+              {
+                id: 1,
+              },
+              {
+                id: 2,
+              },
+            ],
+          },
+        };
+
+        it("should return the first artifact uploaded for the target workflow", async () => {
+          const zipFile = await zip
+            .file("foo.json", JSON.stringify(EXPECTED_ARTIFACT_JSON))
+            .generateAsync({ type: "arraybuffer" });
+          octokit.request.mockImplementation((requestPath) => {
+            if (requestPath === GET_RUN_ARTIFACTS_PATH) {
+              return multipleArtifactsResponse;
+            } else if (requestPath === DOWNLOAD_RUN_ARTIFACT_PATH) {
+              return downloadRunArtifactResponse(zipFile);
+            }
+          });
+
+          const result = await workflows.downloadJobFirstArtifact(
+            getRunJobsResponse(STEP_UUID).data.jobs[0] as GetRunJobResponse
+          );
+          expect(result.data).toEqual(zipFile);
+        });
+
+        // it("should log a warning message", async () => {
+        //   const zipFile = await zip
+        //     .file("foo.json", JSON.stringify(EXPECTED_ARTIFACT_JSON))
+        //     .generateAsync({ type: "arraybuffer" });
+        //   octokit.request.mockImplementation((requestPath) => {
+        //     if (requestPath === GET_RUN_ARTIFACTS_PATH) {
+        //       return multipleArtifactsResponse;
+        //     } else if (requestPath === DOWNLOAD_RUN_ARTIFACT_PATH) {
+        //       return downloadRunArtifactResponse(zipFile);
+        //     }
+        //   });
+
+        //   await workflows.downloadJobFirstArtifact(
+        //     getRunJobsResponse(STEP_UUID).data.jobs[0] as GetRunJobResponse
+        //   );
+        //   expect(core.warning).toHaveBeenCalledWith(
+        //     "We have encountered more than one artifact for this workflow. We will download the first one."
+        //   );
+        // });
       });
     });
   });
