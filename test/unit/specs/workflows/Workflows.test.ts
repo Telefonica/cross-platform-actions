@@ -158,6 +158,7 @@ describe("Workflows module", () => {
         ).rejects.toThrowError("Timed out while waiting for target job to complete");
       });
     });
+
     describe("waitForTargetJobToSuccess method", () => {
       it("should return the data of the target job", async () => {
         octokit.request.mockImplementation((requestPath) => {
@@ -185,8 +186,9 @@ describe("Workflows module", () => {
         });
       });
     });
+
     describe("downloadJobFirstArtifact method", () => {
-      it("should return the artifact uploaded for the target job", async () => {
+      it("should return the first artifact uploaded for the target job", async () => {
         const EXPECTED_ARTIFACT_JSON = { foo: "bar" };
         const zip = new JSZip();
         const zipFile = await zip
@@ -206,10 +208,11 @@ describe("Workflows module", () => {
         );
         expect(result.data).toEqual(zipFile);
       });
+
       it("should throw when timeout is reached and no artifact was found", async () => {
         octokit.request.mockImplementation((requestPath) => {
           if (requestPath === GET_RUN_ARTIFACTS_PATH) {
-            return getRunArtifactsResponse(true);
+            return getRunArtifactsResponse({ voidArtifact: true });
           }
         });
         await expect(() =>

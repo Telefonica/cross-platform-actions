@@ -145,6 +145,7 @@ describe("Github module", () => {
           data: "foo-data",
         },
       ];
+
       it("should call to Github sdk to download run artifacts", async () => {
         await github.downloadRunArtifact({ artifactId: ARTIFACT_ID });
 
