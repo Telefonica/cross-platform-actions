@@ -3,7 +3,7 @@ import { actionsCore } from "@support/mocks/ActionsCore";
 import { getConfig, INPUT_VARS, DEFAULT_VARS } from "@src/config/Config";
 
 describe("Config Module", () => {
-  it("should return the default value of ref and workflow_Id; and the values recover from input of repoName, token and environment in config", () => {
+  it("should return default values when no inputs are provided for repoRef, workflowId and githubOwner", () => {
     const config = getConfig();
     expect(config.repoRef).toEqual(DEFAULT_VARS.REPO_REF);
     expect(config.workflowId).toEqual(DEFAULT_VARS.WORKFLOW_ID);

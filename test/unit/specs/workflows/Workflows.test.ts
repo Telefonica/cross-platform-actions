@@ -250,10 +250,10 @@ describe("Workflows module", () => {
             }
           });
 
-          const result = await workflows.downloadJobFirstArtifact(
+          await workflows.downloadJobFirstArtifact(
             getRunJobsResponse(STEP_UUID).data.jobs[0] as GetRunJobResponse
           );
-          expect(result.data).toEqual(zipFile);
+          expect(octokit.request.mock.calls[1][1].artifact_id).toEqual(1);
         });
 
         it("should log a warning message", async () => {
