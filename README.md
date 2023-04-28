@@ -2,9 +2,10 @@
 
 * [Usage](#usage)
   * [Assumptions](#assumptions)
+  * [Example](#example)
   * [Inputs](#inputs)
   * [Outputs](#outputs)
-  * [Example](#example)
+  * [Debug mode](#debug-mode)
 * [Development](#development)
   * [Requirements](#requirements)
   * [Installation](#installation)
