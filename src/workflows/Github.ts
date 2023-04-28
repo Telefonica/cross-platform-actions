@@ -60,7 +60,7 @@ export const Github: GithubConstructor = class Github implements GithubInterface
           "X-GitHub-Api-Version": "2022-11-28",
         },
       };
-      this._logger.info(`Dispatching Github workflow: ${JSON.stringify({ dataToSend })}`);
+      this._logger.debug(`Dispatching Github workflow: ${JSON.stringify({ dataToSend })}`);
       await this._octokit.request(
         "POST /repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches",
         dataToSend

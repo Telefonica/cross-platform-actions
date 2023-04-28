@@ -31,6 +31,8 @@ __So, you can use this action in the project's components repositories to launch
 5. This action gets the deploy manifest from the deploy platform workflow artifacts and returns it as an output.
 6. The component's deploy workflow gets the deploy manifest from the output and uses it to deploy the components to the execution environment.
 
+To enable the debug mode add a repository variable named `ACTIONS_STEP_DEBUG` and set its value to `true`. Debug mode is more verbose and it shows the response of the requests done to the github API.
+
 ## Assumptions
 
 - The target project has a repository named `${project}-platform`, with a deploy workflow named `deploy.yml`. This workflow should create an environment in the execution platform. It must have two inputs:
