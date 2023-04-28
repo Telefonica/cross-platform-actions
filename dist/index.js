@@ -53461,7 +53461,7 @@ const Github = class Github {
                     "X-GitHub-Api-Version": "2022-11-28",
                 },
             };
-            this._logger.info(`Dispatching Github workflow: ${JSON.stringify({ dataToSend })}`);
+            this._logger.debug(`Dispatching Github workflow: ${JSON.stringify({ dataToSend })}`);
             await this._octokit.request("POST /repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches", dataToSend);
         }
         catch (error) {
@@ -53530,6 +53530,7 @@ const Workflows = class Workflows {
     }
     async dispatch(options) {
         await this._githubClient.dispatchWorkflow(options);
+        this._logger.info(`Workflow ${options.workflowId} dispatched`);
     }
     async _findJobInWorkflowRun(runId, stepUUID) {
         const stepName = `Set ID (${stepUUID})`;
@@ -53564,17 +53565,22 @@ const Workflows = class Workflows {
             };
             const checkWorkflow = () => {
                 requestWorkflows().then((response) => {
+                    this._logger.debug(`Workflow runs: ${JSON.stringify(response.data.workflow_runs)}`);
                     return this._findJobInCompletedWorkflowRuns(response.data.workflow_runs, stepUUID).then((jobData) => {
                         if (jobData) {
+                            this._logger.info(`Target job with ID ${jobData.id} found`);
+                            this._logger.debug(`Target job data: ${JSON.stringify(jobData)}`);
                             clearTimeout(rejectTimeout);
                             resolve(jobData);
                         }
                         else {
+                            this._logger.debug("Target job not found yet, retrying...");
                             waitAndCheckWorkFlow();
                         }
                     });
                 });
             };
+            this._logger.info(`Checking workflows runs executed after ${executedFrom}`);
             checkWorkflow();
         });
     }
@@ -53601,9 +53607,11 @@ const Workflows = class Workflows {
                 })
                     .then((response) => {
                     if (response.data.total_count > 1)
-                        this._logger.warning("We have encountered more than one artifact for this workflow. We will download the first one.");
+                        this._logger.warning("Caution!, there are more than one artifact uploaded for this workflow, downloading the first one");
                     const artifact = response.data.artifacts[0];
                     if (artifact) {
+                        this._logger.info(`Artifact ${artifact.id} found, downloading...`);
+                        this._logger.debug(`Artifact ${JSON.stringify(artifact)}`);
                         return this._githubClient.downloadRunArtifact({
                             artifactId: artifact.id,
                         });
@@ -53619,14 +53627,18 @@ const Workflows = class Workflows {
             const checkArtifact = () => {
                 downloadArtifact().then((response) => {
                     if (response) {
+                        this._logger.info(`Artifact downloaded`);
+                        this._logger.debug(`Download artifact response: ${JSON.stringify(response)}`);
                         clearTimeout(rejectTimeout);
                         resolve(response);
                     }
                     else {
+                        this._logger.debug("Artifact not found yet, retrying...");
                         waitAndDownloadArtifact();
                     }
                 });
             };
+            this._logger.info(`Checking artifacts for job ${jobData.id}`);
             checkArtifact();
         });
     }
