@@ -14,7 +14,7 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: ${{ vars.JOBS_RUNNER }}
     steps:
       - name: Set ID (${{github.event.inputs.id}})
         run: echo "The id of this workflow is ${{github.event.inputs.id}}"
