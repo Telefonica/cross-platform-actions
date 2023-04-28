@@ -16,6 +16,7 @@ module.exports = {
     ".gitignore",
     "dist/**",
     "coverage/**",
+    "**/*.excalidraw",
   ],
   // language - current active spelling language
   language: "en",
