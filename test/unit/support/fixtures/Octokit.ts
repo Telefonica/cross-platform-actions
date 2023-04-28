@@ -32,7 +32,7 @@ export function getRunJobsResponse(
     data: {
       jobs: [
         {
-          id: "foo-job-id",
+          id: 1234,
           name: "foo-job-name",
           steps: [
             {
@@ -46,16 +46,18 @@ export function getRunJobsResponse(
   };
 }
 
-export function getRunArtifactsResponse() {
-  return {
-    data: {
-      artifacts: [
-        {
-          id: "foo-artifact-id",
+export function getRunArtifactsResponse(options: { voidArtifact?: boolean } = {}) {
+  return options.voidArtifact
+    ? { data: { artifacts: [] } }
+    : {
+        data: {
+          artifacts: [
+            {
+              id: 1,
+            },
+          ],
         },
-      ],
-    },
-  };
+      };
 }
 
 export function downloadRunArtifactResponse(zipFile: ArrayBuffer) {

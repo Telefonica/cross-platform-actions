@@ -16,13 +16,14 @@ import { getLogger } from "@support/mocks/Logger";
 import { octokit } from "@support/mocks/Octokit";
 import { uuid } from "@support/mocks/Uuid";
 
+import * as Config from "@src/config/Config";
 import { deployAndGetArtifact, runDeployAndGetArtifactAction } from "@src/Deploy";
 import { Logger } from "@src/support/Logger.types";
 
 const CONFIG = {
   timeoutJobCompleted: 500,
   timeoutArtifactAvailable: 500,
-  repoName: "foo-repo-name",
+  repoName: "foo-repo-name-platform",
   repoRef: "foo-repo-ref",
   workflowId: "foo-workflow-id",
   githubOwner: "foo-github-owner",
@@ -145,6 +146,32 @@ describe("Deploy module", () => {
         await runDeployAndGetArtifactAction();
         expect(octokit.request.mock.calls[0][0]).toEqual(DISPATCH_WORKFLOW_PATH);
         expect(octokit.request.mock.calls[0][1].repo).toEqual(`${FOO_REPO_NAME}-custom-suffix`);
+      });
+    });
+
+    describe("when it does not found a successful workflow job containing a step with the provided stepUUID", () => {
+      beforeEach(() => {
+        jest.mock("@src/config/Config");
+        const getConfig = jest.spyOn(Config, "getConfig");
+        getConfig.mockReturnValue(CONFIG);
+        octokit.request.mockImplementation((requestPath) => {
+          switch (requestPath) {
+            case GET_RUNS_PATH:
+              return getRunsResponse();
+            case GET_RUN_JOBS_PATH:
+              return getRunJobsResponse("foo-wrong-step-uuid");
+            case GET_RUN_ARTIFACTS_PATH:
+              return getRunArtifactsResponse();
+            case DOWNLOAD_RUN_ARTIFACT_PATH:
+              return downloadRunArtifactResponse(zipFile);
+          }
+        });
+      });
+
+      it("should throw with timeout message", async () => {
+        await expect(() => runDeployAndGetArtifactAction()).rejects.toThrow(
+          "Timed out while waiting for target job to complete"
+        );
       });
     });
   });

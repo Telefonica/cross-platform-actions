@@ -1,25 +1,33 @@
+import JSZip from "jszip";
+
 import {
   getRunsResponse,
   getRunJobsResponse,
   GET_RUNS_PATH,
   GET_RUN_JOBS_PATH,
   DISPATCH_WORKFLOW_PATH,
+  DOWNLOAD_RUN_ARTIFACT_PATH,
+  GET_RUN_ARTIFACTS_PATH,
+  getRunArtifactsResponse,
+  downloadRunArtifactResponse,
 } from "@support/fixtures/Octokit";
 import { getLogger } from "@support/mocks/Logger";
 import { octokit } from "@support/mocks/Octokit";
 
+import { GetRunJobResponse } from "@src/workflows/Github.types";
 import { Workflows } from "@src/workflows/Workflows";
 import type { WorkflowsInterface } from "@src/workflows/Workflows.types";
 
 describe("Workflows module", () => {
   describe("Workflows class", () => {
-    let workflows: WorkflowsInterface, logger;
+    let workflows: WorkflowsInterface, logger: ReturnType<typeof getLogger>;
     const OWNER = "foo-owner";
     const PROJECT = "foo-project";
     const TOKEN = "foo-token";
     const TIMEOUT_JOB = 1000;
     const TIMEOUT_ARTIFACT = 500;
     const REQUEST_INTERVAL = 100;
+    const STEP_UUID = "foo-step-uuid";
 
     beforeEach(() => {
       logger = getLogger();
@@ -38,7 +46,6 @@ describe("Workflows module", () => {
       it("should call to Github sdk to dispatch a workflow", async () => {
         const WORKFLOW_ID = "foo-workflow-id";
         const REF = "foo-ref";
-        const STEP_UUID = "foo-step-uuid";
         const ENVIRONMENT = "foo-environment";
 
         await workflows.dispatch({
@@ -64,8 +71,6 @@ describe("Workflows module", () => {
     });
 
     describe("waitForTargetJobToComplete method", () => {
-      const STEP_UUID = "foo-step-uuid";
-
       it("should return the data of the target job", async () => {
         octokit.request.mockImplementation((requestPath) => {
           if (requestPath === GET_RUNS_PATH) {
@@ -83,7 +88,7 @@ describe("Workflows module", () => {
         expect(result).toEqual({
           conclusion: "success",
           name: "foo-job-name",
-          id: "foo-job-id",
+          id: 1234,
           steps: [
             {
               name: `Set ID (${STEP_UUID})`,
@@ -151,6 +156,125 @@ describe("Workflows module", () => {
             executedFrom: "foo-executed-from",
           })
         ).rejects.toThrowError("Timed out while waiting for target job to complete");
+      });
+    });
+
+    describe("waitForTargetJobToSuccess method", () => {
+      it("should return the data of the target job", async () => {
+        octokit.request.mockImplementation((requestPath) => {
+          if (requestPath === GET_RUNS_PATH) {
+            return getRunsResponse();
+          } else if (requestPath === GET_RUN_JOBS_PATH) {
+            return getRunJobsResponse(STEP_UUID);
+          }
+        });
+
+        const result = await workflows.waitForTargetJobToSuccess({
+          stepUUID: STEP_UUID,
+          executedFrom: "foo-executed-from",
+        });
+
+        expect(result).toEqual({
+          conclusion: "success",
+          name: "foo-job-name",
+          id: 1234,
+          steps: [
+            {
+              name: `Set ID (${STEP_UUID})`,
+            },
+          ],
+        });
+      });
+    });
+
+    describe("downloadJobFirstArtifact method", () => {
+      const EXPECTED_ARTIFACT_JSON = { foo: "bar" };
+      const zip = new JSZip();
+
+      it("should return the first artifact uploaded for the target job", async () => {
+        const zipFile = await zip
+          .file("foo.json", JSON.stringify(EXPECTED_ARTIFACT_JSON))
+          .generateAsync({ type: "arraybuffer" });
+
+        octokit.request.mockImplementation((requestPath) => {
+          if (requestPath === GET_RUN_ARTIFACTS_PATH) {
+            return getRunArtifactsResponse();
+          } else if (requestPath === DOWNLOAD_RUN_ARTIFACT_PATH) {
+            return downloadRunArtifactResponse(zipFile);
+          }
+        });
+
+        const result = await workflows.downloadJobFirstArtifact(
+          getRunJobsResponse(STEP_UUID).data.jobs[0] as GetRunJobResponse
+        );
+        expect(result.data).toEqual(zipFile);
+      });
+
+      it("should throw when timeout is reached and no artifact was found", async () => {
+        octokit.request.mockImplementation((requestPath) => {
+          if (requestPath === GET_RUN_ARTIFACTS_PATH) {
+            return getRunArtifactsResponse({ voidArtifact: true });
+          }
+        });
+        await expect(() =>
+          workflows.downloadJobFirstArtifact(
+            getRunJobsResponse(STEP_UUID).data.jobs[0] as GetRunJobResponse
+          )
+        ).rejects.toThrowError("Timed out while trying to download artifact");
+      });
+
+      describe("when there is more than one artifact", () => {
+        const multipleArtifactsResponse = {
+          data: {
+            total_count: 2,
+            artifacts: [
+              {
+                id: 1,
+              },
+              {
+                id: 2,
+              },
+            ],
+          },
+        };
+
+        it("should return the first artifact uploaded for the target workflow", async () => {
+          const zipFile = await zip
+            .file("foo.json", JSON.stringify(EXPECTED_ARTIFACT_JSON))
+            .generateAsync({ type: "arraybuffer" });
+          octokit.request.mockImplementation((requestPath) => {
+            if (requestPath === GET_RUN_ARTIFACTS_PATH) {
+              return multipleArtifactsResponse;
+            } else if (requestPath === DOWNLOAD_RUN_ARTIFACT_PATH) {
+              return downloadRunArtifactResponse(zipFile);
+            }
+          });
+
+          const result = await workflows.downloadJobFirstArtifact(
+            getRunJobsResponse(STEP_UUID).data.jobs[0] as GetRunJobResponse
+          );
+          expect(result.data).toEqual(zipFile);
+        });
+
+        it("should log a warning message", async () => {
+          const zipFile = await zip
+            .file("foo.json", JSON.stringify(EXPECTED_ARTIFACT_JSON))
+            .generateAsync({ type: "arraybuffer" });
+          octokit.request.mockImplementation((requestPath) => {
+            if (requestPath === GET_RUN_ARTIFACTS_PATH) {
+              return multipleArtifactsResponse;
+            } else if (requestPath === DOWNLOAD_RUN_ARTIFACT_PATH) {
+              return downloadRunArtifactResponse(zipFile);
+            }
+          });
+
+          await workflows.downloadJobFirstArtifact(
+            getRunJobsResponse(STEP_UUID).data.jobs[0] as GetRunJobResponse
+          );
+          expect(logger.warning).toHaveBeenCalledWith(
+            "We have encountered more than one artifact for this workflow. We will download the first one."
+          );
+        });
       });
     });
   });

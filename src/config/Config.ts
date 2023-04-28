@@ -2,7 +2,7 @@ import * as core from "@actions/core";
 
 import type { Config } from "./Config.types";
 
-const INPUT_VARS = {
+export const INPUT_VARS = {
   PROJECT: "project",
   TOKEN: "token",
   ENVIRONMENT: "environment",
@@ -11,14 +11,25 @@ const INPUT_VARS = {
   REF: "ref",
 };
 
+export const TIMEOUT_VARS = {
+  JOB_COMPLETED: 600000,
+  ARTIFACT_AVAILABLE: 10000,
+  REQUEST_INTERVAL: 2000,
+};
+
 export const OUTPUT_VARS = {
   MANIFEST: "manifest",
 };
 
-const DEFAULT_REPO_SUFFIX = "-platform";
+export const DEFAULT_VARS = {
+  GITHUB_OWNER: "Telefonica",
+  REPO_REF: "main",
+  WORKFLOW_ID: "deploy.yml",
+  REPO_SUFFIX: "-platform",
+};
 
 export function getRepoName(repoBaseName: string, customRepoSuffix?: string): string {
-  const suffix = customRepoSuffix !== undefined ? customRepoSuffix : DEFAULT_REPO_SUFFIX;
+  const suffix = customRepoSuffix !== undefined ? customRepoSuffix : DEFAULT_VARS.REPO_SUFFIX;
   return `${repoBaseName}${suffix}`;
 }
 
@@ -29,18 +40,18 @@ export function getConfig(): Config {
   );
   const token = core.getInput(INPUT_VARS.TOKEN, { required: true });
   const environment = core.getInput(INPUT_VARS.ENVIRONMENT, { required: true });
-  const workflowId = core.getInput(INPUT_VARS.WORKFLOW_ID) || "deploy.yml";
-  const repoRef = core.getInput(INPUT_VARS.REF) || "main";
+  const workflowId = core.getInput(INPUT_VARS.WORKFLOW_ID) || DEFAULT_VARS.WORKFLOW_ID;
+  const repoRef = core.getInput(INPUT_VARS.REF) || DEFAULT_VARS.REPO_REF;
 
   return {
-    timeoutJobCompleted: 600000,
-    timeoutArtifactAvailable: 10000,
+    timeoutJobCompleted: TIMEOUT_VARS.JOB_COMPLETED,
+    timeoutArtifactAvailable: TIMEOUT_VARS.ARTIFACT_AVAILABLE,
     repoName,
     repoRef,
-    workflowId: workflowId,
-    githubOwner: "Telefonica",
+    workflowId,
+    githubOwner: DEFAULT_VARS.GITHUB_OWNER,
     githubToken: token,
     environment,
-    requestInterval: 2000,
+    requestInterval: TIMEOUT_VARS.REQUEST_INTERVAL,
   };
 }
