@@ -8,8 +8,7 @@ on:
 
 jobs:
   check:
-    # runs-on: cdorunner-cross-standard
-    runs-on: ubuntu-latest
+    runs-on: ${{ vars.JOBS_RUNNER }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -27,8 +26,7 @@ jobs:
       - name: Check Types
         run: npm run check:types
   test-unit:
-    # runs-on: cdorunner-cross-standard
-    runs-on: ubuntu-latest
+    runs-on: ${{ vars.JOBS_RUNNER }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -42,8 +40,7 @@ jobs:
       - name: Test
         run: npm run test
   build:
-    # runs-on: cdorunner-cross-standard
-    runs-on: ubuntu-latest
+    runs-on: ${{ vars.JOBS_RUNNER }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -65,8 +62,8 @@ jobs:
           fi
         id: diff
   test-component:
-    # runs-on: cdorunner-cross-standard
-    runs-on: ubuntu-latest
+    runs-on: ${{ vars.JOBS_RUNNER }}
+    needs: [build]
     steps:
       - name: Checkout
         uses: actions/checkout@v3

@@ -1,6 +1,6 @@
 {
   "name": "cross-platform-actions",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Github action receiving a repo name, launching a deploy workflow there, waiting for the result, and returning the deploy manifest",
   "scripts": {
     "lint": "eslint .",
