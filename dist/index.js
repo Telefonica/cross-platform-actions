@@ -53533,9 +53533,8 @@ const Workflows = class Workflows {
         this._logger.info(`Workflow ${options.workflowId} dispatched`);
     }
     async _findJobInWorkflowRun(runId, stepUUID) {
-        const stepName = `Set ID (${stepUUID})`;
         const workflowJobs = await this._githubClient.getRunJobs({ runId });
-        const foundWorkflow = workflowJobs.data.jobs.find((job) => job.steps?.find((step) => step.name === stepName));
+        const foundWorkflow = workflowJobs.data.jobs.find((job) => job.steps?.find((step) => step.name.includes(stepUUID)));
         return foundWorkflow;
     }
     async _findJobInCompletedWorkflowRuns(workflowRuns, stepUUID) {
