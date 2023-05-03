@@ -1,6 +1,6 @@
 # Cross-platform-actions monorepo
 
-This repository contains the actions of the cross-cutting IDP project
+This repository contains the Github actions related to the execution platforms of the Cross-cutting-enablers IDP project.
 
 ## Actions
 

@@ -10,7 +10,10 @@ Use next sections to describe changes on each release:
 ### Added
 ### Changed
 ### Fixed
+### Deprecated
 ### Removed
+
+## [Unreleased]
 
 ## [1.0.0] - 2023-05-03
 
