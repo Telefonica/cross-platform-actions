@@ -91,7 +91,33 @@ describe("Workflows module", () => {
           id: 1234,
           steps: [
             {
-              name: `Set ID (${STEP_UUID})`,
+              name: `${STEP_UUID}`,
+            },
+          ],
+        });
+      });
+
+      it("should return the data of the target job even if the step name contains more than only the UUID", async () => {
+        octokit.request.mockImplementation((requestPath) => {
+          if (requestPath === GET_RUNS_PATH) {
+            return getRunsResponse();
+          } else if (requestPath === GET_RUN_JOBS_PATH) {
+            return getRunJobsResponse(`Set ID: ${STEP_UUID} - foo`);
+          }
+        });
+
+        const result = await workflows.waitForTargetJobToComplete({
+          stepUUID: STEP_UUID,
+          executedFrom: "foo-executed-from",
+        });
+
+        expect(result).toEqual({
+          conclusion: "success",
+          name: "foo-job-name",
+          id: 1234,
+          steps: [
+            {
+              name: `Set ID: ${STEP_UUID} - foo`,
             },
           ],
         });
@@ -180,7 +206,7 @@ describe("Workflows module", () => {
           id: 1234,
           steps: [
             {
-              name: `Set ID (${STEP_UUID})`,
+              name: `${STEP_UUID}`,
             },
           ],
         });
