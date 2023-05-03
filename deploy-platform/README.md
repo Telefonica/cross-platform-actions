@@ -2,7 +2,7 @@
 
 * [Usage](#usage)
   * [Assumptions](#assumptions)
-  * [Versioning](#versioning)
+  * [Versions](#versions)
   * [Example](#example)
   * [Inputs](#inputs)
   * [Outputs](#outputs)
@@ -18,7 +18,7 @@
   * [Build](#build)
   * [Component tests](#component-tests)
   * [Release](#release)
-    * [Versioning](#versioning-1)
+    * [Versioning](#versioning)
     * [Release process](#release-process)
 
 # Usage
@@ -44,7 +44,7 @@ __So, you can use this action in the project's components repositories to launch
 - The deploy workflow creates a job with a step with `(${{github.event.inputs.id}})` as part of his name. This step will be used to verify that the workflow is the one that was launched by this action. 
 - The deploy workflow uploads __only one__ artifact containing just the deployment JSON manifest file.
 
-## Versioning
+## Versions
 
 This action adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html). During the release process, tags for the whole version, plus latest, major and minor versions are created, so, you can use next syntax to define the version to use:
 
