@@ -1,0 +1,95 @@
+name: Test
+
+on:
+  push:
+    branches:
+      - main
+      - release/*
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ${{ vars.JOBS_RUNNER }}
+    defaults:
+      run:
+        working-directory: deploy-platform
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup env
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
+      - name: Install dependencies
+        run: npm ci
+      - name: Lint
+        run: npm run lint
+      - name: Check spelling
+        run: npm run check:spelling
+      - name: Check Types
+        run: npm run check:types
+  test-unit:
+    runs-on: ${{ vars.JOBS_RUNNER }}
+    defaults:
+      run:
+        working-directory: deploy-platform
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup env
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
+      - name: Install dependencies
+        run: npm ci
+      - name: Test
+        run: npm run test
+  build:
+    runs-on: ${{ vars.JOBS_RUNNER }}
+    defaults:
+      run:
+        working-directory: deploy-platform
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup env
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
+      - name: Install dependencies
+        run: npm ci
+      - name: Build
+        run: npm run build
+      - name: Check dist
+        run: |
+          if [ "$(git diff --ignore-space-at-eol dist/ | wc -l)" -gt "0" ]; then
+            echo "Detected uncommitted changes after build.  See status below:"
+            git diff
+            exit 1
+          fi
+        id: diff
+  test-component:
+    runs-on: ${{ vars.JOBS_RUNNER }}
+    needs: [build]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - id: deploy
+        name: Launch deploy action
+        uses: ./deploy-platform
+        with:
+          environment: 'foo-environment'
+          project: 'cross-platform-actions'
+          repo-suffix: ''
+          token: ${{ secrets.GITHUB_TOKEN }}
+          workflow-id: 'deploy-test.yml'
+          ref: ${{ github.head_ref || github.ref_name }}
+      - name: Check deployment manifest
+        run: |
+          echo '${{ steps.deploy.outputs.manifest }}' | jq -r '.registry.server' | grep 'foo-server' || (echo "Manifest is wrong" && exit 1)
