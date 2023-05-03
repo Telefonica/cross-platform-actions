@@ -184,8 +184,8 @@ To declare a new release, follow these steps:
 * Update the version number in the `package.json` file.
 * Run `npm install` in order to update the `package-lock.json` file.
 * Commit the changes and push them to the repository.
-* __Create a Github release from the release branch__. The release title must be the version number preceded by the `v` letter (`vX.Y.Z`), and the release description must contain the changelog.
+* Merge the release branch into `main`.
+* __Create a Github release from the main branch__. The release title must be the version number preceded by the `v` letter (`vX.Y.Z`), and the release description must contain the changelog.
 * Move the major version tag to the new commit. For example, if the new version is `1.2.3`, move the `v1` tag to the new commit.
 * Move the minor version tag to the new commit. For example, if the new version is `1.2.3`, move the `v1.2` tag to the new commit.
 * Move the `latest` tag to the new commit.
-* Merge the release branch into `main`.
