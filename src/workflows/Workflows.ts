@@ -48,10 +48,9 @@ export const Workflows: WorkflowsConstructor = class Workflows implements Workfl
     runId: number,
     stepUUID: StepUUID
   ): Promise<GetRunJobResponse | undefined> {
-    const stepName = `Set ID (${stepUUID})`;
     const workflowJobs = await this._githubClient.getRunJobs({ runId });
     const foundWorkflow = workflowJobs.data.jobs.find((job) =>
-      job.steps?.find((step) => step.name === stepName)
+      job.steps?.find((step) => step.name.includes(stepUUID))
     );
     return foundWorkflow;
   }

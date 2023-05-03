@@ -36,7 +36,7 @@ export function getRunJobsResponse(
           name: "foo-job-name",
           steps: [
             {
-              name: `Set ID (${stepUUID})`,
+              name: `${stepUUID}`,
             },
           ],
           conclusion: isFailed ? "failed" : "success",
