@@ -10,6 +10,9 @@ on:
 jobs:
   check:
     runs-on: ${{ vars.JOBS_RUNNER }}
+    defaults:
+      run:
+        working-directory: deploy-platform
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -18,6 +21,7 @@ jobs:
         with:
           node-version: 18
           cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
       - name: Install dependencies
         run: npm ci
       - name: Lint
@@ -28,6 +32,9 @@ jobs:
         run: npm run check:types
   test-unit:
     runs-on: ${{ vars.JOBS_RUNNER }}
+    defaults:
+      run:
+        working-directory: deploy-platform
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -36,12 +43,16 @@ jobs:
         with:
           node-version: 18
           cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
       - name: Install dependencies
         run: npm ci
       - name: Test
         run: npm run test
   build:
     runs-on: ${{ vars.JOBS_RUNNER }}
+    defaults:
+      run:
+        working-directory: deploy-platform
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -50,6 +61,7 @@ jobs:
         with:
           node-version: 18
           cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
       - name: Install dependencies
         run: npm ci
       - name: Build
@@ -70,7 +82,7 @@ jobs:
         uses: actions/checkout@v3
       - id: deploy
         name: Launch deploy action
-        uses: ./
+        uses: ./deploy-platform
         with:
           environment: 'foo-environment'
           project: 'cross-platform-actions'

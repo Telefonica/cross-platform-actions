@@ -1,5 +1,5 @@
 {
-  "name": "cross-platform-actions",
+  "name": "deploy-platform-action",
   "version": "1.0.0",
   "description": "Github action receiving a repo name, launching a deploy workflow there, waiting for the result, and returning the deploy manifest",
   "scripts": {
@@ -12,7 +12,7 @@
     "check:types:lib": "tsc --noEmit",
     "check:types": "npm run check:types:test && npm run check:types:lib",
     "build": "ncc build src/index.ts -o dist --source-map",
-    "prepare": "husky install"
+    "prepare": "cd ../ && husky install"
   },
   "keywords": [],
   "author": "Telefónica",
