@@ -8,6 +8,7 @@
   * [Debug mode](#debug-mode)
 * [Development](#development)
   * [Requirements](#requirements)
+  * [Branching model](#branching-model)
   * [Installation](#installation)
   * [Lint](#lint)
   * [Check spelling](#check-spelling)
@@ -15,7 +16,9 @@
   * [Unit tests](#unit-tests)
   * [Build](#build)
   * [Component tests](#component-tests)
-
+  * [Release](#release)
+    * [Versioning](#versioning)
+    * [Release process](#release-process)
 
 # Usage
 
@@ -90,6 +93,12 @@ To enable the debug mode add a repository variable named `ACTIONS_STEP_DEBUG` an
 * [Node.js](https://nodejs.org/en/) >= 18.x
 * [NPM](https://www.npmjs.com/) >= 8.x
 
+## Branching model
+
+This repository uses the trunk-based development branching model. The `main` branch is the main branch (surprise! 😜), and it must be always deployable. All the changes are done in feature branches, and they are merged into `main` using pull requests.
+
+> Note: Even when the main branch should be always deployable, before [declaring a formal release](#release) it may be necessary to perform some manual steps, like updating the changelog or the version number. So, it is recommended to use a release branch to prepare the release.
+
 ## Installation
 
 Use NPM to install the dependencies:
@@ -154,3 +163,29 @@ git add dist
 ## Component tests
 
 Component tests are executed in a real environment, using the GitHub Actions Runner. The action is executed in the workflow, and it dispatches the `deploy-test.yml` workflow in this same repository. The `deploy-test.yml` workflow is a simple workflow that just uploads a fake manifest. The component tests check that the manifest is correctly downloaded by the action and passed as an output.
+
+## Release
+
+### Versioning
+
+All changes must be documented in the [CHANGELOG](./CHANGELOG.md) file. The versioning of the project follows the [Semantic Versioning](https://semver.org/) specification. Here are some basic rules to follow when working on feature branches:
+
+* Do not upgrade the version number in the `package.json` file. The version number is updated in the release process.
+* Add changes to the `Unreleased` section of the changelog.
+
+### Release process
+
+To declare a new release, follow these steps:
+
+* Create a release branch from `main` named `release/x.y.z`, where `x.y.z` is the version number of the release.
+* Update the changelog:
+  * Move all the changes from the `Unreleased` section to a new section with the version number and the current date.
+  * Add a new `Unreleased` section at the top of the file.
+* Update the version number in the `package.json` file.
+* Run `npm install` in order to update the `package-lock.json` file.
+* Commit the changes and push them to the repository.
+* Create a Github release from the release branch. The release title must be the version number, and the release description must contain the changelog.
+* Move the major version tag to the new commit. For example, if the new version is `1.2.3`, move the `v1` tag to the new commit.
+* Move the minor version tag to the new commit. For example, if the new version is `1.2.3`, move the `v1.2` tag to the new commit.
+* Move the `latest` tag to the new commit.
+* Merge the release branch into `main`.
