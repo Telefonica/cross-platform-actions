@@ -12,13 +12,14 @@ Use next sections to describe changes on each release:
 ### Fixed
 ### Removed
 
-## [1.0.0] - 2023-04-28
+## [1.0.0] - 2023-05-03
 
 ### Added
 * feat: Add logs (CROSS-499)
-* docs: Improve documentation (CROSS-499)
 * feat: Add `repo-suffix`, `workflow-id` and `ref` inputs (CROSS-499)
 * feat: Improve error handling (CROSS-499)
+* feat: Support any step name that __includes__ the id parameter to identify the workflow
+* docs: Improve documentation (CROSS-499)
 * test: Add unit tests (CROSS-499)
 * test: Add component tests (CROSS-499)
 * chore: Add linting and spell checking (CROSS-499)
@@ -27,6 +28,7 @@ Use next sections to describe changes on each release:
 
 ### Changed
 * refactor: Migrate to TypeScript. Change code structure to a modular approach (CROSS-499)
+* feat(BREAKING): Migrate to deploy-platform folder
 
 ## [0.1.0-beta.1] - 2023-04-25
 
