@@ -187,7 +187,7 @@ All changes must be documented in the [CHANGELOG](./CHANGELOG.md) file. The vers
 
 To declare a new release, follow these steps:
 
-* Create a release branch from `main` named `release/x.y.z`, where `x.y.z` is the version number of the release.
+* Create a release branch from `main` named `release/vX.Y.Z`, where `X.Y.Z` is the version number of the release.
 * Update the changelog:
   * Move all the changes from the `Unreleased` section to a new section with the version number and the current date.
   * Add a new `Unreleased` section at the top of the file.
