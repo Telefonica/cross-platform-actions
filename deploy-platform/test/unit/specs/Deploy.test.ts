@@ -1,5 +1,6 @@
 import JSZip from "jszip";
 
+import { getRequiredInputs } from "@support/fixtures/Inputs";
 import {
   getRunsResponse,
   getRunJobsResponse,
@@ -11,14 +12,13 @@ import {
   downloadRunArtifactResponse,
   DISPATCH_WORKFLOW_PATH,
 } from "@support/fixtures/Octokit";
-import { actionsCore } from "@support/mocks/ActionsCore";
 import { getLogger } from "@support/mocks/Logger";
 import { octokit } from "@support/mocks/Octokit";
 import { uuid } from "@support/mocks/Uuid";
 
-import * as Config from "@src/config/Config";
-import { deployAndGetArtifact, runDeployAndGetArtifactAction } from "@src/Deploy";
-import { Logger } from "@src/support/Logger.types";
+import * as Config from "@src/lib/config/Config";
+import { deployAndGetArtifact } from "@src/lib/Deploy";
+import { Logger } from "@src/lib/support/Logger.types";
 
 const CONFIG = {
   timeoutJobCompleted: 500,
@@ -31,6 +31,7 @@ const CONFIG = {
   environment: "foo-environment",
   requestInterval: 500,
 };
+const inputs = getRequiredInputs();
 
 describe("Deploy module", () => {
   const EXPECTED_ARTIFACT_JSON = { foo: "bar" };
@@ -64,94 +65,14 @@ describe("Deploy module", () => {
   describe("deployAndGetArtifact method", () => {
     describe("when it is success", () => {
       it("should return artifact content as stringified JSON", async () => {
-        const artifactJson = await deployAndGetArtifact(CONFIG, logger);
+        const artifactJson = await deployAndGetArtifact(inputs, logger);
         expect(JSON.parse(artifactJson)).toEqual(EXPECTED_ARTIFACT_JSON);
       });
     });
 
     describe("when it does not found a successful workflow job containing a step with the provided stepUUID", () => {
       beforeEach(() => {
-        octokit.request.mockImplementation((requestPath) => {
-          switch (requestPath) {
-            case GET_RUNS_PATH:
-              return getRunsResponse();
-            case GET_RUN_JOBS_PATH:
-              return getRunJobsResponse("foo-wrong-step-uuid");
-            case GET_RUN_ARTIFACTS_PATH:
-              return getRunArtifactsResponse();
-            case DOWNLOAD_RUN_ARTIFACT_PATH:
-              return downloadRunArtifactResponse(zipFile);
-          }
-        });
-      });
-
-      it("should throw with timeout message", async () => {
-        await expect(() => deployAndGetArtifact(CONFIG, logger)).rejects.toThrow(
-          "Timed out while waiting for target job to complete"
-        );
-      });
-
-      it("should throw after time run out", async () => {
-        const now = Date.now();
-
-        await expect(() => deployAndGetArtifact(CONFIG, logger)).rejects.toThrow();
-        const elapsed = Date.now() - now;
-        expect(elapsed).toBeGreaterThanOrEqual(CONFIG.timeoutJobCompleted);
-      });
-    });
-
-    describe("when sending params to Github API", () => {
-      it("should send provided owner when dispatching workflow", async () => {
-        await deployAndGetArtifact(CONFIG, logger);
-        expect(octokit.request.mock.calls[0][0]).toEqual(DISPATCH_WORKFLOW_PATH);
-        expect(octokit.request.mock.calls[0][1].owner).toEqual(CONFIG.githubOwner);
-      });
-    });
-  });
-
-  describe("runDeployAndGetArtifactAction method", () => {
-    describe("when it is success", () => {
-      it('should set "manifest" action output with artifact content as stringified JSON', async () => {
-        await runDeployAndGetArtifactAction();
-        expect(actionsCore.setOutput).toHaveBeenCalledWith(
-          "manifest",
-          JSON.stringify(EXPECTED_ARTIFACT_JSON)
-        );
-      });
-    });
-
-    describe("when sending params to Github API", () => {
-      it("should send provided owner when dispatching workflow", async () => {
-        await runDeployAndGetArtifactAction();
-        expect(octokit.request.mock.calls[0][0]).toEqual(DISPATCH_WORKFLOW_PATH);
-        expect(octokit.request.mock.calls[0][1].owner).toEqual("Telefonica");
-      });
-
-      it('should send repoName from action input "project" adding "-platform" when dispatching workflow', async () => {
-        const FOO_REPO_NAME = "foo-repo-name";
-        actionsCore.getInput.mockImplementation((inputName) => {
-          if (inputName === "project") return FOO_REPO_NAME;
-        });
-        await runDeployAndGetArtifactAction();
-        expect(octokit.request.mock.calls[0][0]).toEqual(DISPATCH_WORKFLOW_PATH);
-        expect(octokit.request.mock.calls[0][1].repo).toEqual(`${FOO_REPO_NAME}-platform`);
-      });
-
-      it('should add custom suffix from action input "repo-suffix" to repo name when dispatching workflow', async () => {
-        const FOO_REPO_NAME = "foo-repo-name";
-        actionsCore.getInput.mockImplementation((inputName) => {
-          if (inputName === "project") return FOO_REPO_NAME;
-          if (inputName === "repo-suffix") return "-custom-suffix";
-        });
-        await runDeployAndGetArtifactAction();
-        expect(octokit.request.mock.calls[0][0]).toEqual(DISPATCH_WORKFLOW_PATH);
-        expect(octokit.request.mock.calls[0][1].repo).toEqual(`${FOO_REPO_NAME}-custom-suffix`);
-      });
-    });
-
-    describe("when it does not found a successful workflow job containing a step with the provided stepUUID", () => {
-      beforeEach(() => {
-        jest.mock("@src/config/Config");
+        jest.mock("@src/lib/config/Config");
         const getConfig = jest.spyOn(Config, "getConfig");
         getConfig.mockReturnValue(CONFIG);
         octokit.request.mockImplementation((requestPath) => {
@@ -169,9 +90,25 @@ describe("Deploy module", () => {
       });
 
       it("should throw with timeout message", async () => {
-        await expect(() => runDeployAndGetArtifactAction()).rejects.toThrow(
+        await expect(() => deployAndGetArtifact(inputs, logger)).rejects.toThrow(
           "Timed out while waiting for target job to complete"
         );
+      });
+
+      it("should throw after time run out", async () => {
+        const now = Date.now();
+
+        await expect(() => deployAndGetArtifact(inputs, logger)).rejects.toThrow();
+        const elapsed = Date.now() - now;
+        expect(elapsed).toBeGreaterThanOrEqual(CONFIG.timeoutJobCompleted);
+      });
+    });
+
+    describe("when sending params to Github API", () => {
+      it("should send provided owner when dispatching workflow", async () => {
+        await deployAndGetArtifact(inputs, logger);
+        expect(octokit.request.mock.calls[0][0]).toEqual(DISPATCH_WORKFLOW_PATH);
+        expect(octokit.request.mock.calls[0][1].owner).toEqual(CONFIG.githubOwner);
       });
     });
   });
