@@ -69,14 +69,14 @@ steps:
   - name: Azure Login in the execution platform
     run: |
       az login \
-        --password ${{ fromJSON(steps.platform.outputs.manifest).azure.credentials.client_secret }} \
+        --password ${{ fromJSON(steps.deploy-platform.outputs.manifest).azure.credentials.client_secret }} \
         --service-principal \
-        --tenant ${{ fromJSON(steps.platform.outputs.manifest).azure.credentials.tenant_id }} \
-        --username ${{ fromJSON(steps.platform.outputs.manifest).azure.credentials.client_id }}
-  - name: Docker Login in the execution platform
+        --tenant ${{ fromJSON(steps.deploy-platform.outputs.manifest).azure.credentials.tenant_id }} \
+        --username ${{ fromJSON(steps.deploy-platform.outputs.manifest).azure.credentials.client_id }}
+  - name: Docker Login in the execution deploy-platform
     run: |
       az acr login \
-        --name ${{ fromJSON(steps.platform.outputs.manifest).registry.name }}
+        --name ${{ fromJSON(steps.deploy-platform.outputs.manifest).registry.name }}
 ```
 
 ## Inputs
