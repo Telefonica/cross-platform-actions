@@ -14,8 +14,8 @@ module.exports = {
     "**/*.config.js",
     "pnpm-lock.yaml",
     ".gitignore",
-    "dist/**",
-    "coverage/**",
+    "**/dist/**",
+    "**/coverage/**",
     "**/*.excalidraw",
   ],
   // language - current active spelling language
