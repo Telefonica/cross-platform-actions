@@ -15,6 +15,9 @@ Use next sections to describe changes on each release:
 
 ## [Unreleased]
 
+### Fixed
+* docs: Fix README.md usage example
+
 ## [1.0.0] - 2023-05-03
 
 ### Added
