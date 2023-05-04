@@ -12,7 +12,7 @@ module.exports = {
     "support/dictionaries/**",
     "*.json",
     "**/*.config.js",
-    "package-lock.json",
+    "pnpm-lock.yaml",
     ".gitignore",
     "dist/**",
     "coverage/**",
