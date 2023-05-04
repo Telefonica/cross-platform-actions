@@ -4056,7 +4056,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 
 var universalUserAgent = __nccwpck_require__(5030);
 var request = __nccwpck_require__(6234);
-var oauthMethods = __nccwpck_require__(298);
+var oauthMethods = __nccwpck_require__(8445);
 
 async function getOAuthAccessToken(state, options) {
   const cachedAuthentication = getCachedAuthentication(state, options.auth);
@@ -4212,7 +4212,7 @@ function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'defau
 var universalUserAgent = __nccwpck_require__(5030);
 var request = __nccwpck_require__(6234);
 var authOauthDevice = __nccwpck_require__(4344);
-var oauthMethods = __nccwpck_require__(298);
+var oauthMethods = __nccwpck_require__(8445);
 var btoa = _interopDefault(__nccwpck_require__(2358));
 
 const VERSION = "2.1.1";
@@ -5213,7 +5213,7 @@ var OAuthAppAuth = __nccwpck_require__(8459);
 var core = __nccwpck_require__(6762);
 var universalUserAgent = __nccwpck_require__(5030);
 var authOauthUser = __nccwpck_require__(1591);
-var OAuthMethods = __nccwpck_require__(298);
+var OAuthMethods = __nccwpck_require__(8445);
 var authUnauthenticated = __nccwpck_require__(9567);
 var fromEntries = _interopDefault(__nccwpck_require__(8442));
 
@@ -6098,7 +6098,7 @@ exports.oauthAuthorizationUrl = oauthAuthorizationUrl;
 
 /***/ }),
 
-/***/ 298:
+/***/ 8445:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -53172,7 +53172,7 @@ function wrappy (fn, cb) {
 
 /***/ }),
 
-/***/ 8445:
+/***/ 226:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -53201,45 +53201,17 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.runDeployAndGetArtifactAction = exports.deployAndGetArtifact = void 0;
+exports.runDeployAndGetArtifactAction = void 0;
 const core = __importStar(__nccwpck_require__(2186));
-const uuid_1 = __nccwpck_require__(5840);
-const Config_1 = __nccwpck_require__(5583);
-const Date_1 = __nccwpck_require__(6645);
-const Logger_1 = __nccwpck_require__(1631);
-const Zip_1 = __nccwpck_require__(498);
-const Workflows_1 = __nccwpck_require__(7734);
-async function deployAndGetArtifact({ timeoutJobCompleted, timeoutArtifactAvailable, repoName, repoRef, workflowId, githubOwner, githubToken, environment, requestInterval, }, logger) {
-    const stepUUID = (0, uuid_1.v4)();
-    const executedFrom = (0, Date_1.formattedNow)();
-    const workflows = new Workflows_1.Workflows({
-        token: githubToken,
-        owner: githubOwner,
-        project: repoName,
-        timeoutJobCompleted,
-        timeoutArtifactAvailable,
-        requestInterval,
-        logger,
-    });
-    // Dispatch workflow that will create a job with the unique step UUID
-    await workflows.dispatch({ workflowId, ref: repoRef, stepUUID, environment });
-    // Find recently dispatched job when it has finished
-    const targetJob = await workflows.waitForTargetJobToSuccess({
-        stepUUID,
-        executedFrom,
-    });
-    // Download artifact from the job
-    const artifact = await workflows.downloadJobFirstArtifact(targetJob);
-    // Return artifact content as stringified JSON
-    return (0, Zip_1.getJsonFromZip)(artifact.data);
-}
-exports.deployAndGetArtifact = deployAndGetArtifact;
+const Deploy_1 = __nccwpck_require__(6950);
+const Inputs_1 = __nccwpck_require__(7807);
+const Logger_1 = __nccwpck_require__(8410);
 async function runDeployAndGetArtifactAction() {
     const logger = (0, Logger_1.getLogger)();
     try {
-        const config = (0, Config_1.getConfig)();
-        const artifactJson = await deployAndGetArtifact(config, logger);
-        core.setOutput(Config_1.OUTPUT_VARS.MANIFEST, artifactJson);
+        const inputs = (0, Inputs_1.getInputs)();
+        const artifactJson = await (0, Deploy_1.deployAndGetArtifact)(inputs, logger);
+        core.setOutput("manifest", artifactJson);
     }
     catch (error) {
         core.setFailed(error.message);
@@ -53251,7 +53223,7 @@ exports.runDeployAndGetArtifactAction = runDeployAndGetArtifactAction;
 
 /***/ }),
 
-/***/ 5583:
+/***/ 7807:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -53280,76 +53252,30 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getConfig = exports.getRepoName = exports.DEFAULT_VARS = exports.OUTPUT_VARS = exports.TIMEOUT_VARS = exports.INPUT_VARS = void 0;
+exports.getInputs = void 0;
 const core = __importStar(__nccwpck_require__(2186));
-exports.INPUT_VARS = {
-    PROJECT: "project",
-    TOKEN: "token",
-    ENVIRONMENT: "environment",
-    REPO_SUFFIX: "repo-suffix",
-    WORKFLOW_ID: "workflow-id",
-    REF: "ref",
-};
-exports.TIMEOUT_VARS = {
-    JOB_COMPLETED: 600000,
-    ARTIFACT_AVAILABLE: 10000,
-    REQUEST_INTERVAL: 2000,
-};
-exports.OUTPUT_VARS = {
-    MANIFEST: "manifest",
-};
-exports.DEFAULT_VARS = {
-    GITHUB_OWNER: "Telefonica",
-    REPO_REF: "main",
-    WORKFLOW_ID: "deploy.yml",
-    REPO_SUFFIX: "-platform",
-};
-function getRepoName(repoBaseName, customRepoSuffix) {
-    const suffix = customRepoSuffix !== undefined ? customRepoSuffix : exports.DEFAULT_VARS.REPO_SUFFIX;
-    return `${repoBaseName}${suffix}`;
-}
-exports.getRepoName = getRepoName;
-function getConfig() {
-    const repoName = getRepoName(core.getInput(exports.INPUT_VARS.PROJECT, { required: true }), core.getInput(exports.INPUT_VARS.REPO_SUFFIX));
-    const token = core.getInput(exports.INPUT_VARS.TOKEN, { required: true });
-    const environment = core.getInput(exports.INPUT_VARS.ENVIRONMENT, { required: true });
-    const workflowId = core.getInput(exports.INPUT_VARS.WORKFLOW_ID) || exports.DEFAULT_VARS.WORKFLOW_ID;
-    const repoRef = core.getInput(exports.INPUT_VARS.REF) || exports.DEFAULT_VARS.REPO_REF;
+function getInputs() {
+    const project = core.getInput("project", { required: true });
+    const token = core.getInput("token", { required: true });
+    const environment = core.getInput("environment", { required: true });
+    const repoSuffix = core.getInput("repo-suffix");
+    const workflowId = core.getInput("workflow-id");
+    const ref = core.getInput("ref");
     return {
-        timeoutJobCompleted: exports.TIMEOUT_VARS.JOB_COMPLETED,
-        timeoutArtifactAvailable: exports.TIMEOUT_VARS.ARTIFACT_AVAILABLE,
-        repoName,
-        repoRef,
-        workflowId,
-        githubOwner: exports.DEFAULT_VARS.GITHUB_OWNER,
-        githubToken: token,
+        project,
+        token,
         environment,
-        requestInterval: exports.TIMEOUT_VARS.REQUEST_INTERVAL,
+        repoSuffix,
+        workflowId,
+        ref,
     };
 }
-exports.getConfig = getConfig;
+exports.getInputs = getInputs;
 
 
 /***/ }),
 
-/***/ 6645:
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.formattedNow = void 0;
-function formattedNow() {
-    // cspell: disable-next-line
-    // Format "YYYY-MM-DDTHH:MM"
-    return new Date().toJSON().slice(0, 16);
-}
-exports.formattedNow = formattedNow;
-
-
-/***/ }),
-
-/***/ 1631:
+/***/ 8410:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -53394,7 +53320,125 @@ exports.getLogger = getLogger;
 
 /***/ }),
 
-/***/ 498:
+/***/ 6950:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.deployAndGetArtifact = void 0;
+const uuid_1 = __nccwpck_require__(5840);
+const Config_1 = __nccwpck_require__(5643);
+const Date_1 = __nccwpck_require__(6410);
+const Zip_1 = __nccwpck_require__(7980);
+const Workflows_1 = __nccwpck_require__(7094);
+async function deployAndGetArtifact(inputs, logger) {
+    const stepUUID = (0, uuid_1.v4)();
+    const executedFrom = (0, Date_1.formattedNow)();
+    const config = (0, Config_1.getConfig)(inputs);
+    const workflows = new Workflows_1.Workflows({
+        token: config.githubToken,
+        owner: config.githubOwner,
+        project: config.repoName,
+        timeoutJobCompleted: config.timeoutJobCompleted,
+        timeoutArtifactAvailable: config.timeoutArtifactAvailable,
+        requestInterval: config.requestInterval,
+        logger,
+    });
+    // Dispatch workflow that will create a job with the unique step UUID
+    await workflows.dispatch({
+        workflowId: config.workflowId,
+        ref: config.repoRef,
+        stepUUID,
+        environment: config.environment,
+    });
+    // Find recently dispatched job when it has finished
+    const targetJob = await workflows.waitForTargetJobToSuccess({
+        stepUUID,
+        executedFrom,
+    });
+    // Download artifact from the job
+    const artifact = await workflows.downloadJobFirstArtifact(targetJob);
+    // Return artifact content as stringified JSON
+    return (0, Zip_1.getJsonFromZip)(artifact.data);
+}
+exports.deployAndGetArtifact = deployAndGetArtifact;
+
+
+/***/ }),
+
+/***/ 5643:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getConfig = exports.getRepoName = exports.DEFAULT_VARS = exports.TIMEOUT_VARS = exports.INPUT_VARS = void 0;
+exports.INPUT_VARS = {
+    PROJECT: "project",
+    TOKEN: "token",
+    ENVIRONMENT: "environment",
+    REPO_SUFFIX: "repo-suffix",
+    WORKFLOW_ID: "workflow-id",
+    REF: "ref",
+};
+exports.TIMEOUT_VARS = {
+    JOB_COMPLETED: 600000,
+    ARTIFACT_AVAILABLE: 10000,
+    REQUEST_INTERVAL: 2000,
+};
+exports.DEFAULT_VARS = {
+    GITHUB_OWNER: "Telefonica",
+    REPO_REF: "main",
+    WORKFLOW_ID: "deploy.yml",
+    REPO_SUFFIX: "-platform",
+};
+function getRepoName(repoBaseName, customRepoSuffix) {
+    const suffix = customRepoSuffix !== undefined ? customRepoSuffix : exports.DEFAULT_VARS.REPO_SUFFIX;
+    return `${repoBaseName}${suffix}`;
+}
+exports.getRepoName = getRepoName;
+function getConfig(inputs) {
+    const repoName = getRepoName(inputs.project, inputs.repoSuffix);
+    const token = inputs.token;
+    const environment = inputs.environment;
+    const workflowId = inputs.workflowId || exports.DEFAULT_VARS.WORKFLOW_ID;
+    const repoRef = inputs.ref || exports.DEFAULT_VARS.REPO_REF;
+    return {
+        timeoutJobCompleted: exports.TIMEOUT_VARS.JOB_COMPLETED,
+        timeoutArtifactAvailable: exports.TIMEOUT_VARS.ARTIFACT_AVAILABLE,
+        repoName,
+        repoRef,
+        workflowId,
+        githubOwner: exports.DEFAULT_VARS.GITHUB_OWNER,
+        githubToken: token,
+        environment,
+        requestInterval: exports.TIMEOUT_VARS.REQUEST_INTERVAL,
+    };
+}
+exports.getConfig = getConfig;
+
+
+/***/ }),
+
+/***/ 6410:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.formattedNow = void 0;
+function formattedNow() {
+    // cspell: disable-next-line
+    // Format "YYYY-MM-DDTHH:MM"
+    return new Date().toJSON().slice(0, 16);
+}
+exports.formattedNow = formattedNow;
+
+
+/***/ }),
+
+/***/ 7980:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -53415,7 +53459,7 @@ exports.getJsonFromZip = getJsonFromZip;
 
 /***/ }),
 
-/***/ 2801:
+/***/ 8228:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -53507,14 +53551,14 @@ exports.Github = Github;
 
 /***/ }),
 
-/***/ 7734:
+/***/ 7094:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Workflows = void 0;
-const Github_1 = __nccwpck_require__(2801);
+const Github_1 = __nccwpck_require__(8228);
 const Workflows = class Workflows {
     _githubClient;
     _timeoutJobCompleted;
@@ -53848,8 +53892,8 @@ var __webpack_exports__ = {};
 var exports = __webpack_exports__;
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const Deploy_1 = __nccwpck_require__(8445);
-(0, Deploy_1.runDeployAndGetArtifactAction)();
+const Action_1 = __nccwpck_require__(226);
+(0, Action_1.runDeployAndGetArtifactAction)();
 
 })();
 
