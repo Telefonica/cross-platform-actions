@@ -5,7 +5,9 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-Add a new entry on each version for each modified action.
+__Add a new subsection on each version for each modified action.__
+
+### [action-name]
 
 Use next sections inside each different action entry to describe changes on each release:
 
@@ -21,6 +23,10 @@ Use next sections inside each different action entry to describe changes on each
 
 #### Fixed
 * docs: Fix README.md usage example
+
+#### Changed
+* chore: Use PNPM as mono-repo NodeJS dependencies manager. (CROSS-773)
+* chore: Migrate linter and spell checker to the root package.json. This way, they will be executed for all actions in the mono-repo. (CROSS-773)
 
 ## [1.0.0] - 2023-05-03
 

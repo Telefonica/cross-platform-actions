@@ -20,7 +20,7 @@ This repository contains the Github actions related to the execution platforms o
 
 # Versions
 
-Actions in this repository adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html). During the release process, tags for the whole version, plus latest, major and minor versions are created, so, you can use next syntax to define the version to use:
+This repository adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html). During the release process, tags for the whole version, plus latest, major and minor versions are created, so, you can use next syntax to define the version to use. For example:
 
 * `Telefonica/cross-platform-actions/deploy-platform@v1` - You will use the version `v1.x.x`, keeping up to date with minor and patch releases automatically (recommended).
 * `Telefonica/cross-platform-actions/deploy-platform@v1.1` - You will use the version `v1.1.x`, keeping up to date with just patch releases automatically.
@@ -36,7 +36,7 @@ Actions in this repository adheres to [Semantic Versioning](https://semver.org/s
 
 ### Installation
 
-#### __TypeScript components__
+#### __TypeScript actions__
 
 Github actions implemented with TypeScript use Pnpm as dependencies manager. So, to start working on them, you have to install the dependencies by running `pnpm install` in the root folder. This will install the dependencies of all TypeScript actions in the workspace:
 
@@ -75,7 +75,7 @@ To declare a new release, follow these steps:
 * Commit the changes and push them to the repository.
 * Merge the release branch into `main`.
 * __Create a Github release from the main branch__. The release title must be the version number preceded by the `v` letter (`vX.Y.Z`).
-* The release description must be the corresponding entry in the `CHANGELOG.md file`. It must clearly identify the changes in each different action.
+  * The __release description__ must be the corresponding entry in the `CHANGELOG.md file`. It must clearly identify the changes in each different action.
 * Move the major version tag to the new commit. For example, if the new version is `1.2.3`, move the `v1` tag to the new commit.
 * Move the minor version tag to the new commit. For example, if the new version is `1.2.3`, move the `v1.2` tag to the new commit.
 * Move the `latest` tag to the new commit.
