@@ -9,6 +9,8 @@ This repository contains the Github actions related to the execution platforms o
 * [Development](#development)
   * [Common requirements](#common-requirements)
   * [Installation](#installation)
+  * [Lint](#lint)
+  * [Check spelling](#check-spelling)
 * [Release](#release)
   * [Versioning](#versioning)
   * [Release process](#release-process)
@@ -45,6 +47,28 @@ pnpm i
 ```
 
 Once the installation is completed, you should move to each action's folder and refer to its own documentation to start working on it.
+
+## Lint
+
+This repository uses [ESLint](https://eslint.org/) to lint the code. To run it, execute:
+
+```sh
+pnpm run lint
+```
+
+It is recommended to install the [ESLint extension](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) for Visual Studio Code.
+
+Eslint errors can be automatically fixed with `pnpm run lint:fix`.
+
+## Check spelling
+
+This project uses [cspell](https://github.com/streetsidesoftware/cspell) to check spelling in the code and documentation. To run it, execute:
+
+```sh
+pnpm run check:spelling
+```
+
+You can install the [CSpell extension](https://marketplace.visualstudio.com/items?itemName=streetsidesoftware.code-spell-checker) for Visual Studio Code to get spell checking in your editor.
 
 # Release
 

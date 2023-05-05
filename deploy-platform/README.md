@@ -109,25 +109,11 @@ Read the monorepo [README](../README.md#development) to know how to install the 
 
 ## Lint
 
-This project uses [ESLint](https://eslint.org/) to lint the code. To run it, execute:
-
-```sh
-pnpm run lint
-```
-
-It is recommended to install the [ESLint extension](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) for Visual Studio Code.
-
-Eslint errors can be automatically fixed with `npm run lint:fix`.
+Read the monorepo [README](../README.md#development) to know how to run the linter in the whole monorepo.
 
 ## Check spelling
 
-This project uses [cspell](https://github.com/streetsidesoftware/cspell) to check spelling in the code and documentation. To run it, execute:
-
-```sh
-pnpm run check:spelling
-```
-
-You can install the [CSpell extension](https://marketplace.visualstudio.com/items?itemName=streetsidesoftware.code-spell-checker) for Visual Studio Code to get spell checking in your editor.
+Read the monorepo [README](../README.md#development) to know how to check spelling in the whole monorepo.
 
 ## Check types
 

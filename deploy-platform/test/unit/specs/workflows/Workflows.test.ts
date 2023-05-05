@@ -54,6 +54,7 @@ describe("Workflows module", () => {
           stepUUID: STEP_UUID,
           environment: ENVIRONMENT,
         });
+
         expect(octokit.request).toHaveBeenCalledWith(DISPATCH_WORKFLOW_PATH, {
           owner: OWNER,
           repo: PROJECT,
@@ -176,6 +177,7 @@ describe("Workflows module", () => {
         octokit.request.mockImplementation(() => {
           return getRunsResponse("in_progress");
         });
+
         await expect(() =>
           workflows.waitForTargetJobToComplete({
             stepUUID: STEP_UUID,
@@ -233,6 +235,7 @@ describe("Workflows module", () => {
         const result = await workflows.downloadJobFirstArtifact(
           getRunJobsResponse(STEP_UUID).data.jobs[0] as GetRunJobResponse
         );
+
         expect(result.data).toEqual(zipFile);
       });
 
@@ -242,6 +245,7 @@ describe("Workflows module", () => {
             return getRunArtifactsResponse({ voidArtifact: true });
           }
         });
+
         await expect(() =>
           workflows.downloadJobFirstArtifact(
             getRunJobsResponse(STEP_UUID).data.jobs[0] as GetRunJobResponse
@@ -279,6 +283,7 @@ describe("Workflows module", () => {
           await workflows.downloadJobFirstArtifact(
             getRunJobsResponse(STEP_UUID).data.jobs[0] as GetRunJobResponse
           );
+
           expect(octokit.request.mock.calls[1][1].artifact_id).toEqual(1);
         });
 
@@ -297,6 +302,7 @@ describe("Workflows module", () => {
           await workflows.downloadJobFirstArtifact(
             getRunJobsResponse(STEP_UUID).data.jobs[0] as GetRunJobResponse
           );
+
           expect(logger.warning).toHaveBeenCalledWith(
             "Caution!, there are more than one artifact uploaded for this workflow, downloading the first one"
           );

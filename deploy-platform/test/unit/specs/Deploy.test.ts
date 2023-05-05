@@ -66,6 +66,7 @@ describe("Deploy module", () => {
     describe("when it is success", () => {
       it("should return artifact content as stringified JSON", async () => {
         const artifactJson = await deployAndGetArtifact(inputs, logger);
+
         expect(JSON.parse(artifactJson)).toEqual(EXPECTED_ARTIFACT_JSON);
       });
     });
@@ -73,6 +74,7 @@ describe("Deploy module", () => {
     describe("when it does not found a successful workflow job containing a step with the provided stepUUID", () => {
       beforeEach(() => {
         jest.mock("@src/lib/config/Config");
+
         const getConfig = jest.spyOn(Config, "getConfig");
         getConfig.mockReturnValue(CONFIG);
         octokit.request.mockImplementation((requestPath) => {
@@ -99,7 +101,9 @@ describe("Deploy module", () => {
         const now = Date.now();
 
         await expect(() => deployAndGetArtifact(inputs, logger)).rejects.toThrow();
+
         const elapsed = Date.now() - now;
+
         expect(elapsed).toBeGreaterThanOrEqual(CONFIG.timeoutJobCompleted);
       });
     });
@@ -107,6 +111,7 @@ describe("Deploy module", () => {
     describe("when sending params to Github API", () => {
       it("should send provided owner when dispatching workflow", async () => {
         await deployAndGetArtifact(inputs, logger);
+
         expect(octokit.request.mock.calls[0][0]).toEqual(DISPATCH_WORKFLOW_PATH);
         expect(octokit.request.mock.calls[0][1].owner).toEqual(CONFIG.githubOwner);
       });
