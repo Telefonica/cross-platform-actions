@@ -2,15 +2,6 @@ import { DeployInputs } from "../Deploy.types";
 
 import type { Config } from "./Config.types";
 
-export const INPUT_VARS = {
-  PROJECT: "project",
-  TOKEN: "token",
-  ENVIRONMENT: "environment",
-  REPO_SUFFIX: "repo-suffix",
-  WORKFLOW_ID: "workflow-id",
-  REF: "ref",
-};
-
 export const TIMEOUT_VARS = {
   JOB_COMPLETED: 600000,
   ARTIFACT_AVAILABLE: 10000,
