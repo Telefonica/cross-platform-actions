@@ -27,7 +27,6 @@ Use next sections inside each different action entry to describe changes on each
 
 #### Fixed
 * docs: Fix README.md usage example
-* docs: Move eslint and spell checking docs to the root README file
 
 #### Changed
 * chore: Use PNPM as mono-repo NodeJS dependencies manager. (CROSS-773)
