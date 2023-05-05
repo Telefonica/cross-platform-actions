@@ -14,9 +14,9 @@ import {
 import { getLogger } from "@support/mocks/Logger";
 import { octokit } from "@support/mocks/Octokit";
 
-import { GetRunJobResponse } from "@src/workflows/Github.types";
-import { Workflows } from "@src/workflows/Workflows";
-import type { WorkflowsInterface } from "@src/workflows/Workflows.types";
+import { GetRunJobResponse } from "@src/lib/workflows/Github.types";
+import { Workflows } from "@src/lib/workflows/Workflows";
+import type { WorkflowsInterface } from "@src/lib/workflows/Workflows.types";
 
 describe("Workflows module", () => {
   describe("Workflows class", () => {

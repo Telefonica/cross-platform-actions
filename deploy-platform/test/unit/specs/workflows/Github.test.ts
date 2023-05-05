@@ -8,8 +8,8 @@ import {
 import { getLogger } from "@support/mocks/Logger";
 import { octokit } from "@support/mocks/Octokit";
 
-import { Github, throwIfJobFailed } from "@src/workflows/Github";
-import { GithubInterface, GetRunJobResponse } from "@src/workflows/Github.types";
+import { Github, throwIfJobFailed } from "@src/lib/workflows/Github";
+import { GithubInterface, GetRunJobResponse } from "@src/lib/workflows/Github.types";
 
 describe("Github module", () => {
   describe("Github class", () => {
