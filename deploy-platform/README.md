@@ -46,12 +46,7 @@ __So, you can use this action in the project's components repositories to launch
 
 ## Versions
 
-This action adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html). During the release process, tags for the whole version, plus latest, major and minor versions are created, so, you can use next syntax to define the version to use:
-
-* `Telefonica/cross-platform-actions/deploy-platform@v1` - You will use the version `v1.x.x`, keeping up to date with minor and patch releases automatically (recommended).
-* `Telefonica/cross-platform-actions/deploy-platform@v1.1` - You will use the version `v1.1.x`, keeping up to date with just patch releases automatically.
-* `Telefonica/cross-platform-actions/deploy-platform@v1.1.2` - You will use the version `v1.1.2`, and you will not receive updates automatically.
-* `Telefonica/cross-platform-actions/deploy-platform@latest` - You will use the latest version, and you will always receive updates automatically, even if they are major releases containing possible breaking changes (not recommended).
+To know more about how this action is versioned, read the monorepo [README](../README.md#versions).
 
 ## Example
 
@@ -100,8 +95,7 @@ To enable the debug mode add a repository variable named `ACTIONS_STEP_DEBUG` an
 
 ## Requirements
 
-* [Node.js](https://nodejs.org/en/) >= 18.x
-* [NPM](https://www.npmjs.com/) >= 8.x
+Read the monorepo [README](../README.md#requirements) to know the requirements of this project.
 
 ## Branching model
 
@@ -111,18 +105,14 @@ This repository uses the trunk-based development branching model. The `main` bra
 
 ## Installation
 
-Use NPM to install the dependencies:
-
-```bash
-npm i
-```
+Read the monorepo [README](../README.md#development) to know how to install the monorepo dependencies, which automatically installs the dependencies of this package too.
 
 ## Lint
 
 This project uses [ESLint](https://eslint.org/) to lint the code. To run it, execute:
 
 ```sh
-npm run lint
+pnpm run lint
 ```
 
 It is recommended to install the [ESLint extension](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) for Visual Studio Code.
@@ -134,7 +124,7 @@ Eslint errors can be automatically fixed with `npm run lint:fix`.
 This project uses [cspell](https://github.com/streetsidesoftware/cspell) to check spelling in the code and documentation. To run it, execute:
 
 ```sh
-npm run check:spelling
+pnpm run check:spelling
 ```
 
 You can install the [CSpell extension](https://marketplace.visualstudio.com/items?itemName=streetsidesoftware.code-spell-checker) for Visual Studio Code to get spell checking in your editor.
@@ -144,7 +134,7 @@ You can install the [CSpell extension](https://marketplace.visualstudio.com/item
 This project uses [TypeScript](https://www.typescriptlang.org/). You can check types with:
 
 ```sh
-npm run check:types
+pnpm run check:types
 ```
 
 ## Unit tests
@@ -152,7 +142,7 @@ npm run check:types
 Unit tests are written with [Jest](https://jestjs.io/). To run them, execute:
 
 ```sh
-npm run test
+pnpm run test
 ```
 
 The coverage report will be generated in the `coverage` folder.
@@ -164,7 +154,7 @@ The coverage report will be generated in the `coverage` folder.
 To build the project and add the dist folder, execute:
 
 ```sh
-npm run build
+pnpm run build
 
 # Remember to add the built files!!
 git add dist
@@ -176,26 +166,4 @@ Component tests are executed in a real environment, using the GitHub Actions Run
 
 ## Release
 
-### Versioning
-
-All changes must be documented in the [CHANGELOG](./CHANGELOG.md) file. The versioning of the project follows the [Semantic Versioning](https://semver.org/) specification. Here are some basic rules to follow when working on feature branches:
-
-* Do not upgrade the version number in the `package.json` file. The version number is updated in the release process.
-* Add changes to the `Unreleased` section of the changelog.
-
-### Release process
-
-To declare a new release, follow these steps:
-
-* Create a release branch from `main` named `release/vX.Y.Z`, where `X.Y.Z` is the version number of the release.
-* Update the changelog:
-  * Move all the changes from the `Unreleased` section to a new section with the version number and the current date.
-  * Add a new `Unreleased` section at the top of the file.
-* Update the version number in the `package.json` file.
-* Run `npm install` in order to update the `package-lock.json` file.
-* Commit the changes and push them to the repository.
-* Merge the release branch into `main`.
-* __Create a Github release from the main branch__. The release title must be the version number preceded by the `v` letter (`vX.Y.Z`), and the release description must contain the changelog.
-* Move the major version tag to the new commit. For example, if the new version is `1.2.3`, move the `v1` tag to the new commit.
-* Move the minor version tag to the new commit. For example, if the new version is `1.2.3`, move the `v1.2` tag to the new commit.
-* Move the `latest` tag to the new commit.
+Read the monorepo [README](../README.md#release) to know how to release the monorepo, which automatically releases a new version of this action too.
