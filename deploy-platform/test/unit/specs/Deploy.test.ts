@@ -65,6 +65,7 @@ describe("Deploy module", () => {
     describe("when it is success", () => {
       it("should return artifact content as stringified JSON", async () => {
         const artifactJson = await deployAndGetArtifact(CONFIG, logger);
+
         expect(JSON.parse(artifactJson)).toEqual(EXPECTED_ARTIFACT_JSON);
       });
     });
@@ -95,7 +96,9 @@ describe("Deploy module", () => {
         const now = Date.now();
 
         await expect(() => deployAndGetArtifact(CONFIG, logger)).rejects.toThrow();
+
         const elapsed = Date.now() - now;
+
         expect(elapsed).toBeGreaterThanOrEqual(CONFIG.timeoutJobCompleted);
       });
     });
@@ -103,6 +106,7 @@ describe("Deploy module", () => {
     describe("when sending params to Github API", () => {
       it("should send provided owner when dispatching workflow", async () => {
         await deployAndGetArtifact(CONFIG, logger);
+
         expect(octokit.request.mock.calls[0][0]).toEqual(DISPATCH_WORKFLOW_PATH);
         expect(octokit.request.mock.calls[0][1].owner).toEqual(CONFIG.githubOwner);
       });
@@ -113,6 +117,7 @@ describe("Deploy module", () => {
     describe("when it is success", () => {
       it('should set "manifest" action output with artifact content as stringified JSON', async () => {
         await runDeployAndGetArtifactAction();
+
         expect(actionsCore.setOutput).toHaveBeenCalledWith(
           "manifest",
           JSON.stringify(EXPECTED_ARTIFACT_JSON)
@@ -123,6 +128,7 @@ describe("Deploy module", () => {
     describe("when sending params to Github API", () => {
       it("should send provided owner when dispatching workflow", async () => {
         await runDeployAndGetArtifactAction();
+
         expect(octokit.request.mock.calls[0][0]).toEqual(DISPATCH_WORKFLOW_PATH);
         expect(octokit.request.mock.calls[0][1].owner).toEqual("Telefonica");
       });
@@ -133,6 +139,7 @@ describe("Deploy module", () => {
           if (inputName === "project") return FOO_REPO_NAME;
         });
         await runDeployAndGetArtifactAction();
+
         expect(octokit.request.mock.calls[0][0]).toEqual(DISPATCH_WORKFLOW_PATH);
         expect(octokit.request.mock.calls[0][1].repo).toEqual(`${FOO_REPO_NAME}-platform`);
       });
@@ -144,6 +151,7 @@ describe("Deploy module", () => {
           if (inputName === "repo-suffix") return "-custom-suffix";
         });
         await runDeployAndGetArtifactAction();
+
         expect(octokit.request.mock.calls[0][0]).toEqual(DISPATCH_WORKFLOW_PATH);
         expect(octokit.request.mock.calls[0][1].repo).toEqual(`${FOO_REPO_NAME}-custom-suffix`);
       });

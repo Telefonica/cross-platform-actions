@@ -5,14 +5,12 @@ on:
     branches:
       - main
       - release/*
+      - CROSS-793/chore/eslint-rules
   pull_request:
 
 jobs:
   check:
     runs-on: ${{ vars.JOBS_RUNNER }}
-    defaults:
-      run:
-        working-directory: deploy-platform
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -23,6 +21,7 @@ jobs:
       - name: Check spelling
         run: pnpm run check:spelling
       - name: Check Types
+        working-directory: deploy-platform
         run: pnpm run check:types
   test-unit:
     runs-on: ${{ vars.JOBS_RUNNER }}
