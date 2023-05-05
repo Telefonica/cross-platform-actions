@@ -74,7 +74,6 @@ describe("Deploy module", () => {
     describe("when it does not found a successful workflow job containing a step with the provided stepUUID", () => {
       beforeEach(() => {
         jest.mock("@src/lib/config/Config");
-
         const getConfig = jest.spyOn(Config, "getConfig");
         getConfig.mockReturnValue(CONFIG);
         octokit.request.mockImplementation((requestPath) => {
