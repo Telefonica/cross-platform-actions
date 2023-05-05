@@ -21,12 +21,19 @@ Use next sections inside each different action entry to describe changes on each
 
 ### deploy-platform
 
+## [1.0.1] - 2023-05-05
+
+### deploy-platform
+
 #### Fixed
 * docs: Fix README.md usage example
+* docs: Move eslint and spell checking docs to the root README file
 
 #### Changed
 * chore: Use PNPM as mono-repo NodeJS dependencies manager. (CROSS-773)
 * chore: Migrate linter and spell checker to the root package.json. This way, they will be executed for all actions in the mono-repo. (CROSS-773)
+* chore: Add eslint rules forcing camelCase and formatting Jest tests. (CROSS-793)
+* refactor: Decouple library core from Github Actions interfaces. (CROSS-727)
 
 ## [1.0.0] - 2023-05-03
 
