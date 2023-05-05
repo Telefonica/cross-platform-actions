@@ -19,6 +19,7 @@ module.exports = {
         parser: "flow",
       },
     ],
+    camelcase: [2, { properties: "never" }],
     "no-console": [2, { allow: ["warn", "error"] }],
     "no-shadow": [2, { builtinGlobals: true, hoist: "all" }],
     "no-undef": 2,

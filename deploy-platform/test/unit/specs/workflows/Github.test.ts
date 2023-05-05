@@ -41,6 +41,7 @@ describe("Github module", () => {
           stepUUID: STEP_UUID,
           environment: ENVIRONMENT,
         });
+
         expect(octokit.request).toHaveBeenCalledWith(DISPATCH_WORKFLOW_PATH, {
           owner: OWNER,
           repo: PROJECT,
@@ -80,6 +81,7 @@ describe("Github module", () => {
 
       it("should call to Github sdk to get workflow runs", async () => {
         await github.getRuns({ runDateFilter: RUN_DATE_FILTER });
+
         expect(octokit.request).toHaveBeenCalledWith(GET_RUNS_PATH, {
           owner: OWNER,
           repo: PROJECT,
@@ -94,6 +96,7 @@ describe("Github module", () => {
         octokit.request.mockResolvedValue(WORKFLOW_RUNS);
 
         const result = await github.getRuns({ runDateFilter: RUN_DATE_FILTER });
+
         expect(result).toEqual(WORKFLOW_RUNS);
       });
     });
@@ -104,6 +107,7 @@ describe("Github module", () => {
 
       it("should call to Github sdk to get workflow run jobs", async () => {
         await github.getRunJobs({ runId: RUN_ID });
+
         expect(octokit.request).toHaveBeenCalledWith(GET_RUN_JOBS_PATH, {
           owner: OWNER,
           repo: PROJECT,
@@ -114,6 +118,7 @@ describe("Github module", () => {
       it("should return data returned by Github sdk", async () => {
         octokit.request.mockResolvedValue(WORKFLOW_RUN_JOBS);
         const result = await github.getRunJobs({ runId: RUN_ID });
+
         expect(result).toEqual(WORKFLOW_RUN_JOBS);
       });
     });
@@ -124,6 +129,7 @@ describe("Github module", () => {
 
       it("should call to Github sdk to get workflow run artifacts", async () => {
         await github.getRunArtifacts({ runId: RUN_ID });
+
         expect(octokit.request).toHaveBeenCalledWith(GET_RUN_ARTIFACTS_PATH, {
           owner: OWNER,
           repo: PROJECT,
@@ -134,6 +140,7 @@ describe("Github module", () => {
       it("should return data returned by Github sdk", async () => {
         octokit.request.mockResolvedValue(WORKFLOW_RUN_ARTIFACTS);
         const result = await github.getRunArtifacts({ runId: RUN_ID });
+
         expect(result).toEqual(WORKFLOW_RUN_ARTIFACTS);
       });
     });
@@ -160,6 +167,7 @@ describe("Github module", () => {
       it("should return data returned by Github sdk", async () => {
         octokit.request.mockResolvedValue(DOWNLOADED_ARTIFACTS);
         const result = await github.downloadRunArtifact({ artifactId: ARTIFACT_ID });
+
         expect(result).toEqual(DOWNLOADED_ARTIFACTS);
       });
     });

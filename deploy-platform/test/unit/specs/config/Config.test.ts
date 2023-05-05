@@ -5,6 +5,7 @@ import { getConfig, INPUT_VARS, DEFAULT_VARS } from "@src/config/Config";
 describe("Config Module", () => {
   it("should return default values when no inputs are provided for repoRef, workflowId and githubOwner", () => {
     const config = getConfig();
+
     expect(config.repoRef).toEqual(DEFAULT_VARS.REPO_REF);
     expect(config.workflowId).toEqual(DEFAULT_VARS.WORKFLOW_ID);
     expect(config.githubOwner).toEqual(DEFAULT_VARS.GITHUB_OWNER);
@@ -20,6 +21,7 @@ describe("Config Module", () => {
       }
     });
     const config = getConfig();
+
     expect(config.repoRef).toEqual("foo-ref");
     expect(config.workflowId).toEqual("foo-workflow-id");
   });
