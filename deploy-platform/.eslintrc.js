@@ -1,34 +1,12 @@
+const path = require("path");
+
+function componentPath() {
+  return path.resolve.apply(null, [__dirname, ...arguments]);
+}
+
 module.exports = {
-  root: true,
-  env: {
-    node: true,
-    es6: true,
-  },
-  parserOptions: {
-    ecmaVersion: 2018,
-    sourceType: "module",
-  },
-  plugins: ["prettier"],
-  extends: ["eslint:recommended", "prettier"],
-  rules: {
-    "prettier/prettier": [
-      2,
-      {
-        printWidth: 99,
-        parser: "flow",
-      },
-    ],
-    "no-console": [2, { allow: ["warn", "error"] }],
-    "no-shadow": [2, { builtinGlobals: true, hoist: "all" }],
-    "no-undef": 2,
-    "no-unused-vars": [2, { vars: "all", args: "after-used", ignoreRestSiblings: false }],
-  },
+  ignorePatterns: ["node_modules", "dist/**/*", "coverage/**/*"],
   overrides: [
-    {
-      files: ["**/*.json", "*.json"],
-      plugins: ["prettier", "json"],
-      extends: ["eslint:recommended", "prettier", "plugin:json/recommended"],
-    },
     {
       files: ["**/*.ts", "**/*.tsx"],
       parser: "@typescript-eslint/parser",
@@ -117,8 +95,8 @@ module.exports = {
           node: true,
           alias: {
             map: [
-              ["@src", "./src"],
-              ["@support", "./test/unit/support"],
+              ["@src", componentPath("src")],
+              ["@support", componentPath("test", "unit", "support")],
             ],
             extensions: [".ts", ".js", ".jsx", ".json"],
           },
