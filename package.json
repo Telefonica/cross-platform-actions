@@ -3,7 +3,7 @@
   "private": true,
   "description": "Github actions related to the execution platforms of the Cross-cutting-enablers IDP project",
   "author": "Telefónica",
-  "license": "ISC",
+  "license": "MIT",
   "scripts": {
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
