@@ -80,7 +80,7 @@ steps:
 - `environment` - Environment to create. It will be passed as an input to the deploy workflow.
 - `token` - Github token to get access to the repository workflows
 - `ref` - _Optional_. Branch or tag in which to run the deploy workflow. If not specified, the `main` branch will be used.
-- `repo-suffix` - _Optional_. Suffix to append to the project name to get the platform repository name. If not specified, `-platform` will be used.
+- `repo-name` - _Optional_. When defined, this name will be used to find the repository where the deploy workflow will be launched. If not specified, it will use `${project}-platform`.
 - `workflow-id` - _Optional_. ID of the workflow to launch. If not specified, the first workflow with the name `deploy.yml` will be used.
 
 ## Outputs

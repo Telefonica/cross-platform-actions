@@ -1,2 +1,2 @@
-export declare function hideObjectKeys<Type extends Record<string, unknown>>(object: Type, keysToHide: (keyof Type)[]): Type;
-export declare function logObject<Type extends Record<string, unknown>>(object: Type, keysToHide: (keyof Type)[]): string;
+export declare function hideObjectKeys<Type>(object: Type, keysToHide: (keyof Type)[]): Type;
+export declare function logObject<Type>(object: Type, keysToHide: string[]): string;

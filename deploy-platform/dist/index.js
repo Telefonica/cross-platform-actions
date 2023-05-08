@@ -52528,17 +52528,16 @@ function getInputs() {
     const project = core.getInput("project", { required: true });
     const token = core.getInput("token", { required: true });
     const environment = core.getInput("environment", { required: true });
-    const repoSuffix = core.getInput("repo-suffix");
+    const repoName = core.getInput("repo-name");
     const workflowId = core.getInput("workflow-id");
     const ref = core.getInput("ref");
     return {
         project,
         token,
         environment,
-        repoSuffix,
+        repoName,
         workflowId,
         ref,
-        foo: core.getInput("foo"),
     };
 }
 exports.getInputs = getInputs;
@@ -52661,13 +52660,15 @@ exports.DEFAULT_VARS = {
     REPO_SUFFIX: "-platform",
 };
 exports.CONFIG_SECRETS = ["githubToken"];
-function getRepoName(repoBaseName, customRepoSuffix) {
-    const suffix = customRepoSuffix !== undefined ? customRepoSuffix : exports.DEFAULT_VARS.REPO_SUFFIX;
-    return `${repoBaseName}${suffix}`;
+function getRepoName(repoBaseName, customRepoName) {
+    if (customRepoName) {
+        return customRepoName;
+    }
+    return `${repoBaseName}${exports.DEFAULT_VARS.REPO_SUFFIX}`;
 }
 exports.getRepoName = getRepoName;
 function getConfig(inputs) {
-    const repoName = getRepoName(inputs.project, inputs.repoSuffix);
+    const repoName = getRepoName(inputs.project, inputs.repoName);
     const token = inputs.token;
     const environment = inputs.environment;
     const workflowId = inputs.workflowId || exports.DEFAULT_VARS.WORKFLOW_ID;
@@ -52682,7 +52683,6 @@ function getConfig(inputs) {
         githubToken: token,
         environment,
         requestInterval: exports.TIMEOUT_VARS.REQUEST_INTERVAL,
-        foo: `Foo: ${inputs.foo}`,
     };
 }
 exports.getConfig = getConfig;
@@ -52718,8 +52718,12 @@ function hideObjectKeys(object, keysToHide) {
     const copy = { ...object };
     return keysToHide.reduce((objectCopy, key) => {
         const objectKey = key;
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         if (objectCopy[objectKey] !== undefined) {
             // Setting the value directly with the key in the object produces a type error: https://github.com/microsoft/TypeScript/issues/47357
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
             Reflect.set(objectCopy, key, "*****");
         }
         return objectCopy;

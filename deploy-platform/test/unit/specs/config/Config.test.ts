@@ -45,12 +45,12 @@ describe("Config Module", () => {
       });
     });
 
-    describe("when repoSuffix is provided", () => {
-      it("should return repoName adding concatenating the project and the repoSuffix", () => {
+    describe("when repoName is provided", () => {
+      it("should return repoName adding concatenating the project and the repoName", () => {
         const inputs = getAllInputs();
-        const config = getConfig(inputs);
+        const config = getConfig({ ...inputs, repoName: "repo-name" });
 
-        expect(config.repoName).toEqual("foo-project".concat("foo-repo-suffix"));
+        expect(config.repoName).toEqual("repo-name");
       });
     });
   });
