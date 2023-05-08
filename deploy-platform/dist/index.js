@@ -52624,7 +52624,6 @@ async function deployAndGetArtifact(inputs, logger) {
         workflowId: config.workflowId,
         ref: config.repoRef,
         stepUUID,
-        environment: config.environment,
     });
     // Find recently dispatched job when it has finished
     const targetJob = await workflows.waitForTargetJobToSuccess({
@@ -52791,7 +52790,7 @@ const Github = class Github {
         this._project = project;
         this._logger = logger;
     }
-    async dispatchWorkflow({ workflowId, ref, stepUUID, environment }) {
+    async dispatchWorkflow({ workflowId, ref, stepUUID }) {
         try {
             const dataToSend = {
                 owner: this._owner,
@@ -52800,7 +52799,6 @@ const Github = class Github {
                 ref: ref,
                 inputs: {
                     id: stepUUID,
-                    environment: environment,
                 },
                 headers: {
                     "X-GitHub-Api-Version": "2022-11-28",

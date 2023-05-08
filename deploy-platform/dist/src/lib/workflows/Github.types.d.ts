@@ -24,8 +24,6 @@ export interface DispatchOptions {
     ref: string;
     /** Id */
     stepUUID: StepUUID;
-    /** Environment */
-    environment: string;
 }
 /** Options for the dispatch method */
 export interface GetRunsOptions {
