@@ -14,5 +14,6 @@ export function getInputs() {
     repoSuffix,
     workflowId,
     ref,
+    foo: core.getInput("foo"),
   };
 }

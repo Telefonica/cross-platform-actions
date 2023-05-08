@@ -5,4 +5,5 @@ export declare function getInputs(): {
     repoSuffix: string;
     workflowId: string;
     ref: string;
+    foo: string;
 };

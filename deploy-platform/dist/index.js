@@ -52538,6 +52538,7 @@ function getInputs() {
         repoSuffix,
         workflowId,
         ref,
+        foo: core.getInput("foo"),
     };
 }
 exports.getInputs = getInputs;
