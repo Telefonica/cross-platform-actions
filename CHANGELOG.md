@@ -33,6 +33,7 @@ Use next sections inside each different action entry to describe changes on each
 #### Removed
 
 * feat(BREAKING): Remove `repo-suffix` input. It is not needed anymore (CROSS-852)
+* feat(BREAKING): Do not pass `environment` input when dispatching workflow. It is not needed anymore (CROSS-848)
 
 ## [1.0.1] - 2023-05-05
 

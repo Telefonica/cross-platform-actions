@@ -45,7 +45,7 @@ export const Github: GithubConstructor = class Github implements GithubInterface
     this._logger = logger;
   }
 
-  public async dispatchWorkflow({ workflowId, ref, stepUUID, environment }: DispatchOptions) {
+  public async dispatchWorkflow({ workflowId, ref, stepUUID }: DispatchOptions) {
     try {
       const dataToSend = {
         owner: this._owner,
@@ -54,7 +54,6 @@ export const Github: GithubConstructor = class Github implements GithubInterface
         ref: ref,
         inputs: {
           id: stepUUID,
-          environment: environment,
         },
         headers: {
           "X-GitHub-Api-Version": "2022-11-28",
