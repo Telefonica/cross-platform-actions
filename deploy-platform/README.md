@@ -75,11 +75,11 @@ steps:
 
 ## Inputs
 
-- `project` - Project name. This action will launch the deploy workflow in a repository with the name `${project}-platform`.
+- `project` - Project name. This action will launch the deploy workflow in a repository with the name `[project]-platform`.
 - `environment` - Environment to create. It determines the workflow to be launched in the platform repository. For example, if the environment is `dev`, the workflow `deploy-dev.yml` will be launched.
 - `token` - Github token to get access to the repository workflows
 - `ref` - _Optional_. Branch or tag in which to run the deploy workflow. If not specified, the `main` branch will be used.
-- `repo-name` - _Optional_. When defined, this name will be used to find the repository where the deploy workflow will be launched. If not specified, it will use `${project}-platform`.
+- `repo-name` - _Optional_. When defined, this name will be used to find the repository where the deploy workflow will be launched. If not specified, it will use `[project]-platform`.
 - `workflow-id` - _Optional_. ID of the workflow to launch. If not specified, the workflow with the name `deploy-[environment].yml` will be used.
 
 ## Outputs
