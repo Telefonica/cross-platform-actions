@@ -11,7 +11,7 @@
     "prepare": "cd ../ && husky install"
   },
   "keywords": [],
-  "author": "Telefónica Digital España SLU",
+  "author": "Telefónica",
   "license": "MIT",
   "dependencies": {
     "@actions/core": "1.10.0",

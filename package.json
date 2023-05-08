@@ -2,7 +2,7 @@
   "name": "cross-platform-actions",
   "private": true,
   "description": "Github actions related to the execution platforms of the Cross-cutting-enablers IDP project",
-  "author": "Telefónica Digital España SLU",
+  "author": "Telefónica",
   "license": "MIT",
   "scripts": {
     "lint": "eslint .",
