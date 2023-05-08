@@ -63,6 +63,31 @@ describe("Deploy module", () => {
   });
 
   describe("deployAndGetArtifact method", () => {
+    describe("when logging configuration", () => {
+      beforeEach(() => {
+        const getConfig = jest.spyOn(Config, "getConfig");
+        getConfig.mockReturnValue(CONFIG);
+      });
+
+      it("should hide githubToken", async () => {
+        await deployAndGetArtifact(inputs, logger);
+
+        expect(logger.debug).toHaveBeenCalledWith(
+          `Configuration: ${JSON.stringify({ ...CONFIG, githubToken: "*****" }, null, 2)}`
+        );
+      });
+    });
+
+    describe("when logging inputs", () => {
+      it("should hide token", async () => {
+        await deployAndGetArtifact(inputs, logger);
+
+        expect(logger.debug).toHaveBeenCalledWith(
+          `Inputs: ${JSON.stringify({ ...inputs, token: "*****" }, null, 2)}`
+        );
+      });
+    });
+
     describe("when it is success", () => {
       it("should return artifact content as stringified JSON", async () => {
         const artifactJson = await deployAndGetArtifact(inputs, logger);

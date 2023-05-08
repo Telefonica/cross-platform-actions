@@ -21,6 +21,10 @@ Use next sections inside each different action entry to describe changes on each
 
 ### deploy-platform
 
+#### Added
+
+* feat: Log inputs and configuration in debug mode, hiding secrets (CROSS-852)
+
 ## [1.0.1] - 2023-05-05
 
 ### deploy-platform
