@@ -9,7 +9,7 @@ export function hideObjectKeys<Type>(object: Type, keysToHide: (keyof Type)[]): 
       // Setting the value directly with the key in the object produces a type error: https://github.com/microsoft/TypeScript/issues/47357
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      Reflect.set(objectCopy, key, "*****");
+      objectCopy[objectKey] = "*****";
     }
     return objectCopy;
   }, copy);
