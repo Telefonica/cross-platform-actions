@@ -52681,7 +52681,7 @@ function getConfig(inputs) {
         githubToken: token,
         environment,
         requestInterval: exports.TIMEOUT_VARS.REQUEST_INTERVAL,
-        foo: inputs.foo,
+        foo: `Foo: ${inputs.foo}`,
     };
 }
 exports.getConfig = getConfig;

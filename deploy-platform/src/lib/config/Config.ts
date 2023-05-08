@@ -39,6 +39,6 @@ export function getConfig(inputs: DeployInputs): Config {
     githubToken: token,
     environment,
     requestInterval: TIMEOUT_VARS.REQUEST_INTERVAL,
-    foo: inputs.foo,
+    foo: `Foo: ${inputs.foo}`,
   };
 }
