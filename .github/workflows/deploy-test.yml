@@ -24,4 +24,4 @@ jobs:
         with:
           name: deployment
           path: deployment.json
-          expiration-days: 1
+          retention-days: 1
