@@ -46,13 +46,11 @@ describe("Workflows module", () => {
       it("should call to Github sdk to dispatch a workflow", async () => {
         const WORKFLOW_ID = "foo-workflow-id";
         const REF = "foo-ref";
-        const ENVIRONMENT = "foo-environment";
 
         await workflows.dispatch({
           workflowId: WORKFLOW_ID,
           ref: REF,
           stepUUID: STEP_UUID,
-          environment: ENVIRONMENT,
         });
 
         expect(octokit.request).toHaveBeenCalledWith(DISPATCH_WORKFLOW_PATH, {
@@ -62,7 +60,6 @@ describe("Workflows module", () => {
           ref: REF,
           inputs: {
             id: STEP_UUID,
-            environment: ENVIRONMENT,
           },
           headers: {
             "X-GitHub-Api-Version": "2022-11-28",

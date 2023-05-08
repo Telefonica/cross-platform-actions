@@ -28,10 +28,12 @@ Use next sections inside each different action entry to describe changes on each
 #### Changed
 
 * feat: Add `repo-name` input. When defined, this will be the repository in which the deploy workflow will be launched (CROSS-852)
+* feat(BREAKING): Use the `environment` input to determine the workflow to be executed. For example, if the environment is `dev`, the workflow `deploy-dev.yml` will be launched. (CROSS-848)
 
 #### Removed
 
-* feat(BREAKING CHANGE): Remove `repo-suffix` input. It is not needed anymore (CROSS-852)
+* feat(BREAKING): Remove `repo-suffix` input. It is not needed anymore (CROSS-852)
+* feat(BREAKING): Do not pass `environment` input when dispatching workflow. It is not needed anymore (CROSS-848)
 
 ## [1.0.1] - 2023-05-05
 

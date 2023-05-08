@@ -33,7 +33,6 @@ export async function deployAndGetArtifact(inputs: DeployInputs, logger: Logger)
     workflowId: config.workflowId,
     ref: config.repoRef,
     stepUUID,
-    environment: config.environment,
   });
 
   // Find recently dispatched job when it has finished

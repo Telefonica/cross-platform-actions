@@ -1,7 +1,7 @@
 name: Deploy
 inputs:
   environment:
-    description: Environment to deploy. It will be passed as input to the deploy workflow
+    description: Environment to create. It determines the workflow to be launched in the platform repository
     required: true
   project:
     description: Project to which the deploy containing the deploy action belongs
@@ -10,7 +10,7 @@ inputs:
     description: Github token
     required: true
   repo-name:
-    description: Repository containing the deploy platform workflow. Defaults to "[environment]-platform"
+    description: Repository containing the deploy platform workflow. Defaults to "[project]-platform"
   workflow-id:
     description: ID of the workflow to trigger. Defaults to "deploy.yml"
   ref:

@@ -3,7 +3,7 @@ export interface DeployInputs {
   project: string;
   /** Github token allowing with permissions to trigger the deploy workflow */
   token: string;
-  /** Execution platform environment to deploy */
+  /** Environment to deploy. It determines the workflow to be launched in the platform repository */
   environment: string;
   /** Custom repository name. Defaults to "[project]-platform" */
   repoName?: string;

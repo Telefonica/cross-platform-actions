@@ -32,14 +32,12 @@ describe("Github module", () => {
       const WORKFLOW_ID = "foo-workflow-id";
       const REF = "foo-ref";
       const STEP_UUID = "foo-step-uuid";
-      const ENVIRONMENT = "foo-environment";
 
       it("should call to Github sdk to dispatch a workflow", async () => {
         await github.dispatchWorkflow({
           workflowId: WORKFLOW_ID,
           ref: REF,
           stepUUID: STEP_UUID,
-          environment: ENVIRONMENT,
         });
 
         expect(octokit.request).toHaveBeenCalledWith(DISPATCH_WORKFLOW_PATH, {
@@ -49,7 +47,6 @@ describe("Github module", () => {
           ref: REF,
           inputs: {
             id: STEP_UUID,
-            environment: ENVIRONMENT,
           },
           headers: {
             "X-GitHub-Api-Version": "2022-11-28",
@@ -69,7 +66,6 @@ describe("Github module", () => {
             workflowId: WORKFLOW_ID,
             ref: REF,
             stepUUID: STEP_UUID,
-            environment: ENVIRONMENT,
           })
         ).rejects.toThrow(`Error dispatching Github workflow: foo-error`);
       });
