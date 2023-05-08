@@ -34,10 +34,6 @@ Use next sections inside each different action entry to describe changes on each
 
 * feat(BREAKING): Remove `repo-suffix` input. It is not needed anymore (CROSS-852)
 
-#### Fixed
-
-* chore: Use Node 18 as github action runner
-
 ## [1.0.1] - 2023-05-05
 
 ### deploy-platform
