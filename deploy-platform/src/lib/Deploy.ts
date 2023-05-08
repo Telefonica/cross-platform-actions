@@ -8,7 +8,7 @@ import { logObject } from "./support/Logs";
 import { getJsonFromZip } from "./support/Zip";
 import { Workflows } from "./workflows/Workflows";
 
-const INPUT_SECRETS = ["token"];
+const INPUT_SECRETS = ["token"] as (keyof DeployInputs)[];
 
 export async function deployAndGetArtifact(inputs: DeployInputs, logger: Logger): Promise<string> {
   const stepUUID = uuidV4();

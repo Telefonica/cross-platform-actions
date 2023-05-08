@@ -52718,12 +52718,7 @@ function hideObjectKeys(object, keysToHide) {
     const copy = { ...object };
     return keysToHide.reduce((objectCopy, key) => {
         const objectKey = key;
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
         if (objectCopy[objectKey] !== undefined) {
-            // Setting the value directly with the key in the object produces a type error: https://github.com/microsoft/TypeScript/issues/47357
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
             objectCopy[objectKey] = "*****";
         }
         return objectCopy;

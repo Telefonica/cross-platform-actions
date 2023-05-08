@@ -15,7 +15,7 @@ export const DEFAULT_VARS = {
   REPO_SUFFIX: "-platform",
 };
 
-export const CONFIG_SECRETS = ["githubToken"];
+export const CONFIG_SECRETS = ["githubToken"] as (keyof Config)[];
 
 export function getRepoName(repoBaseName: string, customRepoName?: string): string {
   if (customRepoName) {
