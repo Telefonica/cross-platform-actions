@@ -90,15 +90,15 @@ describe("runDeployAndGetArtifactAction method", () => {
       expect(octokit.request.mock.calls[0][1].repo).toEqual(`${FOO_REPO_NAME}-platform`);
     });
 
-    it('should add custom suffix from action input "repo-suffix" to repo name when dispatching workflow', async () => {
+    it('should use custom repo name from action input "repo-name" when dispatching workflow', async () => {
       actionsCore.getInput.mockImplementation((inputName) => {
         if (inputName === "project") return FOO_REPO_NAME;
-        if (inputName === "repo-suffix") return "-custom-suffix";
+        if (inputName === "repo-name") return "foo-repo-name";
       });
       await runDeployAndGetArtifactAction();
 
       expect(octokit.request.mock.calls[0][0]).toEqual(DISPATCH_WORKFLOW_PATH);
-      expect(octokit.request.mock.calls[0][1].repo).toEqual(`${FOO_REPO_NAME}-custom-suffix`);
+      expect(octokit.request.mock.calls[0][1].repo).toEqual(`foo-repo-name`);
     });
   });
 

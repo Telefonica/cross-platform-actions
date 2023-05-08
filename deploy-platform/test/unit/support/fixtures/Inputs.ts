@@ -11,7 +11,7 @@ export function getAllInputs() {
     project: "foo-project",
     token: "foo-token",
     environment: "foo-environment",
-    repoSuffix: "foo-repo-suffix",
+    repoName: "foo-repo-name",
     workflowId: "foo-workflow-id",
     ref: "foo-ref",
   };

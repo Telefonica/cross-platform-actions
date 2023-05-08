@@ -21,6 +21,18 @@ Use next sections inside each different action entry to describe changes on each
 
 ### deploy-platform
 
+#### Added
+
+* feat: Log inputs and configuration in debug mode, hiding secrets (CROSS-852)
+
+#### Changed
+
+* feat: Add `repo-name` input. When defined, this will be the repository in which the deploy workflow will be launched (CROSS-852)
+
+#### Removed
+
+* feat(BREAKING CHANGE): Remove `repo-suffix` input. It is not needed anymore (CROSS-852)
+
 ## [1.0.1] - 2023-05-05
 
 ### deploy-platform

@@ -52528,14 +52528,14 @@ function getInputs() {
     const project = core.getInput("project", { required: true });
     const token = core.getInput("token", { required: true });
     const environment = core.getInput("environment", { required: true });
-    const repoSuffix = core.getInput("repo-suffix");
+    const repoName = core.getInput("repo-name");
     const workflowId = core.getInput("workflow-id");
     const ref = core.getInput("ref");
     return {
         project,
         token,
         environment,
-        repoSuffix,
+        repoName,
         workflowId,
         ref,
     };
@@ -52600,12 +52600,16 @@ exports.deployAndGetArtifact = void 0;
 const uuid_1 = __nccwpck_require__(1566);
 const Config_1 = __nccwpck_require__(1002);
 const Date_1 = __nccwpck_require__(4897);
+const Logs_1 = __nccwpck_require__(6988);
 const Zip_1 = __nccwpck_require__(7284);
 const Workflows_1 = __nccwpck_require__(1444);
+const INPUT_SECRETS = ["token"];
 async function deployAndGetArtifact(inputs, logger) {
     const stepUUID = (0, uuid_1.v4)();
     const executedFrom = (0, Date_1.formattedNow)();
     const config = (0, Config_1.getConfig)(inputs);
+    logger.debug(`Inputs: ${(0, Logs_1.logObject)(inputs, INPUT_SECRETS)}`);
+    logger.debug(`Configuration: ${(0, Logs_1.logObject)(config, Config_1.CONFIG_SECRETS)}`);
     const workflows = new Workflows_1.Workflows({
         token: config.githubToken,
         owner: config.githubOwner,
@@ -52643,7 +52647,7 @@ exports.deployAndGetArtifact = deployAndGetArtifact;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getConfig = exports.getRepoName = exports.DEFAULT_VARS = exports.TIMEOUT_VARS = void 0;
+exports.getConfig = exports.getRepoName = exports.CONFIG_SECRETS = exports.DEFAULT_VARS = exports.TIMEOUT_VARS = void 0;
 exports.TIMEOUT_VARS = {
     JOB_COMPLETED: 600000,
     ARTIFACT_AVAILABLE: 10000,
@@ -52655,13 +52659,16 @@ exports.DEFAULT_VARS = {
     WORKFLOW_ID: "deploy.yml",
     REPO_SUFFIX: "-platform",
 };
-function getRepoName(repoBaseName, customRepoSuffix) {
-    const suffix = customRepoSuffix !== undefined ? customRepoSuffix : exports.DEFAULT_VARS.REPO_SUFFIX;
-    return `${repoBaseName}${suffix}`;
+exports.CONFIG_SECRETS = ["githubToken"];
+function getRepoName(repoBaseName, customRepoName) {
+    if (customRepoName) {
+        return customRepoName;
+    }
+    return `${repoBaseName}${exports.DEFAULT_VARS.REPO_SUFFIX}`;
 }
 exports.getRepoName = getRepoName;
 function getConfig(inputs) {
-    const repoName = getRepoName(inputs.project, inputs.repoSuffix);
+    const repoName = getRepoName(inputs.project, inputs.repoName);
     const token = inputs.token;
     const environment = inputs.environment;
     const workflowId = inputs.workflowId || exports.DEFAULT_VARS.WORKFLOW_ID;
@@ -52696,6 +52703,33 @@ function formattedNow() {
     return new Date().toJSON().slice(0, 16);
 }
 exports.formattedNow = formattedNow;
+
+
+/***/ }),
+
+/***/ 6988:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.logObject = exports.hideObjectKeys = void 0;
+function hideObjectKeys(object, keysToHide) {
+    const copy = { ...object };
+    return keysToHide.reduce((objectCopy, key) => {
+        const objectKey = key;
+        if (objectCopy[objectKey] !== undefined) {
+            objectCopy[objectKey] = "*****";
+        }
+        return objectCopy;
+    }, copy);
+}
+exports.hideObjectKeys = hideObjectKeys;
+function logObject(object, keysToHide) {
+    const copy = hideObjectKeys(object, keysToHide);
+    return JSON.stringify(copy, null, 2);
+}
+exports.logObject = logObject;
 
 
 /***/ }),

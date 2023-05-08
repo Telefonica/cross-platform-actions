@@ -1,16 +1,22 @@
 import { v4 as uuidV4 } from "uuid";
 
-import { getConfig } from "./config/Config";
+import { getConfig, CONFIG_SECRETS } from "./config/Config";
 import { DeployInputs } from "./Deploy.types";
 import { formattedNow } from "./support/Date";
 import { Logger } from "./support/Logger.types";
+import { logObject } from "./support/Logs";
 import { getJsonFromZip } from "./support/Zip";
 import { Workflows } from "./workflows/Workflows";
+
+const INPUT_SECRETS = ["token"] as (keyof DeployInputs)[];
 
 export async function deployAndGetArtifact(inputs: DeployInputs, logger: Logger): Promise<string> {
   const stepUUID = uuidV4();
   const executedFrom = formattedNow();
   const config = getConfig(inputs);
+
+  logger.debug(`Inputs: ${logObject(inputs, INPUT_SECRETS)}`);
+  logger.debug(`Configuration: ${logObject(config, CONFIG_SECRETS)}`);
 
   const workflows = new Workflows({
     token: config.githubToken,
