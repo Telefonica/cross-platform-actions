@@ -4,14 +4,26 @@ import { getConfig, DEFAULT_VARS } from "@src/lib/config/Config";
 
 describe("Config Module", () => {
   describe("getConfig method", () => {
-    describe("when no inputs are provided for repoRef, workflowId and githubOwner", () => {
+    describe("when no inputs are provided for repoRef and githubOwner", () => {
       it("should return default values", () => {
         const inputs = getRequiredInputs();
         const config = getConfig(inputs);
 
         expect(config.repoRef).toEqual(DEFAULT_VARS.REPO_REF);
-        expect(config.workflowId).toEqual(DEFAULT_VARS.WORKFLOW_ID);
         expect(config.githubOwner).toEqual(DEFAULT_VARS.GITHUB_OWNER);
+      });
+    });
+
+    describe("when no input is provided for workflowId", () => {
+      it('should return a workflow id with the pattern "deploy-[input.environment].yml"', () => {
+        const inputs = getRequiredInputs();
+        const config = getConfig({ ...inputs, environment: "production" });
+
+        expect(config.workflowId).toEqual("deploy-production.yml");
+
+        const config2 = getConfig({ ...inputs, environment: "develop" });
+
+        expect(config2.workflowId).toEqual("deploy-develop.yml");
       });
     });
 

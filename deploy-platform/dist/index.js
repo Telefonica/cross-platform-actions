@@ -52647,7 +52647,7 @@ exports.deployAndGetArtifact = deployAndGetArtifact;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getConfig = exports.getRepoName = exports.CONFIG_SECRETS = exports.DEFAULT_VARS = exports.TIMEOUT_VARS = void 0;
+exports.getConfig = exports.getWorkflowId = exports.getRepoName = exports.CONFIG_SECRETS = exports.DEFAULT_VARS = exports.TIMEOUT_VARS = void 0;
 exports.TIMEOUT_VARS = {
     JOB_COMPLETED: 600000,
     ARTIFACT_AVAILABLE: 10000,
@@ -52656,7 +52656,8 @@ exports.TIMEOUT_VARS = {
 exports.DEFAULT_VARS = {
     GITHUB_OWNER: "Telefonica",
     REPO_REF: "main",
-    WORKFLOW_ID: "deploy.yml",
+    WORKFLOW_ID_PREFIX: "deploy",
+    WORKFLOW_ID_EXTENSION: "yml",
     REPO_SUFFIX: "-platform",
 };
 exports.CONFIG_SECRETS = ["githubToken"];
@@ -52667,11 +52668,15 @@ function getRepoName(repoBaseName, customRepoName) {
     return `${repoBaseName}${exports.DEFAULT_VARS.REPO_SUFFIX}`;
 }
 exports.getRepoName = getRepoName;
+function getWorkflowId(environment) {
+    return `${exports.DEFAULT_VARS.WORKFLOW_ID_PREFIX}-${environment}.${exports.DEFAULT_VARS.WORKFLOW_ID_EXTENSION}`;
+}
+exports.getWorkflowId = getWorkflowId;
 function getConfig(inputs) {
     const repoName = getRepoName(inputs.project, inputs.repoName);
     const token = inputs.token;
     const environment = inputs.environment;
-    const workflowId = inputs.workflowId || exports.DEFAULT_VARS.WORKFLOW_ID;
+    const workflowId = inputs.workflowId || getWorkflowId(environment);
     const repoRef = inputs.ref || exports.DEFAULT_VARS.REPO_REF;
     return {
         timeoutJobCompleted: exports.TIMEOUT_VARS.JOB_COMPLETED,

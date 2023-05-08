@@ -64,11 +64,10 @@ jobs:
         name: Launch deploy action
         uses: ./deploy-platform
         with:
-          environment: 'foo-environment'
+          environment: 'test'
           project: 'cross-platform-actions'
           repo-name: 'cross-platform-actions'
           token: ${{ secrets.GITHUB_TOKEN }}
-          workflow-id: 'deploy-test.yml'
           ref: ${{ github.head_ref || github.ref_name }}
       - name: Check deployment manifest
         run: |

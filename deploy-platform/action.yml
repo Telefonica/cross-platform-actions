@@ -1,7 +1,7 @@
 name: Deploy
 inputs:
   environment:
-    description: Environment to deploy. It will be passed as input to the deploy workflow
+    description: Environment to create. It determines the workflow to be launched in the platform repository
     required: true
   project:
     description: Project to which the deploy containing the deploy action belongs
@@ -19,5 +19,5 @@ outputs:
   manifest:
     description: Manifest downloaded from the deploy workflow artifact
 runs:
-  using: 'node16'
+  using: 'node18'
   main: 'dist/index.js'

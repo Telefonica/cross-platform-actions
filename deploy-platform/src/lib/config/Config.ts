@@ -11,7 +11,8 @@ export const TIMEOUT_VARS = {
 export const DEFAULT_VARS = {
   GITHUB_OWNER: "Telefonica",
   REPO_REF: "main",
-  WORKFLOW_ID: "deploy.yml",
+  WORKFLOW_ID_PREFIX: "deploy",
+  WORKFLOW_ID_EXTENSION: "yml",
   REPO_SUFFIX: "-platform",
 };
 
@@ -24,11 +25,15 @@ export function getRepoName(repoBaseName: string, customRepoName?: string): stri
   return `${repoBaseName}${DEFAULT_VARS.REPO_SUFFIX}`;
 }
 
+export function getWorkflowId(environment: string): string {
+  return `${DEFAULT_VARS.WORKFLOW_ID_PREFIX}-${environment}.${DEFAULT_VARS.WORKFLOW_ID_EXTENSION}`;
+}
+
 export function getConfig(inputs: DeployInputs): Config {
   const repoName = getRepoName(inputs.project, inputs.repoName);
   const token = inputs.token;
   const environment = inputs.environment;
-  const workflowId = inputs.workflowId || DEFAULT_VARS.WORKFLOW_ID;
+  const workflowId = inputs.workflowId || getWorkflowId(environment);
   const repoRef = inputs.ref || DEFAULT_VARS.REPO_REF;
 
   return {
