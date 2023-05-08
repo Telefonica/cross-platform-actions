@@ -9,8 +9,8 @@ inputs:
   token: 
     description: Github token
     required: true
-  repo-suffix:
-    description: Custom suffix for the deploy repo name. Defaults to "-platform"
+  repo-name:
+    description: Repository containing the deploy platform workflow. Defaults to "[environment]-platform"
   workflow-id:
     description: ID of the workflow to trigger. Defaults to "deploy.yml"
   ref:

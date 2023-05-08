@@ -11,5 +11,6 @@ export declare const DEFAULT_VARS: {
     WORKFLOW_ID: string;
     REPO_SUFFIX: string;
 };
-export declare function getRepoName(repoBaseName: string, customRepoSuffix?: string): string;
+export declare const CONFIG_SECRETS: (keyof Config)[];
+export declare function getRepoName(repoBaseName: string, customRepoName?: string): string;
 export declare function getConfig(inputs: DeployInputs): Config;

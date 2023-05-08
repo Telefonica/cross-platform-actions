@@ -15,13 +15,17 @@ export const DEFAULT_VARS = {
   REPO_SUFFIX: "-platform",
 };
 
-export function getRepoName(repoBaseName: string, customRepoSuffix?: string): string {
-  const suffix = customRepoSuffix !== undefined ? customRepoSuffix : DEFAULT_VARS.REPO_SUFFIX;
-  return `${repoBaseName}${suffix}`;
+export const CONFIG_SECRETS = ["githubToken"] as (keyof Config)[];
+
+export function getRepoName(repoBaseName: string, customRepoName?: string): string {
+  if (customRepoName) {
+    return customRepoName;
+  }
+  return `${repoBaseName}${DEFAULT_VARS.REPO_SUFFIX}`;
 }
 
 export function getConfig(inputs: DeployInputs): Config {
-  const repoName = getRepoName(inputs.project, inputs.repoSuffix);
+  const repoName = getRepoName(inputs.project, inputs.repoName);
   const token = inputs.token;
   const environment = inputs.environment;
   const workflowId = inputs.workflowId || DEFAULT_VARS.WORKFLOW_ID;
