@@ -1,5 +1,5 @@
 /** Configuration for the deploy action */
-export interface Config {
+export interface Config extends Record<string, unknown> {
     /** Milliseconds to wait before considering that a job is not going to complete */
     timeoutJobCompleted: number;
     /** Milliseconds to wait before considering that a job artifact can't be downloaded */
