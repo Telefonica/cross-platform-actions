@@ -9,7 +9,7 @@ export interface Config {
   /** Name of the branch in which to launch the deploy workflow */
   repoRef: string;
   /** Deploy workflow id */
-  workflowId: string;
+  workflowId: string | number;
   /** Github owner of the repository in which to launch the deploy workflow */
   githubOwner: string;
   /** Github token allowing to dispatch the deploy workflow */

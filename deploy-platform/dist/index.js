@@ -52619,9 +52619,13 @@ async function deployAndGetArtifact(inputs, logger) {
         requestInterval: config.requestInterval,
         logger,
     });
+    // Find workflow to dispatch if workflowId is the name of the workflow
+    const workflowId = isNaN(Number(config.workflowId))
+        ? await workflows.findWorkflowToDispatch(config.workflowId)
+        : Number(config.workflowId);
     // Dispatch workflow that will create a job with the unique step UUID
     await workflows.dispatch({
-        workflowId: config.workflowId,
+        workflowId,
         ref: config.repoRef,
         stepUUID,
     });
@@ -52790,6 +52794,12 @@ const Github = class Github {
         this._project = project;
         this._logger = logger;
     }
+    async getWorkflows() {
+        return this._octokit.request("GET /repos/{owner}/{repo}/actions/workflows", {
+            owner: this._owner,
+            repo: this._project,
+        });
+    }
     async dispatchWorkflow({ workflowId, ref, stepUUID }) {
         try {
             const dataToSend = {
@@ -52874,6 +52884,28 @@ const Workflows = class Workflows {
     async dispatch(options) {
         await this._githubClient.dispatchWorkflow(options);
         this._logger.info(`Workflow ${options.workflowId} dispatched`);
+    }
+    async findWorkflowToDispatch(workflowId) {
+        this._logger.info(`Searching workflow ${workflowId} in repository workflows list to dispatch`);
+        const workflows = await this._githubClient.getWorkflows();
+        this._logger.debug(`Workflows found: ${JSON.stringify(workflows.data.workflows)}`);
+        const foundWorkflow = this._findWorkflowInWorkflowsResponse(workflows.data.workflows, workflowId);
+        return foundWorkflow;
+    }
+    _findWorkflowInWorkflowsResponse(workflows, workflowId) {
+        let foundWorkflow;
+        foundWorkflow = workflows.find((workflow) => workflow.path.toLowerCase().includes(workflowId.toLowerCase()));
+        if (!foundWorkflow) {
+            foundWorkflow = workflows.find((workflow) => workflow.path.toLowerCase().includes(workflowId.toLowerCase().replaceAll("-", "_")));
+        }
+        if (!foundWorkflow) {
+            foundWorkflow = workflows.find((workflow) => workflow.name.toLowerCase().includes(workflowId.toLowerCase()));
+        }
+        if (!foundWorkflow) {
+            throw new Error(`Workflow ${workflowId} not found`);
+        }
+        this._logger.debug(`Workflow ${workflowId} found. Id: ${foundWorkflow["id"]}`);
+        return foundWorkflow["id"];
     }
     async _findJobInWorkflowRun(runId, stepUUID) {
         const workflowJobs = await this._githubClient.getRunJobs({ runId });

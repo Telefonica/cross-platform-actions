@@ -19,13 +19,14 @@ import { uuid } from "@support/mocks/Uuid";
 import * as Config from "@src/lib/config/Config";
 import { deployAndGetArtifact } from "@src/lib/Deploy";
 import { Logger } from "@src/lib/support/Logger.types";
+import * as workflowsLib from "@src/lib/workflows/Workflows";
 
 const CONFIG = {
   timeoutJobCompleted: 500,
   timeoutArtifactAvailable: 500,
   repoName: "foo-repo-name-platform",
   repoRef: "foo-repo-ref",
-  workflowId: "foo-workflow-id",
+  workflowId: 1234,
   githubOwner: "foo-github-owner",
   githubToken: "foo-github-token",
   environment: "foo-environment",
@@ -93,6 +94,46 @@ describe("Deploy module", () => {
         const artifactJson = await deployAndGetArtifact(inputs, logger);
 
         expect(JSON.parse(artifactJson)).toEqual(EXPECTED_ARTIFACT_JSON);
+      });
+    });
+
+    describe("when workflow_id is a string", () => {
+      const findWorkflowToDispatch = jest.fn();
+
+      beforeEach(() => {
+        jest.mock("@src/lib/config/Config");
+        const getConfig = jest.spyOn(Config, "getConfig");
+        getConfig.mockReturnValue({ ...CONFIG, workflowId: "foo-workflow-id" });
+        jest.mock("@src/lib/workflows/Workflows");
+        jest
+          .spyOn(workflowsLib.Workflows.prototype, "findWorkflowToDispatch")
+          .mockImplementation(findWorkflowToDispatch);
+      });
+
+      it("should call findWorkflowToDispatch with workflow_id", async () => {
+        await deployAndGetArtifact(inputs, logger);
+
+        expect(findWorkflowToDispatch).toHaveBeenCalledWith("foo-workflow-id");
+      });
+    });
+
+    describe("when workflow_id is a number", () => {
+      const findWorkflowToDispatch = jest.fn();
+
+      beforeEach(() => {
+        jest.mock("@src/lib/config/Config");
+        const getConfig = jest.spyOn(Config, "getConfig");
+        getConfig.mockReturnValue(CONFIG);
+        jest.mock("@src/lib/workflows/Workflows");
+        jest
+          .spyOn(workflowsLib.Workflows.prototype, "findWorkflowToDispatch")
+          .mockImplementation(findWorkflowToDispatch);
+      });
+
+      it("should not call findWorkflowToDispatch", async () => {
+        await deployAndGetArtifact(inputs, logger);
+
+        expect(findWorkflowToDispatch).not.toHaveBeenCalled();
       });
     });
 

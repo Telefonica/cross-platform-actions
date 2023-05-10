@@ -4,6 +4,7 @@ import { Github, throwIfJobFailed } from "./Github";
 import type {
   GithubInterface,
   DispatchOptions,
+  GetWorkflowsResponse,
   GetRunJobResponse,
   GetRunResponse,
   StepUUID,
@@ -42,6 +43,42 @@ export const Workflows: WorkflowsConstructor = class Workflows implements Workfl
   public async dispatch(options: DispatchOptions): Promise<void> {
     await this._githubClient.dispatchWorkflow(options);
     this._logger.info(`Workflow ${options.workflowId} dispatched`);
+  }
+
+  public async findWorkflowToDispatch(workflowId: string): Promise<number> {
+    this._logger.info(`Searching workflow ${workflowId} in repository workflows list to dispatch`);
+    const workflows = await this._githubClient.getWorkflows();
+    this._logger.debug(`Workflows found: ${JSON.stringify(workflows.data.workflows)}`);
+    const foundWorkflow = this._findWorkflowInWorkflowsResponse(
+      workflows.data.workflows,
+      workflowId
+    );
+    return foundWorkflow;
+  }
+
+  private _findWorkflowInWorkflowsResponse(
+    workflows: GetWorkflowsResponse["data"]["workflows"],
+    workflowId: string
+  ): number {
+    let foundWorkflow: GetWorkflowsResponse["data"]["workflows"][0] | undefined;
+    foundWorkflow = workflows.find((workflow) =>
+      workflow.path.toLowerCase().includes(workflowId.toLowerCase())
+    );
+    if (!foundWorkflow) {
+      foundWorkflow = workflows.find((workflow) =>
+        workflow.path.toLowerCase().includes(workflowId.toLowerCase().replaceAll("-", "_"))
+      );
+    }
+    if (!foundWorkflow) {
+      foundWorkflow = workflows.find((workflow) =>
+        workflow.name.toLowerCase().includes(workflowId.toLowerCase())
+      );
+    }
+    if (!foundWorkflow) {
+      throw new Error(`Workflow ${workflowId} not found`);
+    }
+    this._logger.debug(`Workflow ${workflowId} found. Id: ${foundWorkflow["id"]}`);
+    return foundWorkflow["id"];
   }
 
   private async _findJobInWorkflowRun(

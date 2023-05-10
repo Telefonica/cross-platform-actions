@@ -11,6 +11,7 @@ import type {
   GetRunJobsOptions,
   GetRunArtifactsOptions,
   DownloadRunArtifactOptions,
+  GetWorkflowsResponse,
   GetRunResponse,
   GetRunJobResponse,
   GetRunJobsResponse,
@@ -43,6 +44,13 @@ export const Github: GithubConstructor = class Github implements GithubInterface
     this._owner = owner;
     this._project = project;
     this._logger = logger;
+  }
+
+  public async getWorkflows(): Promise<GetWorkflowsResponse> {
+    return this._octokit.request("GET /repos/{owner}/{repo}/actions/workflows", {
+      owner: this._owner,
+      repo: this._project,
+    });
   }
 
   public async dispatchWorkflow({ workflowId, ref, stepUUID }: DispatchOptions) {

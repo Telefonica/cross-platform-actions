@@ -28,6 +28,7 @@ export interface WaitForTargetJobOptions {
 
 /** Workflows interface */
 export interface WorkflowsInterface {
+  findWorkflowToDispatch(workflowId: string): Promise<number>;
   dispatch(options: DispatchOptions): Promise<void>;
   waitForTargetJobToComplete(options: WaitForTargetJobOptions): Promise<GetRunJobResponse>;
   waitForTargetJobToSuccess(options: WaitForTargetJobOptions): Promise<GetRunJobResponse>;

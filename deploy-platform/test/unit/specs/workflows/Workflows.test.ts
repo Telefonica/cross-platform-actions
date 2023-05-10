@@ -10,6 +10,8 @@ import {
   GET_RUN_ARTIFACTS_PATH,
   getRunArtifactsResponse,
   downloadRunArtifactResponse,
+  GET_WORKFLOWS_PATH,
+  getWorkflowsResponse,
 } from "@support/fixtures/Octokit";
 import { getLogger } from "@support/mocks/Logger";
 import { octokit } from "@support/mocks/Octokit";
@@ -28,6 +30,7 @@ describe("Workflows module", () => {
     const TIMEOUT_ARTIFACT = 500;
     const REQUEST_INTERVAL = 100;
     const STEP_UUID = "foo-step-uuid";
+    const WORKFLOW_ID = 1234;
 
     beforeEach(() => {
       logger = getLogger();
@@ -42,9 +45,102 @@ describe("Workflows module", () => {
       });
     });
 
+    describe("findWorkflowToDispatch method", () => {
+      const workflowId = "foo-workflow-id";
+
+      it("should return the id of the workflow to dispatch", async () => {
+        octokit.request.mockImplementation((requestPath) => {
+          if (requestPath === GET_WORKFLOWS_PATH) {
+            return getWorkflowsResponse(workflowId);
+          }
+        });
+        const result = await workflows.findWorkflowToDispatch(workflowId);
+
+        expect(result).toEqual(WORKFLOW_ID);
+      });
+
+      describe("when the name of the .yml have some part uppercase", () => {
+        it("should return the id of the workflow to dispatch", async () => {
+          octokit.request.mockImplementation((requestPath) => {
+            if (requestPath === GET_WORKFLOWS_PATH) {
+              return getWorkflowsResponse(workflowId.toUpperCase());
+            }
+          });
+          const result = await workflows.findWorkflowToDispatch(workflowId);
+
+          expect(result).toEqual(WORKFLOW_ID);
+        });
+      });
+
+      describe("when the name of the .yml have '_' instead of '-'", () => {
+        it("should return the id of the workflow to dispatch", async () => {
+          octokit.request.mockImplementation((requestPath) => {
+            if (requestPath === GET_WORKFLOWS_PATH) {
+              return getWorkflowsResponse(workflowId.replaceAll("-", "_"));
+            }
+          });
+          const result = await workflows.findWorkflowToDispatch(workflowId);
+
+          expect(result).toEqual(WORKFLOW_ID);
+        });
+      });
+
+      describe("when the name of the .yml have some part uppercase and '_' instead of '-'", () => {
+        it("should return the id of the workflow to dispatch", async () => {
+          octokit.request.mockImplementation((requestPath) => {
+            if (requestPath === GET_WORKFLOWS_PATH) {
+              return getWorkflowsResponse(workflowId.toUpperCase().replaceAll("-", "_"));
+            }
+          });
+          const result = await workflows.findWorkflowToDispatch(workflowId);
+
+          expect(result).toEqual(WORKFLOW_ID);
+        });
+      });
+
+      describe("when workflow_id is the name of the workflow", () => {
+        const workflowName = "foo-workflow-name";
+
+        it("should return the id of the workflow to dispatch", async () => {
+          octokit.request.mockImplementation((requestPath) => {
+            if (requestPath === GET_WORKFLOWS_PATH) {
+              return getWorkflowsResponse();
+            }
+          });
+          const result = await workflows.findWorkflowToDispatch(workflowName);
+
+          expect(result).toEqual(WORKFLOW_ID);
+        });
+
+        it("should return the id of the workflow to dispatch even if the name is uppercase", async () => {
+          octokit.request.mockImplementation((requestPath) => {
+            if (requestPath === GET_WORKFLOWS_PATH) {
+              return getWorkflowsResponse();
+            }
+          });
+          const result = await workflows.findWorkflowToDispatch(workflowName.toUpperCase());
+
+          expect(result).toEqual(WORKFLOW_ID);
+        });
+      });
+
+      describe("when the workflow is not found", () => {
+        it("should throw an error", async () => {
+          octokit.request.mockImplementation((requestPath) => {
+            if (requestPath === GET_WORKFLOWS_PATH) {
+              return getWorkflowsResponse();
+            }
+          });
+
+          await expect(workflows.findWorkflowToDispatch(workflowId)).rejects.toThrowError(
+            `Workflow ${workflowId} not found`
+          );
+        });
+      });
+    });
+
     describe("dispatchWorkflow method", () => {
       it("should call to Github sdk to dispatch a workflow", async () => {
-        const WORKFLOW_ID = "foo-workflow-id";
         const REF = "foo-ref";
 
         await workflows.dispatch({
@@ -86,7 +182,7 @@ describe("Workflows module", () => {
         expect(result).toEqual({
           conclusion: "success",
           name: "foo-job-name",
-          id: 1234,
+          id: WORKFLOW_ID,
           steps: [
             {
               name: `${STEP_UUID}`,
@@ -112,7 +208,7 @@ describe("Workflows module", () => {
         expect(result).toEqual({
           conclusion: "success",
           name: "foo-job-name",
-          id: 1234,
+          id: WORKFLOW_ID,
           steps: [
             {
               name: `Set ID: ${STEP_UUID} - foo`,
@@ -202,7 +298,7 @@ describe("Workflows module", () => {
         expect(result).toEqual({
           conclusion: "success",
           name: "foo-job-name",
-          id: 1234,
+          id: WORKFLOW_ID,
           steps: [
             {
               name: `${STEP_UUID}`,

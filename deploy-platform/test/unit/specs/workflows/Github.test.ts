@@ -4,6 +4,7 @@ import {
   DISPATCH_WORKFLOW_PATH,
   GET_RUN_ARTIFACTS_PATH,
   DOWNLOAD_RUN_ARTIFACT_PATH,
+  GET_WORKFLOWS_PATH,
 } from "@support/fixtures/Octokit";
 import { getLogger } from "@support/mocks/Logger";
 import { octokit } from "@support/mocks/Octokit";
@@ -28,8 +29,19 @@ describe("Github module", () => {
       });
     });
 
+    describe("getWorkflows method", () => {
+      it("should call to Github sdk to get workflows", async () => {
+        await github.getWorkflows();
+
+        expect(octokit.request).toHaveBeenCalledWith(GET_WORKFLOWS_PATH, {
+          owner: OWNER,
+          repo: PROJECT,
+        });
+      });
+    });
+
     describe("dispatchWorkflow method", () => {
-      const WORKFLOW_ID = "foo-workflow-id";
+      const WORKFLOW_ID = 1234;
       const REF = "foo-ref";
       const STEP_UUID = "foo-step-uuid";
 
