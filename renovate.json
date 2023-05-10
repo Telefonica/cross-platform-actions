@@ -2,5 +2,47 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "config:base"
-  ]
+  ],
+  "baseBranches": ["main"],
+  "automerge": true,
+  "platformAutomerge": true,
+  "automergeStrategy": "squash",
+  "major": {
+    "automerge": false
+  },
+  "minor": {
+    "automerge": true
+  },
+  "separateMultipleMajor": true,
+  "rangeStrategy": "pin",
+  "packageRules": [
+    {
+      "groupName": "all patch dependencies",
+      "groupSlug": "all-patch-dependencies",
+      "matchPackagePatterns": [
+        "*"
+      ],
+      "matchUpdateTypes": [
+        "patch"
+      ]
+    },
+    {
+      "matchDepTypes": ["peerDependencies", "engines"],
+      "rangeStrategy": "widen"
+    },
+    {
+      "matchPackageNames": ["node"],
+      "allowedVersions": "<19"
+    }
+  ],
+  "labels": [
+    "dependencies",
+    "renovate"
+  ],
+  "stabilityDays": 3,
+  "prHourlyLimit": 2,
+  "prConcurrentLimit": 2,
+  "timezone": "Europe/Madrid",
+  "schedule": ["after 8pm and before 6am on every weekday", "every weekend"],
+  "masterIssue": true
 }

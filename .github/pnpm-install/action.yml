@@ -1,0 +1,38 @@
+name: 'Pnpm install'
+description: 'Install Node and Pnpm'
+inputs:
+  node-version:
+    description: 'Node.js version'
+    default: '18.x'
+  working-dir:
+    description: 'Monorepo working directory'
+    default: '.'
+runs:
+  using: 'composite'
+  steps:
+    - name: Install pnpm
+      uses: pnpm/action-setup@v2.2.4
+      with:
+        version: '8.x'
+    - name: Use Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ inputs.node-version }}
+        cache: 'pnpm'
+        cache-dependency-path: ${{ inputs.working-dir }}/pnpm-lock.yaml
+    - name: Get pnpm store directory
+      shell: bash
+      id: pnpm-cache
+      run: |
+        echo "pnpm_cache_dir=$(pnpm store path)" >> $GITHUB_OUTPUT 
+    - uses: actions/cache@v3
+      name: Setup pnpm cache
+      with:
+        path: ${{ steps.pnpm-cache.outputs.pnpm_cache_dir }}
+        key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+        restore-keys: |
+          ${{ runner.os }}-pnpm-store-
+    - name: Install dependencies
+      shell: bash
+      working-directory: ${{ inputs.working-dir }}
+      run: pnpm install
