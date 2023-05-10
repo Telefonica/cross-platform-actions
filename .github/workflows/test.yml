@@ -14,7 +14,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Setup env
-        uses: Telefonica/cross-nx/.github/actions/pnpm-install@0.1.0-beta.1
+        uses: ./.github/actions/pnpm-install
       - name: Lint
         run: pnpm run lint
       - name: Check spelling
@@ -31,7 +31,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Setup env
-        uses: Telefonica/cross-nx/.github/actions/pnpm-install@0.1.0-beta.1
+        uses: ./.github/actions/pnpm-install
       - name: Test
         run: pnpm run test
   build:
@@ -43,7 +43,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Setup env
-        uses: Telefonica/cross-nx/.github/actions/pnpm-install@0.1.0-beta.1
+        uses: ./.github/actions/pnpm-install
       - name: Build
         run: pnpm run build
       - name: Check dist
