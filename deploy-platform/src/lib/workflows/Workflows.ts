@@ -45,40 +45,62 @@ export const Workflows: WorkflowsConstructor = class Workflows implements Workfl
     this._logger.info(`Workflow ${options.workflowId} dispatched`);
   }
 
-  public async findWorkflowToDispatch(workflowId: string): Promise<number> {
-    this._logger.info(`Searching workflow ${workflowId} in repository workflows list to dispatch`);
+  public async findWorkflowToDispatch(workflowFileName: string): Promise<number> {
+    this._logger.info(
+      `Searching workflow ${workflowFileName} in repository workflows list to dispatch`
+    );
     const workflows = await this._githubClient.getWorkflows();
     this._logger.debug(`Workflows found: ${JSON.stringify(workflows.data.workflows)}`);
     const foundWorkflow = this._findWorkflowInWorkflowsResponse(
       workflows.data.workflows,
-      workflowId
+      workflowFileName
     );
     return foundWorkflow;
   }
 
   private _findWorkflowInWorkflowsResponse(
     workflows: GetWorkflowsResponse["data"]["workflows"],
-    workflowId: string
+    workflowFileName: string
   ): number {
-    let foundWorkflow: GetWorkflowsResponse["data"]["workflows"][0] | undefined;
-    foundWorkflow = workflows.find((workflow) =>
-      workflow.path.toLowerCase().includes(workflowId.toLowerCase())
+    const foundWorkflow =
+      this._findWorkflowWithPathEqualToLowercaseName(workflows, workflowFileName) ||
+      this._findWorkflowWithPathEqualsToLowercaseNameReplacingDashes(
+        workflows,
+        workflowFileName
+      ) ||
+      this._findWorkflowByName(workflows, workflowFileName);
+    if (!foundWorkflow) {
+      throw new Error(`Workflow ${workflowFileName} not found`);
+    }
+    this._logger.debug(`Workflow ${workflowFileName} found. Id: ${foundWorkflow["id"]}`);
+    return foundWorkflow.id;
+  }
+
+  private _findWorkflowWithPathEqualToLowercaseName(
+    workflows: GetWorkflowsResponse["data"]["workflows"],
+    workflowFileName: string
+  ) {
+    return workflows.find((workflow) =>
+      workflow.path.toLowerCase().endsWith(workflowFileName.toLowerCase())
     );
-    if (!foundWorkflow) {
-      foundWorkflow = workflows.find((workflow) =>
-        workflow.path.toLowerCase().includes(workflowId.toLowerCase().replaceAll("-", "_"))
-      );
-    }
-    if (!foundWorkflow) {
-      foundWorkflow = workflows.find((workflow) =>
-        workflow.name.toLowerCase().includes(workflowId.toLowerCase())
-      );
-    }
-    if (!foundWorkflow) {
-      throw new Error(`Workflow ${workflowId} not found`);
-    }
-    this._logger.debug(`Workflow ${workflowId} found. Id: ${foundWorkflow["id"]}`);
-    return foundWorkflow["id"];
+  }
+
+  private _findWorkflowWithPathEqualsToLowercaseNameReplacingDashes(
+    workflows: GetWorkflowsResponse["data"]["workflows"],
+    workflowFileName: string
+  ) {
+    return workflows.find((workflow) =>
+      workflow.path.toLowerCase().endsWith(workflowFileName.toLowerCase().replaceAll("-", "_"))
+    );
+  }
+
+  private _findWorkflowByName(
+    workflows: GetWorkflowsResponse["data"]["workflows"],
+    workflowFileName: string
+  ) {
+    return workflows.find(
+      (workflow) => workflow.name.toLowerCase() === workflowFileName.toLowerCase()
+    );
   }
 
   private async _findJobInWorkflowRun(

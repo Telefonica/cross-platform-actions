@@ -52619,10 +52619,9 @@ async function deployAndGetArtifact(inputs, logger) {
         requestInterval: config.requestInterval,
         logger,
     });
-    // Find workflow to dispatch if workflowId is the name of the workflow
-    const workflowId = isNaN(Number(config.workflowId))
-        ? await workflows.findWorkflowToDispatch(config.workflowId)
-        : Number(config.workflowId);
+    // Check if workflowId is provided or find it from workflowFileName
+    const workflowId = config.workflowId ||
+        (await workflows.findWorkflowToDispatch(config.workflowFileName));
     // Dispatch workflow that will create a job with the unique step UUID
     await workflows.dispatch({
         workflowId,
@@ -52650,7 +52649,7 @@ exports.deployAndGetArtifact = deployAndGetArtifact;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getConfig = exports.getWorkflowId = exports.getRepoName = exports.CONFIG_SECRETS = exports.DEFAULT_VARS = exports.TIMEOUT_VARS = void 0;
+exports.getConfig = exports.getWorkflowFileName = exports.getRepoName = exports.CONFIG_SECRETS = exports.DEFAULT_VARS = exports.TIMEOUT_VARS = void 0;
 exports.TIMEOUT_VARS = {
     JOB_COMPLETED: 600000,
     ARTIFACT_AVAILABLE: 10000,
@@ -52659,8 +52658,8 @@ exports.TIMEOUT_VARS = {
 exports.DEFAULT_VARS = {
     GITHUB_OWNER: "Telefonica",
     REPO_REF: "main",
-    WORKFLOW_ID_PREFIX: "deploy",
-    WORKFLOW_ID_EXTENSION: "yml",
+    WORKFLOW_FILE_NAME_PREFIX: "deploy",
+    WORKFLOW_FILE_NAME_EXTENSION: "yml",
     REPO_SUFFIX: "-platform",
 };
 exports.CONFIG_SECRETS = ["githubToken"];
@@ -52671,21 +52670,33 @@ function getRepoName(repoBaseName, customRepoName) {
     return `${repoBaseName}${exports.DEFAULT_VARS.REPO_SUFFIX}`;
 }
 exports.getRepoName = getRepoName;
-function getWorkflowId(environment) {
-    return `${exports.DEFAULT_VARS.WORKFLOW_ID_PREFIX}-${environment}.${exports.DEFAULT_VARS.WORKFLOW_ID_EXTENSION}`;
+function getWorkflowFileName(environment) {
+    return `${exports.DEFAULT_VARS.WORKFLOW_FILE_NAME_PREFIX}-${environment}.${exports.DEFAULT_VARS.WORKFLOW_FILE_NAME_EXTENSION}`;
 }
-exports.getWorkflowId = getWorkflowId;
+exports.getWorkflowFileName = getWorkflowFileName;
 function getConfig(inputs) {
     const repoName = getRepoName(inputs.project, inputs.repoName);
     const token = inputs.token;
     const environment = inputs.environment;
-    const workflowId = inputs.workflowId || getWorkflowId(environment);
+    let workflowId, workflowFileName;
+    if (inputs.workflowId) {
+        if (isNaN(inputs.workflowId)) {
+            workflowFileName = inputs.workflowId;
+        }
+        else {
+            workflowId = inputs.workflowId;
+        }
+    }
+    else {
+        workflowFileName = getWorkflowFileName(environment);
+    }
     const repoRef = inputs.ref || exports.DEFAULT_VARS.REPO_REF;
     return {
         timeoutJobCompleted: exports.TIMEOUT_VARS.JOB_COMPLETED,
         timeoutArtifactAvailable: exports.TIMEOUT_VARS.ARTIFACT_AVAILABLE,
         repoName,
         repoRef,
+        workflowFileName,
         workflowId,
         githubOwner: exports.DEFAULT_VARS.GITHUB_OWNER,
         githubToken: token,
@@ -52885,27 +52896,31 @@ const Workflows = class Workflows {
         await this._githubClient.dispatchWorkflow(options);
         this._logger.info(`Workflow ${options.workflowId} dispatched`);
     }
-    async findWorkflowToDispatch(workflowId) {
-        this._logger.info(`Searching workflow ${workflowId} in repository workflows list to dispatch`);
+    async findWorkflowToDispatch(workflowFileName) {
+        this._logger.info(`Searching workflow ${workflowFileName} in repository workflows list to dispatch`);
         const workflows = await this._githubClient.getWorkflows();
         this._logger.debug(`Workflows found: ${JSON.stringify(workflows.data.workflows)}`);
-        const foundWorkflow = this._findWorkflowInWorkflowsResponse(workflows.data.workflows, workflowId);
+        const foundWorkflow = this._findWorkflowInWorkflowsResponse(workflows.data.workflows, workflowFileName);
         return foundWorkflow;
     }
-    _findWorkflowInWorkflowsResponse(workflows, workflowId) {
-        let foundWorkflow;
-        foundWorkflow = workflows.find((workflow) => workflow.path.toLowerCase().includes(workflowId.toLowerCase()));
+    _findWorkflowInWorkflowsResponse(workflows, workflowFileName) {
+        const foundWorkflow = this._findWorkflowWithPathEqualToLowercaseName(workflows, workflowFileName) ||
+            this._findWorkflowWithPathEqualsToLowercaseNameReplacingDashes(workflows, workflowFileName) ||
+            this._findWorkflowByName(workflows, workflowFileName);
         if (!foundWorkflow) {
-            foundWorkflow = workflows.find((workflow) => workflow.path.toLowerCase().includes(workflowId.toLowerCase().replaceAll("-", "_")));
+            throw new Error(`Workflow ${workflowFileName} not found`);
         }
-        if (!foundWorkflow) {
-            foundWorkflow = workflows.find((workflow) => workflow.name.toLowerCase().includes(workflowId.toLowerCase()));
-        }
-        if (!foundWorkflow) {
-            throw new Error(`Workflow ${workflowId} not found`);
-        }
-        this._logger.debug(`Workflow ${workflowId} found. Id: ${foundWorkflow["id"]}`);
-        return foundWorkflow["id"];
+        this._logger.debug(`Workflow ${workflowFileName} found. Id: ${foundWorkflow["id"]}`);
+        return foundWorkflow.id;
+    }
+    _findWorkflowWithPathEqualToLowercaseName(workflows, workflowFileName) {
+        return workflows.find((workflow) => workflow.path.toLowerCase().endsWith(workflowFileName.toLowerCase()));
+    }
+    _findWorkflowWithPathEqualsToLowercaseNameReplacingDashes(workflows, workflowFileName) {
+        return workflows.find((workflow) => workflow.path.toLowerCase().endsWith(workflowFileName.toLowerCase().replaceAll("-", "_")));
+    }
+    _findWorkflowByName(workflows, workflowFileName) {
+        return workflows.find((workflow) => workflow.name.toLowerCase() === workflowFileName.toLowerCase());
     }
     async _findJobInWorkflowRun(runId, stepUUID) {
         const workflowJobs = await this._githubClient.getRunJobs({ runId });

@@ -25,7 +25,8 @@ const CONFIG = {
   timeoutArtifactAvailable: 500,
   repoName: "foo-repo-name-platform",
   repoRef: "foo-repo-ref",
-  workflowId: "foo-workflow-id",
+  workflowFileName: "foo-workflow-id",
+  workflowId: undefined,
   githubOwner: "foo-github-owner",
   githubToken: "foo-github-token",
   environment: "foo-environment",
@@ -115,7 +116,7 @@ describe("runDeployAndGetArtifactAction method", () => {
       octokit.request.mockImplementation((requestPath) => {
         switch (requestPath) {
           case GET_WORKFLOWS_PATH:
-            return getWorkflowsResponse(CONFIG.workflowId);
+            return getWorkflowsResponse(CONFIG.workflowFileName);
           case GET_RUNS_PATH:
             return getRunsResponse();
           case GET_RUN_JOBS_PATH:

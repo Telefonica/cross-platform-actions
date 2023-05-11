@@ -12,13 +12,13 @@ const WORKFLOW_RUN_RESPONSE = {
   id: "foo-run-id",
 };
 
-export function getWorkflowsResponse(workflowId?: string) {
+export function getWorkflowsResponse(workflowFileName?: string) {
   return {
     data: {
       workflows: [
         {
           id: 1234,
-          path: `.github/workflows/${workflowId}`,
+          path: `.github/workflows/${workflowFileName}`,
           name: "foo-workflow-name",
         },
       ],
