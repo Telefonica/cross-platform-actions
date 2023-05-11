@@ -51,14 +51,14 @@ export const Workflows: WorkflowsConstructor = class Workflows implements Workfl
     );
     const workflows = await this._githubClient.getWorkflows();
     this._logger.debug(`Workflows found: ${JSON.stringify(workflows.data.workflows)}`);
-    const foundWorkflow = this._findWorkflowInWorkflowsResponse(
+    const foundWorkflowId = this._findWorkflowIdInWorkflowsResponse(
       workflows.data.workflows,
       workflowFileName
     );
-    return foundWorkflow;
+    return foundWorkflowId;
   }
 
-  private _findWorkflowInWorkflowsResponse(
+  private _findWorkflowIdInWorkflowsResponse(
     workflows: GetWorkflowsResponse["data"]["workflows"],
     workflowFileName: string
   ): number {
@@ -72,7 +72,7 @@ export const Workflows: WorkflowsConstructor = class Workflows implements Workfl
     if (!foundWorkflow) {
       throw new Error(`Workflow ${workflowFileName} not found`);
     }
-    this._logger.debug(`Workflow ${workflowFileName} found. Id: ${foundWorkflow["id"]}`);
+    this._logger.debug(`Workflow ${workflowFileName} found. Id: ${foundWorkflow.id}`);
     return foundWorkflow.id;
   }
 
