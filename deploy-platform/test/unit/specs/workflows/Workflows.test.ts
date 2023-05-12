@@ -254,7 +254,7 @@ describe("Workflows module", () => {
             stepUUID: STEP_UUID,
             executedFrom: "foo-executed-from",
           })
-        ).rejects.toThrowError("Timed out while waiting for target job to complete");
+        ).rejects.toThrow("Timed out while waiting for target job to complete");
       });
     });
 
@@ -321,7 +321,7 @@ describe("Workflows module", () => {
           workflows.downloadJobFirstArtifact(
             getRunJobsResponse(STEP_UUID).data.jobs[0] as GetRunJobResponse
           )
-        ).rejects.toThrowError("Timed out while trying to download artifact");
+        ).rejects.toThrow("Timed out while trying to download artifact");
       });
 
       describe("when there is more than one artifact", () => {

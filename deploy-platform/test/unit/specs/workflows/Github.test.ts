@@ -185,7 +185,7 @@ describe("Github module", () => {
     it("should throw an error if job conclusion is not success", () => {
       expect(() =>
         throwIfJobFailed({ conclusion: "failure", name: "foo-name" } as GetRunJobResponse)
-      ).toThrowError("Job foo-name failed");
+      ).toThrow("Job foo-name failed");
     });
 
     it("should not throw if job conclusion is success", () => {
