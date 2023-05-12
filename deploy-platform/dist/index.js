@@ -52619,9 +52619,12 @@ async function deployAndGetArtifact(inputs, logger) {
         requestInterval: config.requestInterval,
         logger,
     });
+    // Check if workflowId is provided or find it from workflowFileName
+    const workflowId = config.workflowId ||
+        (await workflows.findWorkflowToDispatch(config.workflowFileName));
     // Dispatch workflow that will create a job with the unique step UUID
     await workflows.dispatch({
-        workflowId: config.workflowId,
+        workflowId,
         ref: config.repoRef,
         stepUUID,
     });
@@ -52646,7 +52649,7 @@ exports.deployAndGetArtifact = deployAndGetArtifact;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getConfig = exports.getWorkflowId = exports.getRepoName = exports.CONFIG_SECRETS = exports.DEFAULT_VARS = exports.TIMEOUT_VARS = void 0;
+exports.getConfig = exports.getWorkflowFileName = exports.getRepoName = exports.CONFIG_SECRETS = exports.DEFAULT_VARS = exports.TIMEOUT_VARS = void 0;
 exports.TIMEOUT_VARS = {
     JOB_COMPLETED: 600000,
     ARTIFACT_AVAILABLE: 10000,
@@ -52655,8 +52658,8 @@ exports.TIMEOUT_VARS = {
 exports.DEFAULT_VARS = {
     GITHUB_OWNER: "Telefonica",
     REPO_REF: "main",
-    WORKFLOW_ID_PREFIX: "deploy",
-    WORKFLOW_ID_EXTENSION: "yml",
+    WORKFLOW_FILE_NAME_PREFIX: "deploy",
+    WORKFLOW_FILE_NAME_EXTENSION: "yml",
     REPO_SUFFIX: "-platform",
 };
 exports.CONFIG_SECRETS = ["githubToken"];
@@ -52667,21 +52670,33 @@ function getRepoName(repoBaseName, customRepoName) {
     return `${repoBaseName}${exports.DEFAULT_VARS.REPO_SUFFIX}`;
 }
 exports.getRepoName = getRepoName;
-function getWorkflowId(environment) {
-    return `${exports.DEFAULT_VARS.WORKFLOW_ID_PREFIX}-${environment}.${exports.DEFAULT_VARS.WORKFLOW_ID_EXTENSION}`;
+function getWorkflowFileName(environment) {
+    return `${exports.DEFAULT_VARS.WORKFLOW_FILE_NAME_PREFIX}-${environment}.${exports.DEFAULT_VARS.WORKFLOW_FILE_NAME_EXTENSION}`;
 }
-exports.getWorkflowId = getWorkflowId;
+exports.getWorkflowFileName = getWorkflowFileName;
 function getConfig(inputs) {
     const repoName = getRepoName(inputs.project, inputs.repoName);
     const token = inputs.token;
     const environment = inputs.environment;
-    const workflowId = inputs.workflowId || getWorkflowId(environment);
+    let workflowId, workflowFileName;
+    if (inputs.workflowId) {
+        if (isNaN(inputs.workflowId)) {
+            workflowFileName = inputs.workflowId;
+        }
+        else {
+            workflowId = inputs.workflowId;
+        }
+    }
+    else {
+        workflowFileName = getWorkflowFileName(environment);
+    }
     const repoRef = inputs.ref || exports.DEFAULT_VARS.REPO_REF;
     return {
         timeoutJobCompleted: exports.TIMEOUT_VARS.JOB_COMPLETED,
         timeoutArtifactAvailable: exports.TIMEOUT_VARS.ARTIFACT_AVAILABLE,
         repoName,
         repoRef,
+        workflowFileName,
         workflowId,
         githubOwner: exports.DEFAULT_VARS.GITHUB_OWNER,
         githubToken: token,
@@ -52790,6 +52805,12 @@ const Github = class Github {
         this._project = project;
         this._logger = logger;
     }
+    async getWorkflows() {
+        return this._octokit.request("GET /repos/{owner}/{repo}/actions/workflows", {
+            owner: this._owner,
+            repo: this._project,
+        });
+    }
     async dispatchWorkflow({ workflowId, ref, stepUUID }) {
         try {
             const dataToSend = {
@@ -52856,8 +52877,20 @@ exports.Github = Github;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.Workflows = void 0;
+exports.Workflows = exports.findWorkflowByName = exports.findWorkflowWithPathEqualsToLowercaseNameReplacingDashes = exports.findWorkflowWithPathEqualToLowercaseName = void 0;
 const Github_1 = __nccwpck_require__(1410);
+function findWorkflowWithPathEqualToLowercaseName(workflows, workflowFileName) {
+    return workflows.find((workflow) => workflow.path.toLowerCase().endsWith(workflowFileName.toLowerCase()));
+}
+exports.findWorkflowWithPathEqualToLowercaseName = findWorkflowWithPathEqualToLowercaseName;
+function findWorkflowWithPathEqualsToLowercaseNameReplacingDashes(workflows, workflowFileName) {
+    return workflows.find((workflow) => workflow.path.toLowerCase().endsWith(workflowFileName.toLowerCase().replaceAll("-", "_")));
+}
+exports.findWorkflowWithPathEqualsToLowercaseNameReplacingDashes = findWorkflowWithPathEqualsToLowercaseNameReplacingDashes;
+function findWorkflowByName(workflows, workflowFileName) {
+    return workflows.find((workflow) => workflow.name.toLowerCase() === workflowFileName.toLowerCase());
+}
+exports.findWorkflowByName = findWorkflowByName;
 const Workflows = class Workflows {
     _githubClient;
     _timeoutJobCompleted;
@@ -52874,6 +52907,24 @@ const Workflows = class Workflows {
     async dispatch(options) {
         await this._githubClient.dispatchWorkflow(options);
         this._logger.info(`Workflow ${options.workflowId} dispatched`);
+    }
+    async findWorkflowToDispatch(workflowFileName) {
+        this._logger.info(`Searching workflow ${workflowFileName} in repository workflows list to dispatch`);
+        const workflows = await this._githubClient.getWorkflows();
+        this._logger.debug(`Workflows found: ${JSON.stringify(workflows.data.workflows)}`);
+        const foundWorkflowId = this._findWorkflowIdInWorkflowsResponse(workflows.data.workflows, workflowFileName);
+        return foundWorkflowId;
+    }
+    _findWorkflowIdInWorkflowsResponse(workflows, workflowFileName) {
+        const foundWorkflow = findWorkflowWithPathEqualToLowercaseName(workflows, workflowFileName) ||
+            findWorkflowWithPathEqualsToLowercaseNameReplacingDashes(workflows, workflowFileName) ||
+            findWorkflowByName(workflows, workflowFileName);
+        if (!foundWorkflow) {
+            throw new Error(`Workflow ${workflowFileName} not found`);
+        }
+        this._logger.info(`Found workflow with fileName "${foundWorkflow.path.split("/").pop()}" and name "${foundWorkflow.name}" matching with "${workflowFileName}"`);
+        this._logger.debug(`Workflow ${workflowFileName} found. Id: ${foundWorkflow.id}`);
+        return foundWorkflow.id;
     }
     async _findJobInWorkflowRun(runId, stepUUID) {
         const workflowJobs = await this._githubClient.getRunJobs({ runId });

@@ -20,6 +20,7 @@ module.exports = {
       },
     ],
     camelcase: [2, { properties: "never" }],
+    "dot-notation": 2,
     "no-console": [2, { allow: ["warn", "error"] }],
     "no-shadow": [2, { builtinGlobals: true, hoist: "all" }],
     "no-undef": 2,

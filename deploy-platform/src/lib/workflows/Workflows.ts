@@ -4,6 +4,7 @@ import { Github, throwIfJobFailed } from "./Github";
 import type {
   GithubInterface,
   DispatchOptions,
+  GetWorkflowsResponse,
   GetRunJobResponse,
   GetRunResponse,
   StepUUID,
@@ -15,6 +16,33 @@ import type {
   WorkflowsInterface,
   WaitForTargetJobOptions,
 } from "./Workflows.types";
+
+export function findWorkflowWithPathEqualToLowercaseName(
+  workflows: GetWorkflowsResponse["data"]["workflows"],
+  workflowFileName: string
+) {
+  return workflows.find((workflow) =>
+    workflow.path.toLowerCase().endsWith(workflowFileName.toLowerCase())
+  );
+}
+
+export function findWorkflowWithPathEqualsToLowercaseNameReplacingDashes(
+  workflows: GetWorkflowsResponse["data"]["workflows"],
+  workflowFileName: string
+) {
+  return workflows.find((workflow) =>
+    workflow.path.toLowerCase().endsWith(workflowFileName.toLowerCase().replaceAll("-", "_"))
+  );
+}
+
+export function findWorkflowByName(
+  workflows: GetWorkflowsResponse["data"]["workflows"],
+  workflowFileName: string
+) {
+  return workflows.find(
+    (workflow) => workflow.name.toLowerCase() === workflowFileName.toLowerCase()
+  );
+}
 
 export const Workflows: WorkflowsConstructor = class Workflows implements WorkflowsInterface {
   private _githubClient: GithubInterface;
@@ -42,6 +70,39 @@ export const Workflows: WorkflowsConstructor = class Workflows implements Workfl
   public async dispatch(options: DispatchOptions): Promise<void> {
     await this._githubClient.dispatchWorkflow(options);
     this._logger.info(`Workflow ${options.workflowId} dispatched`);
+  }
+
+  public async findWorkflowToDispatch(workflowFileName: string): Promise<number> {
+    this._logger.info(
+      `Searching workflow ${workflowFileName} in repository workflows list to dispatch`
+    );
+    const workflows = await this._githubClient.getWorkflows();
+    this._logger.debug(`Workflows found: ${JSON.stringify(workflows.data.workflows)}`);
+    const foundWorkflowId = this._findWorkflowIdInWorkflowsResponse(
+      workflows.data.workflows,
+      workflowFileName
+    );
+    return foundWorkflowId;
+  }
+
+  private _findWorkflowIdInWorkflowsResponse(
+    workflows: GetWorkflowsResponse["data"]["workflows"],
+    workflowFileName: string
+  ): number {
+    const foundWorkflow =
+      findWorkflowWithPathEqualToLowercaseName(workflows, workflowFileName) ||
+      findWorkflowWithPathEqualsToLowercaseNameReplacingDashes(workflows, workflowFileName) ||
+      findWorkflowByName(workflows, workflowFileName);
+    if (!foundWorkflow) {
+      throw new Error(`Workflow ${workflowFileName} not found`);
+    }
+    this._logger.info(
+      `Found workflow with fileName "${foundWorkflow.path.split("/").pop()}" and name "${
+        foundWorkflow.name
+      }" matching with "${workflowFileName}"`
+    );
+    this._logger.debug(`Workflow ${workflowFileName} found. Id: ${foundWorkflow.id}`);
+    return foundWorkflow.id;
   }
 
   private async _findJobInWorkflowRun(

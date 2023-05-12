@@ -11,6 +11,8 @@ import {
   DOWNLOAD_RUN_ARTIFACT_PATH,
   downloadRunArtifactResponse,
   DISPATCH_WORKFLOW_PATH,
+  GET_WORKFLOWS_PATH,
+  getWorkflowsResponse,
 } from "@support/fixtures/Octokit";
 import { getLogger } from "@support/mocks/Logger";
 import { octokit } from "@support/mocks/Octokit";
@@ -25,7 +27,8 @@ const CONFIG = {
   timeoutArtifactAvailable: 500,
   repoName: "foo-repo-name-platform",
   repoRef: "foo-repo-ref",
-  workflowId: "foo-workflow-id",
+  workflowFileName: "foo-workflow-file-name",
+  workflowId: 1234,
   githubOwner: "foo-github-owner",
   githubToken: "foo-github-token",
   environment: "foo-environment",
@@ -50,6 +53,8 @@ describe("Deploy module", () => {
     uuid.v4.mockReturnValue(STEP_UUID);
     octokit.request.mockImplementation((requestPath) => {
       switch (requestPath) {
+        case GET_WORKFLOWS_PATH:
+          return getWorkflowsResponse(CONFIG.workflowFileName);
         case GET_RUNS_PATH:
           return getRunsResponse();
         case GET_RUN_JOBS_PATH:
@@ -138,6 +143,25 @@ describe("Deploy module", () => {
 
         expect(octokit.request.mock.calls[0][0]).toEqual(DISPATCH_WORKFLOW_PATH);
         expect(octokit.request.mock.calls[0][1].owner).toEqual(CONFIG.githubOwner);
+      });
+
+      describe("when workflowId is a provided", () => {
+        it("should dispatch workflow with the provided workflowId", async () => {
+          await deployAndGetArtifact(inputs, logger);
+
+          expect(octokit.request.mock.calls[0][0]).toEqual(DISPATCH_WORKFLOW_PATH);
+          expect(octokit.request.mock.calls[0][1].workflow_id).toEqual(CONFIG.workflowId);
+        });
+      });
+
+      describe("when workflowId is not provided", () => {
+        it("should call getWorkflows to find the workflow to dispatch", async () => {
+          const getConfig = jest.spyOn(Config, "getConfig");
+          getConfig.mockReturnValue({ ...CONFIG, workflowId: undefined });
+          await deployAndGetArtifact(inputs, logger);
+
+          expect(octokit.request.mock.calls[0][0]).toEqual(GET_WORKFLOWS_PATH);
+        });
       });
     });
   });

@@ -10,6 +10,8 @@ import {
   DOWNLOAD_RUN_ARTIFACT_PATH,
   downloadRunArtifactResponse,
   DISPATCH_WORKFLOW_PATH,
+  GET_WORKFLOWS_PATH,
+  getWorkflowsResponse,
 } from "@support/fixtures/Octokit";
 import { actionsCore } from "@support/mocks/ActionsCore";
 import { octokit } from "@support/mocks/Octokit";
@@ -23,7 +25,8 @@ const CONFIG = {
   timeoutArtifactAvailable: 500,
   repoName: "foo-repo-name-platform",
   repoRef: "foo-repo-ref",
-  workflowId: "foo-workflow-id",
+  workflowFileName: "foo-workflow-id",
+  workflowId: undefined,
   githubOwner: "foo-github-owner",
   githubToken: "foo-github-token",
   environment: "foo-environment",
@@ -46,6 +49,8 @@ describe("runDeployAndGetArtifactAction method", () => {
     uuid.v4.mockReturnValue(STEP_UUID);
     octokit.request.mockImplementation((requestPath) => {
       switch (requestPath) {
+        case GET_WORKFLOWS_PATH:
+          return getWorkflowsResponse(`deploy-${CONFIG.environment}.yml`);
         case GET_RUNS_PATH:
           return getRunsResponse();
         case GET_RUN_JOBS_PATH:
@@ -79,26 +84,27 @@ describe("runDeployAndGetArtifactAction method", () => {
     it("should send provided owner when dispatching workflow", async () => {
       await runDeployAndGetArtifactAction();
 
-      expect(octokit.request.mock.calls[0][0]).toEqual(DISPATCH_WORKFLOW_PATH);
-      expect(octokit.request.mock.calls[0][1].owner).toEqual("Telefonica");
+      expect(octokit.request.mock.calls[1][0]).toEqual(DISPATCH_WORKFLOW_PATH);
+      expect(octokit.request.mock.calls[1][1].owner).toEqual("Telefonica");
     });
 
     it('should send repoName from action input "project" adding "-platform" when dispatching workflow', async () => {
       await runDeployAndGetArtifactAction();
 
-      expect(octokit.request.mock.calls[0][0]).toEqual(DISPATCH_WORKFLOW_PATH);
-      expect(octokit.request.mock.calls[0][1].repo).toEqual(`${FOO_REPO_NAME}-platform`);
+      expect(octokit.request.mock.calls[1][0]).toEqual(DISPATCH_WORKFLOW_PATH);
+      expect(octokit.request.mock.calls[1][1].repo).toEqual(`${FOO_REPO_NAME}-platform`);
     });
 
     it('should use custom repo name from action input "repo-name" when dispatching workflow', async () => {
       actionsCore.getInput.mockImplementation((inputName) => {
+        if (inputName === "environment") return CONFIG.environment;
         if (inputName === "project") return FOO_REPO_NAME;
         if (inputName === "repo-name") return "foo-repo-name";
       });
       await runDeployAndGetArtifactAction();
 
-      expect(octokit.request.mock.calls[0][0]).toEqual(DISPATCH_WORKFLOW_PATH);
-      expect(octokit.request.mock.calls[0][1].repo).toEqual(`foo-repo-name`);
+      expect(octokit.request.mock.calls[1][0]).toEqual(DISPATCH_WORKFLOW_PATH);
+      expect(octokit.request.mock.calls[1][1].repo).toEqual(`foo-repo-name`);
     });
   });
 
@@ -109,6 +115,8 @@ describe("runDeployAndGetArtifactAction method", () => {
       getConfig.mockReturnValue(CONFIG);
       octokit.request.mockImplementation((requestPath) => {
         switch (requestPath) {
+          case GET_WORKFLOWS_PATH:
+            return getWorkflowsResponse(CONFIG.workflowFileName);
           case GET_RUNS_PATH:
             return getRunsResponse();
           case GET_RUN_JOBS_PATH:

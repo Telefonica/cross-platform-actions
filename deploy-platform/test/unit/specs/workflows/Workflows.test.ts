@@ -10,12 +10,19 @@ import {
   GET_RUN_ARTIFACTS_PATH,
   getRunArtifactsResponse,
   downloadRunArtifactResponse,
+  GET_WORKFLOWS_PATH,
+  getWorkflowsResponse,
 } from "@support/fixtures/Octokit";
 import { getLogger } from "@support/mocks/Logger";
 import { octokit } from "@support/mocks/Octokit";
 
-import { GetRunJobResponse } from "@src/lib/workflows/Github.types";
-import { Workflows } from "@src/lib/workflows/Workflows";
+import { GetRunJobResponse, GetWorkflowsResponse } from "@src/lib/workflows/Github.types";
+import {
+  Workflows,
+  findWorkflowWithPathEqualToLowercaseName,
+  findWorkflowWithPathEqualsToLowercaseNameReplacingDashes,
+  findWorkflowByName,
+} from "@src/lib/workflows/Workflows";
 import type { WorkflowsInterface } from "@src/lib/workflows/Workflows.types";
 
 describe("Workflows module", () => {
@@ -28,6 +35,7 @@ describe("Workflows module", () => {
     const TIMEOUT_ARTIFACT = 500;
     const REQUEST_INTERVAL = 100;
     const STEP_UUID = "foo-step-uuid";
+    const WORKFLOW_ID = 1234;
 
     beforeEach(() => {
       logger = getLogger();
@@ -42,9 +50,75 @@ describe("Workflows module", () => {
       });
     });
 
+    describe("findWorkflowToDispatch method", () => {
+      const workflowFileName = "foo-workflow-file-name";
+
+      it("should return the id of the workflow to dispatch", async () => {
+        octokit.request.mockImplementation((requestPath) => {
+          if (requestPath === GET_WORKFLOWS_PATH) {
+            return getWorkflowsResponse(workflowFileName);
+          }
+        });
+        const result = await workflows.findWorkflowToDispatch(workflowFileName);
+
+        expect(result).toEqual(WORKFLOW_ID);
+      });
+    });
+
+    describe("when looking for a workflow which matches workflowFileName", () => {
+      const workflowFileName = "foo-workflow-file-name";
+
+      it("should find it when the name of the yaml is uppercase", async () => {
+        const workflowsResponse = getWorkflowsResponse(
+          workflowFileName.toUpperCase()
+        ) as GetWorkflowsResponse;
+
+        expect(
+          findWorkflowWithPathEqualToLowercaseName(
+            workflowsResponse.data.workflows,
+            workflowFileName
+          )?.id
+        ).toEqual(WORKFLOW_ID);
+      });
+
+      it("should find it when the name of the yaml have '_' instead of '-'", async () => {
+        const workflowsResponse = getWorkflowsResponse(
+          workflowFileName.replaceAll("-", "_")
+        ) as GetWorkflowsResponse;
+
+        expect(
+          findWorkflowWithPathEqualsToLowercaseNameReplacingDashes(
+            workflowsResponse.data.workflows,
+            workflowFileName
+          )?.id
+        ).toEqual(WORKFLOW_ID);
+      });
+
+      it("should find it when the workflowFileName is the name of the workflow instead", async () => {
+        const workflowsResponse = getWorkflowsResponse() as GetWorkflowsResponse;
+
+        expect(
+          findWorkflowByName(workflowsResponse.data.workflows, "foo-workflow-name")?.id
+        ).toEqual(WORKFLOW_ID);
+      });
+
+      describe("when the workflow is not found", () => {
+        it("should throw an error", async () => {
+          octokit.request.mockImplementation((requestPath) => {
+            if (requestPath === GET_WORKFLOWS_PATH) {
+              return getWorkflowsResponse();
+            }
+          });
+
+          await expect(workflows.findWorkflowToDispatch(workflowFileName)).rejects.toThrow(
+            `Workflow ${workflowFileName} not found`
+          );
+        });
+      });
+    });
+
     describe("dispatchWorkflow method", () => {
       it("should call to Github sdk to dispatch a workflow", async () => {
-        const WORKFLOW_ID = "foo-workflow-id";
         const REF = "foo-ref";
 
         await workflows.dispatch({
@@ -86,7 +160,7 @@ describe("Workflows module", () => {
         expect(result).toEqual({
           conclusion: "success",
           name: "foo-job-name",
-          id: 1234,
+          id: WORKFLOW_ID,
           steps: [
             {
               name: `${STEP_UUID}`,
@@ -112,7 +186,7 @@ describe("Workflows module", () => {
         expect(result).toEqual({
           conclusion: "success",
           name: "foo-job-name",
-          id: 1234,
+          id: WORKFLOW_ID,
           steps: [
             {
               name: `Set ID: ${STEP_UUID} - foo`,
@@ -202,7 +276,7 @@ describe("Workflows module", () => {
         expect(result).toEqual({
           conclusion: "success",
           name: "foo-job-name",
-          id: 1234,
+          id: WORKFLOW_ID,
           steps: [
             {
               name: `${STEP_UUID}`,

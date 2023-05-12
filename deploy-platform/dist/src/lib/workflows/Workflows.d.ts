@@ -1,2 +1,42 @@
+import type { GetWorkflowsResponse } from "./Github.types";
 import type { WorkflowsConstructor } from "./Workflows.types";
+export declare function findWorkflowWithPathEqualToLowercaseName(workflows: GetWorkflowsResponse["data"]["workflows"], workflowFileName: string): {
+    id: number;
+    node_id: string;
+    name: string;
+    path: string;
+    state: "active" | "deleted" | "disabled_fork" | "disabled_inactivity" | "disabled_manually";
+    created_at: string;
+    updated_at: string;
+    url: string;
+    html_url: string;
+    badge_url: string;
+    deleted_at?: string | undefined;
+} | undefined;
+export declare function findWorkflowWithPathEqualsToLowercaseNameReplacingDashes(workflows: GetWorkflowsResponse["data"]["workflows"], workflowFileName: string): {
+    id: number;
+    node_id: string;
+    name: string;
+    path: string;
+    state: "active" | "deleted" | "disabled_fork" | "disabled_inactivity" | "disabled_manually";
+    created_at: string;
+    updated_at: string;
+    url: string;
+    html_url: string;
+    badge_url: string;
+    deleted_at?: string | undefined;
+} | undefined;
+export declare function findWorkflowByName(workflows: GetWorkflowsResponse["data"]["workflows"], workflowFileName: string): {
+    id: number;
+    node_id: string;
+    name: string;
+    path: string;
+    state: "active" | "deleted" | "disabled_fork" | "disabled_inactivity" | "disabled_manually";
+    created_at: string;
+    updated_at: string;
+    url: string;
+    html_url: string;
+    badge_url: string;
+    deleted_at?: string | undefined;
+} | undefined;
 export declare const Workflows: WorkflowsConstructor;

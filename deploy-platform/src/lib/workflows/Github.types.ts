@@ -24,7 +24,7 @@ export type StepUUID = string;
 /** Options for the dispatch method */
 export interface DispatchOptions {
   /** Workflow id */
-  workflowId: string;
+  workflowId: number;
   /** Github branch */
   ref: string;
   /** Id */
@@ -54,6 +54,8 @@ export interface DownloadRunArtifactOptions {
   artifactId: number;
 }
 
+export type GetWorkflowsResponse =
+  Endpoints["GET /repos/{owner}/{repo}/actions/workflows"]["response"];
 export type GetRunResponse = Endpoints["GET /repos/{owner}/{repo}/actions/runs"]["response"];
 export type GetRunJobsResponse =
   Endpoints["GET /repos/{owner}/{repo}/actions/runs/{run_id}/jobs"]["response"];
@@ -64,6 +66,8 @@ export type DownloadRunArtifactResponse =
   Endpoints["GET /repos/{owner}/{repo}/actions/artifacts/{artifact_id}/{archive_format}"]["response"];
 
 export interface GithubInterface {
+  /** Gets workflows */
+  getWorkflows: () => Promise<GetWorkflowsResponse>;
   /** Dispatches a workflow */
   dispatchWorkflow: (options: DispatchOptions) => Promise<void>;
   /** Gets workflow runs */

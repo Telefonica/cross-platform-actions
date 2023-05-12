@@ -8,7 +8,7 @@ export interface DeployInputs {
     /** Custom repository name. Defaults to "[project]-platform" */
     repoName?: string;
     /** Custom workflow id. Defaults to "deploy.yml" */
-    workflowId?: string;
+    workflowId?: string | number;
     /** Custom repository ref. Defaults to main */
     ref?: string;
 }

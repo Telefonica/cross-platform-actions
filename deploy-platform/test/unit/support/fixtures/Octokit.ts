@@ -1,3 +1,4 @@
+export const GET_WORKFLOWS_PATH = "GET /repos/{owner}/{repo}/actions/workflows";
 export const DISPATCH_WORKFLOW_PATH =
   "POST /repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches";
 export const GET_RUNS_PATH = `GET /repos/{owner}/{repo}/actions/runs?created>={run_date_filter}`;
@@ -10,6 +11,20 @@ const WORKFLOW_RUN_RESPONSE = {
   status: "completed",
   id: "foo-run-id",
 };
+
+export function getWorkflowsResponse(workflowFileName?: string) {
+  return {
+    data: {
+      workflows: [
+        {
+          id: 1234,
+          path: `.github/workflows/${workflowFileName}`,
+          name: "foo-workflow-name",
+        },
+      ],
+    },
+  };
+}
 
 export function getRunsResponse(status?: string) {
   return {

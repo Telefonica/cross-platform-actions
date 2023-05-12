@@ -28,9 +28,14 @@ export async function deployAndGetArtifact(inputs: DeployInputs, logger: Logger)
     logger,
   });
 
+  // Check if workflowId is provided or find it from workflowFileName
+  const workflowId =
+    config.workflowId ||
+    (await workflows.findWorkflowToDispatch(config.workflowFileName as string));
+
   // Dispatch workflow that will create a job with the unique step UUID
   await workflows.dispatch({
-    workflowId: config.workflowId,
+    workflowId,
     ref: config.repoRef,
     stepUUID,
   });
