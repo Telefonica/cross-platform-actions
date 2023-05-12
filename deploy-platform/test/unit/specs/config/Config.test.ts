@@ -27,7 +27,7 @@ describe("Config Module", () => {
       });
     });
 
-    describe("when ref are provided", () => {
+    describe("when ref is provided", () => {
       it("should return the value provided", () => {
         const inputs = getAllInputs();
         const config = getConfig(inputs);
@@ -44,6 +44,7 @@ describe("Config Module", () => {
         });
 
         expect(config.workflowFileName).toEqual("foo-workflow-id");
+        expect(config.workflowId).toBeUndefined();
 
         const config2 = getConfig({
           ...getRequiredInputs(),
@@ -51,6 +52,7 @@ describe("Config Module", () => {
         });
 
         expect(config2.workflowId).toEqual(1234);
+        expect(config2.workflowName).toBeUndefined();
       });
 
       it("should return the repo name adding the default suffix", () => {
