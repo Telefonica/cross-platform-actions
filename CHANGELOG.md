@@ -21,6 +21,15 @@ Use next sections inside each different action entry to describe changes on each
 
 ### deploy-platform
 
+## [2.1.0] - 2023-05-12
+
+### deploy-platform
+
+#### Added
+
+* feat: Add logic to make environment and workflowId inputs case insensitive (CROSS-875)
+* feat: Admit a number as workflowId input (CROSS-875)
+
 ## [2.0.0] - 2023-05-08
 
 ### deploy-platform
@@ -29,8 +38,6 @@ Use next sections inside each different action entry to describe changes on each
 
 * feat: Log inputs and configuration in debug mode, hiding secrets (CROSS-852)
 * feat: Add `repo-name` input. When defined, this will be the repository in which the deploy workflow will be launched (CROSS-852)
-* feat: Add logic to make environment and workflowId inputs case insensitive (CROSS-875)
-* feat: Admit a number as workflowId input (CROSS-875)
 
 #### Changed
 
