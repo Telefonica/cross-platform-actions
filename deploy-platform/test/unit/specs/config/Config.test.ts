@@ -52,7 +52,7 @@ describe("Config Module", () => {
         });
 
         expect(config2.workflowId).toEqual(1234);
-        expect(config2.workflowName).toBeUndefined();
+        expect(config2.workflowFileName).toBeUndefined();
       });
 
       it("should return the repo name adding the default suffix", () => {

@@ -96,7 +96,11 @@ export const Workflows: WorkflowsConstructor = class Workflows implements Workfl
     if (!foundWorkflow) {
       throw new Error(`Workflow ${workflowFileName} not found`);
     }
-    this._logger.info(`Found workflow with fileName "${foundWorkflow.path.split("/").pop()}" and name "${foundWorkflow.name}" matching with "${workflowFileName}"`);
+    this._logger.info(
+      `Found workflow with fileName "${foundWorkflow.path.split("/").pop()}" and name "${
+        foundWorkflow.name
+      }" matching with "${workflowFileName}"`
+    );
     this._logger.debug(`Workflow ${workflowFileName} found. Id: ${foundWorkflow.id}`);
     return foundWorkflow.id;
   }
