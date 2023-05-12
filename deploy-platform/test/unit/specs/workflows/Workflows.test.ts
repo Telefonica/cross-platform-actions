@@ -16,8 +16,13 @@ import {
 import { getLogger } from "@support/mocks/Logger";
 import { octokit } from "@support/mocks/Octokit";
 
-import { GetRunJobResponse } from "@src/lib/workflows/Github.types";
-import { Workflows } from "@src/lib/workflows/Workflows";
+import { GetRunJobResponse, GetWorkflowsResponse } from "@src/lib/workflows/Github.types";
+import {
+  Workflows,
+  findWorkflowWithPathEqualToLowercaseName,
+  findWorkflowWithPathEqualsToLowercaseNameReplacingDashes,
+  findWorkflowByName,
+} from "@src/lib/workflows/Workflows";
 import type { WorkflowsInterface } from "@src/lib/workflows/Workflows.types";
 
 describe("Workflows module", () => {
@@ -58,70 +63,43 @@ describe("Workflows module", () => {
 
         expect(result).toEqual(WORKFLOW_ID);
       });
+    });
 
-      describe("when the name of the yaml have some part uppercase", () => {
-        it("should return the id of the workflow to dispatch", async () => {
-          octokit.request.mockImplementation((requestPath) => {
-            if (requestPath === GET_WORKFLOWS_PATH) {
-              return getWorkflowsResponse(workflowFileName.toUpperCase());
-            }
-          });
-          const result = await workflows.findWorkflowToDispatch(workflowFileName);
+    describe("when looking for a workflow which matches workflowFileName", () => {
+      const workflowFileName = "foo-workflow-file-name";
 
-          expect(result).toEqual(WORKFLOW_ID);
-        });
+      it("should find it when the name of the yaml is uppercase", async () => {
+        const workflowsResponse = getWorkflowsResponse(
+          workflowFileName.toUpperCase()
+        ) as GetWorkflowsResponse;
+
+        expect(
+          findWorkflowWithPathEqualToLowercaseName(
+            workflowsResponse.data.workflows,
+            workflowFileName
+          )?.id
+        ).toEqual(WORKFLOW_ID);
       });
 
-      describe("when the name of the .yml have '_' instead of '-'", () => {
-        it("should return the id of the workflow to dispatch", async () => {
-          octokit.request.mockImplementation((requestPath) => {
-            if (requestPath === GET_WORKFLOWS_PATH) {
-              return getWorkflowsResponse(workflowFileName.replaceAll("-", "_"));
-            }
-          });
-          const result = await workflows.findWorkflowToDispatch(workflowFileName);
+      it("should find it when the name of the yaml have '_' instead of '-'", async () => {
+        const workflowsResponse = getWorkflowsResponse(
+          workflowFileName.replaceAll("-", "_")
+        ) as GetWorkflowsResponse;
 
-          expect(result).toEqual(WORKFLOW_ID);
-        });
+        expect(
+          findWorkflowWithPathEqualsToLowercaseNameReplacingDashes(
+            workflowsResponse.data.workflows,
+            workflowFileName
+          )?.id
+        ).toEqual(WORKFLOW_ID);
       });
 
-      describe("when the name of the .yml have some part uppercase and '_' instead of '-'", () => {
-        it("should return the id of the workflow to dispatch", async () => {
-          octokit.request.mockImplementation((requestPath) => {
-            if (requestPath === GET_WORKFLOWS_PATH) {
-              return getWorkflowsResponse(workflowFileName.toUpperCase().replaceAll("-", "_"));
-            }
-          });
-          const result = await workflows.findWorkflowToDispatch(workflowFileName);
+      it("should find it when the workflowFileName is the name of the workflow instead", async () => {
+        const workflowsResponse = getWorkflowsResponse() as GetWorkflowsResponse;
 
-          expect(result).toEqual(WORKFLOW_ID);
-        });
-      });
-
-      describe("when workflow_id is the name of the workflow", () => {
-        const workflowName = "foo-workflow-name";
-
-        it("should return the id of the workflow to dispatch", async () => {
-          octokit.request.mockImplementation((requestPath) => {
-            if (requestPath === GET_WORKFLOWS_PATH) {
-              return getWorkflowsResponse();
-            }
-          });
-          const result = await workflows.findWorkflowToDispatch(workflowName);
-
-          expect(result).toEqual(WORKFLOW_ID);
-        });
-
-        it("should return the id of the workflow to dispatch even if the name is uppercase", async () => {
-          octokit.request.mockImplementation((requestPath) => {
-            if (requestPath === GET_WORKFLOWS_PATH) {
-              return getWorkflowsResponse();
-            }
-          });
-          const result = await workflows.findWorkflowToDispatch(workflowName.toUpperCase());
-
-          expect(result).toEqual(WORKFLOW_ID);
-        });
+        expect(
+          findWorkflowByName(workflowsResponse.data.workflows, "foo-workflow-name")?.id
+        ).toEqual(WORKFLOW_ID);
       });
 
       describe("when the workflow is not found", () => {

@@ -17,6 +17,33 @@ import type {
   WaitForTargetJobOptions,
 } from "./Workflows.types";
 
+export function findWorkflowWithPathEqualToLowercaseName(
+  workflows: GetWorkflowsResponse["data"]["workflows"],
+  workflowFileName: string
+) {
+  return workflows.find((workflow) =>
+    workflow.path.toLowerCase().endsWith(workflowFileName.toLowerCase())
+  );
+}
+
+export function findWorkflowWithPathEqualsToLowercaseNameReplacingDashes(
+  workflows: GetWorkflowsResponse["data"]["workflows"],
+  workflowFileName: string
+) {
+  return workflows.find((workflow) =>
+    workflow.path.toLowerCase().endsWith(workflowFileName.toLowerCase().replaceAll("-", "_"))
+  );
+}
+
+export function findWorkflowByName(
+  workflows: GetWorkflowsResponse["data"]["workflows"],
+  workflowFileName: string
+) {
+  return workflows.find(
+    (workflow) => workflow.name.toLowerCase() === workflowFileName.toLowerCase()
+  );
+}
+
 export const Workflows: WorkflowsConstructor = class Workflows implements WorkflowsInterface {
   private _githubClient: GithubInterface;
   private _timeoutJobCompleted: number;
@@ -63,44 +90,15 @@ export const Workflows: WorkflowsConstructor = class Workflows implements Workfl
     workflowFileName: string
   ): number {
     const foundWorkflow =
-      this._findWorkflowWithPathEqualToLowercaseName(workflows, workflowFileName) ||
-      this._findWorkflowWithPathEqualsToLowercaseNameReplacingDashes(
-        workflows,
-        workflowFileName
-      ) ||
-      this._findWorkflowByName(workflows, workflowFileName);
+      findWorkflowWithPathEqualToLowercaseName(workflows, workflowFileName) ||
+      findWorkflowWithPathEqualsToLowercaseNameReplacingDashes(workflows, workflowFileName) ||
+      findWorkflowByName(workflows, workflowFileName);
     if (!foundWorkflow) {
       throw new Error(`Workflow ${workflowFileName} not found`);
     }
+    this._logger.info(`Found workflow ${foundWorkflow.name} matching with ${workflowFileName}`);
     this._logger.debug(`Workflow ${workflowFileName} found. Id: ${foundWorkflow.id}`);
     return foundWorkflow.id;
-  }
-
-  private _findWorkflowWithPathEqualToLowercaseName(
-    workflows: GetWorkflowsResponse["data"]["workflows"],
-    workflowFileName: string
-  ) {
-    return workflows.find((workflow) =>
-      workflow.path.toLowerCase().endsWith(workflowFileName.toLowerCase())
-    );
-  }
-
-  private _findWorkflowWithPathEqualsToLowercaseNameReplacingDashes(
-    workflows: GetWorkflowsResponse["data"]["workflows"],
-    workflowFileName: string
-  ) {
-    return workflows.find((workflow) =>
-      workflow.path.toLowerCase().endsWith(workflowFileName.toLowerCase().replaceAll("-", "_"))
-    );
-  }
-
-  private _findWorkflowByName(
-    workflows: GetWorkflowsResponse["data"]["workflows"],
-    workflowFileName: string
-  ) {
-    return workflows.find(
-      (workflow) => workflow.name.toLowerCase() === workflowFileName.toLowerCase()
-    );
   }
 
   private async _findJobInWorkflowRun(

@@ -52877,8 +52877,20 @@ exports.Github = Github;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.Workflows = void 0;
+exports.Workflows = exports.findWorkflowByName = exports.findWorkflowWithPathEqualsToLowercaseNameReplacingDashes = exports.findWorkflowWithPathEqualToLowercaseName = void 0;
 const Github_1 = __nccwpck_require__(1410);
+function findWorkflowWithPathEqualToLowercaseName(workflows, workflowFileName) {
+    return workflows.find((workflow) => workflow.path.toLowerCase().endsWith(workflowFileName.toLowerCase()));
+}
+exports.findWorkflowWithPathEqualToLowercaseName = findWorkflowWithPathEqualToLowercaseName;
+function findWorkflowWithPathEqualsToLowercaseNameReplacingDashes(workflows, workflowFileName) {
+    return workflows.find((workflow) => workflow.path.toLowerCase().endsWith(workflowFileName.toLowerCase().replaceAll("-", "_")));
+}
+exports.findWorkflowWithPathEqualsToLowercaseNameReplacingDashes = findWorkflowWithPathEqualsToLowercaseNameReplacingDashes;
+function findWorkflowByName(workflows, workflowFileName) {
+    return workflows.find((workflow) => workflow.name.toLowerCase() === workflowFileName.toLowerCase());
+}
+exports.findWorkflowByName = findWorkflowByName;
 const Workflows = class Workflows {
     _githubClient;
     _timeoutJobCompleted;
@@ -52900,27 +52912,19 @@ const Workflows = class Workflows {
         this._logger.info(`Searching workflow ${workflowFileName} in repository workflows list to dispatch`);
         const workflows = await this._githubClient.getWorkflows();
         this._logger.debug(`Workflows found: ${JSON.stringify(workflows.data.workflows)}`);
-        const foundWorkflow = this._findWorkflowInWorkflowsResponse(workflows.data.workflows, workflowFileName);
-        return foundWorkflow;
+        const foundWorkflowId = this._findWorkflowIdInWorkflowsResponse(workflows.data.workflows, workflowFileName);
+        return foundWorkflowId;
     }
-    _findWorkflowInWorkflowsResponse(workflows, workflowFileName) {
-        const foundWorkflow = this._findWorkflowWithPathEqualToLowercaseName(workflows, workflowFileName) ||
-            this._findWorkflowWithPathEqualsToLowercaseNameReplacingDashes(workflows, workflowFileName) ||
-            this._findWorkflowByName(workflows, workflowFileName);
+    _findWorkflowIdInWorkflowsResponse(workflows, workflowFileName) {
+        const foundWorkflow = findWorkflowWithPathEqualToLowercaseName(workflows, workflowFileName) ||
+            findWorkflowWithPathEqualsToLowercaseNameReplacingDashes(workflows, workflowFileName) ||
+            findWorkflowByName(workflows, workflowFileName);
         if (!foundWorkflow) {
             throw new Error(`Workflow ${workflowFileName} not found`);
         }
-        this._logger.debug(`Workflow ${workflowFileName} found. Id: ${foundWorkflow["id"]}`);
+        this._logger.info(`Found workflow ${foundWorkflow.name} matching with ${workflowFileName}`);
+        this._logger.debug(`Workflow ${workflowFileName} found. Id: ${foundWorkflow.id}`);
         return foundWorkflow.id;
-    }
-    _findWorkflowWithPathEqualToLowercaseName(workflows, workflowFileName) {
-        return workflows.find((workflow) => workflow.path.toLowerCase().endsWith(workflowFileName.toLowerCase()));
-    }
-    _findWorkflowWithPathEqualsToLowercaseNameReplacingDashes(workflows, workflowFileName) {
-        return workflows.find((workflow) => workflow.path.toLowerCase().endsWith(workflowFileName.toLowerCase().replaceAll("-", "_")));
-    }
-    _findWorkflowByName(workflows, workflowFileName) {
-        return workflows.find((workflow) => workflow.name.toLowerCase() === workflowFileName.toLowerCase());
     }
     async _findJobInWorkflowRun(runId, stepUUID) {
         const workflowJobs = await this._githubClient.getRunJobs({ runId });
