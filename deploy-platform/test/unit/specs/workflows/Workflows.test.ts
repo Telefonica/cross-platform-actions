@@ -110,7 +110,7 @@ describe("Workflows module", () => {
             }
           });
 
-          await expect(workflows.findWorkflowToDispatch(workflowFileName)).rejects.toThrowError(
+          await expect(workflows.findWorkflowToDispatch(workflowFileName)).rejects.toThrow(
             `Workflow ${workflowFileName} not found`
           );
         });
