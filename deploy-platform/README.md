@@ -81,6 +81,7 @@ steps:
 - `ref` - _Optional_. Branch or tag in which to run the deploy workflow. If not specified, the `main` branch will be used.
 - `repo-name` - _Optional_. When defined, this name will be used to find the repository where the deploy workflow will be launched. If not specified, it will use `[project]-platform`.
 - `workflow-id` - _Optional_. File name of the workflow to launch. If not specified, the workflow with the name `deploy-[environment].yml` will be used. It also accepts ID of the workflow to launch. This input is not case sensitive, it accepts `deploy-dev.yml`, `DEPLOY-DEV.YML`, `Deploy-Dev.yml`, etc.
+- `request-interval` - _Optional_. Interval in milliseconds between requests to the github API to check if the deploy workflow has finished. Default value is `10000`.
 
 ## Outputs
 

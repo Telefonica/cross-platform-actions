@@ -7,6 +7,7 @@ export function getInputs() {
   const repoName = core.getInput("repo-name");
   const workflowId = core.getInput("workflow-id");
   const ref = core.getInput("ref");
+  const requestInterval = core.getInput("request-interval");
   return {
     project,
     token,
@@ -14,5 +15,6 @@ export function getInputs() {
     repoName,
     workflowId,
     ref,
+    requestInterval,
   };
 }
