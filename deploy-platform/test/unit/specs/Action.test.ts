@@ -173,8 +173,9 @@ describe("runDeployAndGetArtifactAction method", () => {
         if (inputName === "request-interval") return "foo";
       });
 
-      await runDeployAndGetArtifactAction();
-
+      await expect(() => runDeployAndGetArtifactAction()).rejects.toThrow(
+        "Input request-interval must be a number"
+      );
       expect(actionsCore.setFailed).toHaveBeenCalledWith(
         "Input request-interval must be a number"
       );

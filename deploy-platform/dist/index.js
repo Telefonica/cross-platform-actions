@@ -52480,19 +52480,8 @@ async function runDeployAndGetArtifactAction() {
     const logger = (0, Logger_1.getLogger)();
     try {
         const inputs = (0, Inputs_1.getInputs)();
-        if (inputs.requestInterval) {
-            const requestInterval = parseInt(inputs.requestInterval);
-            if (isNaN(requestInterval))
-                core.setFailed("Input request-interval must be a number");
-            else {
-                const artifactJson = await (0, Deploy_1.deployAndGetArtifact)({ ...inputs, requestInterval }, logger);
-                core.setOutput("manifest", artifactJson);
-            }
-        }
-        else {
-            const artifactJson = await (0, Deploy_1.deployAndGetArtifact)({ ...inputs, requestInterval: undefined }, logger);
-            core.setOutput("manifest", artifactJson);
-        }
+        const artifactJson = await (0, Deploy_1.deployAndGetArtifact)(inputs, logger);
+        core.setOutput("manifest", artifactJson);
     }
     catch (error) {
         core.setFailed(error.message);
@@ -52543,7 +52532,7 @@ function getInputs() {
     const workflowId = core.getInput("workflow-id");
     const ref = core.getInput("ref");
     const requestInterval = core.getInput("request-interval");
-    return {
+    return sanitizeInputs({
         project,
         token,
         environment,
@@ -52551,9 +52540,23 @@ function getInputs() {
         workflowId,
         ref,
         requestInterval,
-    };
+    });
 }
 exports.getInputs = getInputs;
+function sanitizeInputs(inputs) {
+    if (inputs.requestInterval) {
+        const requestInterval = parseInt(inputs.requestInterval);
+        if (isNaN(requestInterval)) {
+            throw new Error("Input request-interval must be a number");
+        }
+        else {
+            return { ...inputs, requestInterval };
+        }
+    }
+    else {
+        return { ...inputs, requestInterval: undefined };
+    }
+}
 
 
 /***/ }),
