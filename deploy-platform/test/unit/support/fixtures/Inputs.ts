@@ -14,5 +14,6 @@ export function getAllInputs() {
     repoName: "foo-repo-name",
     workflowId: "foo-workflow-id",
     ref: "foo-ref",
+    requestInterval: 100,
   };
 }

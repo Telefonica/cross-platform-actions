@@ -73,5 +73,14 @@ describe("Config Module", () => {
         expect(config.repoName).toEqual("repo-name");
       });
     });
+
+    describe("when requestInterval is provided", () => {
+      it("should return the value provided", () => {
+        const inputs = getAllInputs();
+        const config = getConfig(inputs);
+
+        expect(config.requestInterval).toEqual(100);
+      });
+    });
   });
 });

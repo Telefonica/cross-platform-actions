@@ -11,4 +11,6 @@ export interface DeployInputs {
     workflowId?: string | number;
     /** Custom repository ref. Defaults to main */
     ref?: string;
+    /** Interval between requests to check if the workflow has finished. Defaults to 10000 ms */
+    requestInterval?: number;
 }

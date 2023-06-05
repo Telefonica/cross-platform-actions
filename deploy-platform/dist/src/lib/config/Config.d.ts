@@ -3,7 +3,6 @@ import type { Config } from "./Config.types";
 export declare const TIMEOUT_VARS: {
     JOB_COMPLETED: number;
     ARTIFACT_AVAILABLE: number;
-    REQUEST_INTERVAL: number;
 };
 export declare const DEFAULT_VARS: {
     GITHUB_OWNER: string;
@@ -11,6 +10,7 @@ export declare const DEFAULT_VARS: {
     WORKFLOW_FILE_NAME_PREFIX: string;
     WORKFLOW_FILE_NAME_EXTENSION: string;
     REPO_SUFFIX: string;
+    REQUEST_INTERVAL: number;
 };
 export declare const CONFIG_SECRETS: (keyof Config)[];
 export declare function getRepoName(repoBaseName: string, customRepoName?: string): string;

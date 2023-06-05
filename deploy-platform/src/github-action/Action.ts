@@ -11,7 +11,7 @@ export async function runDeployAndGetArtifactAction(): Promise<void> {
     const inputs = getInputs();
     if (inputs.requestInterval) {
       const requestInterval = parseInt(inputs.requestInterval);
-      if (isNaN(requestInterval)) core.setFailed("request-interval must be a number");
+      if (isNaN(requestInterval)) core.setFailed("Input request-interval must be a number");
       else {
         const artifactJson = await deployAndGetArtifact({ ...inputs, requestInterval }, logger);
         core.setOutput("manifest", artifactJson);

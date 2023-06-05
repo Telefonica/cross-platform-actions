@@ -52480,8 +52480,19 @@ async function runDeployAndGetArtifactAction() {
     const logger = (0, Logger_1.getLogger)();
     try {
         const inputs = (0, Inputs_1.getInputs)();
-        const artifactJson = await (0, Deploy_1.deployAndGetArtifact)(inputs, logger);
-        core.setOutput("manifest", artifactJson);
+        if (inputs.requestInterval) {
+            const requestInterval = parseInt(inputs.requestInterval);
+            if (isNaN(requestInterval))
+                core.setFailed("Input request-interval must be a number");
+            else {
+                const artifactJson = await (0, Deploy_1.deployAndGetArtifact)({ ...inputs, requestInterval }, logger);
+                core.setOutput("manifest", artifactJson);
+            }
+        }
+        else {
+            const artifactJson = await (0, Deploy_1.deployAndGetArtifact)({ ...inputs, requestInterval: undefined }, logger);
+            core.setOutput("manifest", artifactJson);
+        }
     }
     catch (error) {
         core.setFailed(error.message);
@@ -52531,6 +52542,7 @@ function getInputs() {
     const repoName = core.getInput("repo-name");
     const workflowId = core.getInput("workflow-id");
     const ref = core.getInput("ref");
+    const requestInterval = core.getInput("request-interval");
     return {
         project,
         token,
@@ -52538,6 +52550,7 @@ function getInputs() {
         repoName,
         workflowId,
         ref,
+        requestInterval,
     };
 }
 exports.getInputs = getInputs;
@@ -52653,7 +52666,6 @@ exports.getConfig = exports.getWorkflowFileName = exports.getRepoName = exports.
 exports.TIMEOUT_VARS = {
     JOB_COMPLETED: 600000,
     ARTIFACT_AVAILABLE: 10000,
-    REQUEST_INTERVAL: 2000,
 };
 exports.DEFAULT_VARS = {
     GITHUB_OWNER: "Telefonica",
@@ -52661,6 +52673,7 @@ exports.DEFAULT_VARS = {
     WORKFLOW_FILE_NAME_PREFIX: "deploy",
     WORKFLOW_FILE_NAME_EXTENSION: "yml",
     REPO_SUFFIX: "-platform",
+    REQUEST_INTERVAL: 10000,
 };
 exports.CONFIG_SECRETS = ["githubToken"];
 function getRepoName(repoBaseName, customRepoName) {
@@ -52691,6 +52704,7 @@ function getConfig(inputs) {
         workflowFileName = getWorkflowFileName(environment);
     }
     const repoRef = inputs.ref || exports.DEFAULT_VARS.REPO_REF;
+    const requestInterval = inputs.requestInterval || exports.DEFAULT_VARS.REQUEST_INTERVAL;
     return {
         timeoutJobCompleted: exports.TIMEOUT_VARS.JOB_COMPLETED,
         timeoutArtifactAvailable: exports.TIMEOUT_VARS.ARTIFACT_AVAILABLE,
@@ -52701,7 +52715,7 @@ function getConfig(inputs) {
         githubOwner: exports.DEFAULT_VARS.GITHUB_OWNER,
         githubToken: token,
         environment,
-        requestInterval: exports.TIMEOUT_VARS.REQUEST_INTERVAL,
+        requestInterval,
     };
 }
 exports.getConfig = getConfig;

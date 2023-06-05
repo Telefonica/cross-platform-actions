@@ -5,4 +5,5 @@ export declare function getInputs(): {
     repoName: string;
     workflowId: string;
     ref: string;
+    requestInterval: string;
 };
