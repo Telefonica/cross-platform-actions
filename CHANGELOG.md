@@ -21,6 +21,16 @@ Use next sections inside each different action entry to describe changes on each
 
 ### deploy-platform
 
+## [2.2.0] - 2023-06-06
+
+### monorepo
+
+#### Changed
+
+* chore: Update dependencies
+
+### deploy-platform
+
 #### Added
 
 * feat: Add `request-interval` input. This input allows to set the interval between requests to the Github API when waiting for the workflow to finish. (CROSS-1093)
