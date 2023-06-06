@@ -5,7 +5,6 @@ import type { Config } from "./Config.types";
 export const TIMEOUT_VARS = {
   JOB_COMPLETED: 600000,
   ARTIFACT_AVAILABLE: 10000,
-  REQUEST_INTERVAL: 2000,
 };
 
 export const DEFAULT_VARS = {
@@ -14,6 +13,7 @@ export const DEFAULT_VARS = {
   WORKFLOW_FILE_NAME_PREFIX: "deploy",
   WORKFLOW_FILE_NAME_EXTENSION: "yml",
   REPO_SUFFIX: "-platform",
+  REQUEST_INTERVAL: 10000,
 };
 
 export const CONFIG_SECRETS = ["githubToken"] as (keyof Config)[];
@@ -44,6 +44,7 @@ export function getConfig(inputs: DeployInputs): Config {
     workflowFileName = getWorkflowFileName(environment);
   }
   const repoRef = inputs.ref || DEFAULT_VARS.REPO_REF;
+  const requestInterval = inputs.requestInterval || DEFAULT_VARS.REQUEST_INTERVAL;
 
   return {
     timeoutJobCompleted: TIMEOUT_VARS.JOB_COMPLETED,
@@ -55,6 +56,6 @@ export function getConfig(inputs: DeployInputs): Config {
     githubOwner: DEFAULT_VARS.GITHUB_OWNER,
     githubToken: token,
     environment,
-    requestInterval: TIMEOUT_VARS.REQUEST_INTERVAL,
+    requestInterval,
   };
 }

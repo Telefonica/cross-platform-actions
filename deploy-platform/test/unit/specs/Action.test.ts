@@ -18,14 +18,15 @@ import { octokit } from "@support/mocks/Octokit";
 import { uuid } from "@support/mocks/Uuid";
 
 import { runDeployAndGetArtifactAction } from "@src/github-action/Action";
-import * as Config from "@src/lib/config/Config";
+import * as ConfigLib from "@src/lib/config/Config";
+import { DeployInputs } from "@src/lib/Deploy.types";
 
 const CONFIG = {
   timeoutJobCompleted: 500,
   timeoutArtifactAvailable: 500,
   repoName: "foo-repo-name-platform",
   repoRef: "foo-repo-ref",
-  workflowFileName: "foo-workflow-id",
+  workflowFileName: "foo-workflow-name",
   workflowId: undefined,
   githubOwner: "foo-github-owner",
   githubToken: "foo-github-token",
@@ -111,7 +112,7 @@ describe("runDeployAndGetArtifactAction method", () => {
   describe("when it does not found a successful workflow job containing a step with the provided stepUUID", () => {
     beforeEach(() => {
       jest.mock("@src/lib/config/Config");
-      const getConfig = jest.spyOn(Config, "getConfig");
+      const getConfig = jest.spyOn(ConfigLib, "getConfig");
       getConfig.mockReturnValue(CONFIG);
       octokit.request.mockImplementation((requestPath) => {
         switch (requestPath) {
@@ -132,6 +133,51 @@ describe("runDeployAndGetArtifactAction method", () => {
     it("should throw with timeout message", async () => {
       await expect(() => runDeployAndGetArtifactAction()).rejects.toThrow(
         "Timed out while waiting for target job to complete"
+      );
+    });
+  });
+
+  describe("when request interval is provided", () => {
+    let defaultConfig: DeployInputs;
+
+    beforeEach(() => {
+      actionsCore.getInput.mockImplementation((inputName) => {
+        if (inputName === "project") return FOO_REPO_NAME;
+        if (inputName === "environment") return CONFIG.environment;
+        if (inputName === "token") return CONFIG.githubToken;
+        if (inputName === "request-interval") return "100";
+      });
+
+      defaultConfig = {
+        environment: CONFIG.environment,
+        project: FOO_REPO_NAME,
+        token: CONFIG.githubToken,
+        requestInterval: 100,
+      };
+    });
+
+    jest.mock("@src/lib/config/Config");
+    const getConfig = jest.spyOn(ConfigLib, "getConfig");
+
+    it("should use provided request interval", async () => {
+      await runDeployAndGetArtifactAction();
+
+      expect(getConfig).toHaveBeenCalledWith(defaultConfig);
+    });
+
+    it("should set action to error when request interval is not a number", async () => {
+      actionsCore.getInput.mockImplementation((inputName) => {
+        if (inputName === "project") return FOO_REPO_NAME;
+        if (inputName === "environment") return CONFIG.environment;
+        if (inputName === "token") return CONFIG.githubToken;
+        if (inputName === "request-interval") return "foo";
+      });
+
+      await expect(() => runDeployAndGetArtifactAction()).rejects.toThrow(
+        "Input request-interval must be a number"
+      );
+      expect(actionsCore.setFailed).toHaveBeenCalledWith(
+        "Input request-interval must be a number"
       );
     });
   });

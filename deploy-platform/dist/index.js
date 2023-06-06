@@ -52531,6 +52531,7 @@ function getInputs() {
     const repoName = core.getInput("repo-name");
     const workflowId = core.getInput("workflow-id");
     const ref = core.getInput("ref");
+    const requestInterval = core.getInput("request-interval");
     return {
         project,
         token,
@@ -52538,9 +52539,19 @@ function getInputs() {
         repoName,
         workflowId,
         ref,
+        requestInterval: ensureNumericValue(requestInterval),
     };
 }
 exports.getInputs = getInputs;
+function ensureNumericValue(value) {
+    if (!value)
+        return undefined;
+    const numericValue = parseInt(value);
+    if (isNaN(numericValue)) {
+        throw new Error("Input request-interval must be a number");
+    }
+    return numericValue;
+}
 
 
 /***/ }),
@@ -52653,7 +52664,6 @@ exports.getConfig = exports.getWorkflowFileName = exports.getRepoName = exports.
 exports.TIMEOUT_VARS = {
     JOB_COMPLETED: 600000,
     ARTIFACT_AVAILABLE: 10000,
-    REQUEST_INTERVAL: 2000,
 };
 exports.DEFAULT_VARS = {
     GITHUB_OWNER: "Telefonica",
@@ -52661,6 +52671,7 @@ exports.DEFAULT_VARS = {
     WORKFLOW_FILE_NAME_PREFIX: "deploy",
     WORKFLOW_FILE_NAME_EXTENSION: "yml",
     REPO_SUFFIX: "-platform",
+    REQUEST_INTERVAL: 10000,
 };
 exports.CONFIG_SECRETS = ["githubToken"];
 function getRepoName(repoBaseName, customRepoName) {
@@ -52691,6 +52702,7 @@ function getConfig(inputs) {
         workflowFileName = getWorkflowFileName(environment);
     }
     const repoRef = inputs.ref || exports.DEFAULT_VARS.REPO_REF;
+    const requestInterval = inputs.requestInterval || exports.DEFAULT_VARS.REQUEST_INTERVAL;
     return {
         timeoutJobCompleted: exports.TIMEOUT_VARS.JOB_COMPLETED,
         timeoutArtifactAvailable: exports.TIMEOUT_VARS.ARTIFACT_AVAILABLE,
@@ -52701,7 +52713,7 @@ function getConfig(inputs) {
         githubOwner: exports.DEFAULT_VARS.GITHUB_OWNER,
         githubToken: token,
         environment,
-        requestInterval: exports.TIMEOUT_VARS.REQUEST_INTERVAL,
+        requestInterval,
     };
 }
 exports.getConfig = getConfig;

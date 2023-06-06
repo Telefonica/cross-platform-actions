@@ -10,6 +10,7 @@ export async function runDeployAndGetArtifactAction(): Promise<void> {
   try {
     const inputs = getInputs();
     const artifactJson = await deployAndGetArtifact(inputs, logger);
+
     core.setOutput("manifest", artifactJson);
   } catch (error) {
     core.setFailed((error as Error).message);

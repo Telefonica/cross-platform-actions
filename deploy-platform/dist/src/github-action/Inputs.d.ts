@@ -1,8 +1,2 @@
-export declare function getInputs(): {
-    project: string;
-    token: string;
-    environment: string;
-    repoName: string;
-    workflowId: string;
-    ref: string;
-};
+import { DeployInputs } from "../lib/Deploy.types";
+export declare function getInputs(): DeployInputs;

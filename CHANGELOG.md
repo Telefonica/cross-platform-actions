@@ -21,6 +21,10 @@ Use next sections inside each different action entry to describe changes on each
 
 ### deploy-platform
 
+#### Added
+
+* feat: Add `request-interval` input. This input allows to set the interval between requests to the Github API when waiting for the workflow to finish. (CROSS-1093)
+
 ## [2.1.0] - 2023-05-12
 
 ### deploy-platform
