@@ -10,36 +10,22 @@ export function getInputs(): DeployInputs {
   const workflowId = core.getInput("workflow-id");
   const ref = core.getInput("ref");
   const requestInterval = core.getInput("request-interval");
-  return sanitizeInputs({
+  return {
     project,
     token,
     environment,
     repoName,
     workflowId,
     ref,
-    requestInterval,
-  });
+    requestInterval: ensureNumericValue(requestInterval),
+  };
 }
 
-function sanitizeInputs(inputs: ActionInputs): DeployInputs {
-  if (inputs.requestInterval) {
-    const requestInterval = parseInt(inputs.requestInterval);
-    if (isNaN(requestInterval)) {
-      throw new Error("Input request-interval must be a number");
-    } else {
-      return { ...inputs, requestInterval };
-    }
-  } else {
-    return { ...inputs, requestInterval: undefined };
+function ensureNumericValue(value: string): number | undefined {
+  if (!value) return undefined;
+  const numericValue = parseInt(value);
+  if (isNaN(numericValue)) {
+    throw new Error("Input request-interval must be a number");
   }
+  return numericValue;
 }
-
-type ActionInputs = {
-  project: string;
-  token: string;
-  environment: string;
-  repoName?: string;
-  workflowId?: string;
-  ref?: string;
-  requestInterval?: string;
-};
