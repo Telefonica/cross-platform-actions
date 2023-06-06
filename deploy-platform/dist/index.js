@@ -52532,30 +52532,25 @@ function getInputs() {
     const workflowId = core.getInput("workflow-id");
     const ref = core.getInput("ref");
     const requestInterval = core.getInput("request-interval");
-    return sanitizeInputs({
+    return {
         project,
         token,
         environment,
         repoName,
         workflowId,
         ref,
-        requestInterval,
-    });
+        requestInterval: ensureNumericValue(requestInterval),
+    };
 }
 exports.getInputs = getInputs;
-function sanitizeInputs(inputs) {
-    if (inputs.requestInterval) {
-        const requestInterval = parseInt(inputs.requestInterval);
-        if (isNaN(requestInterval)) {
-            throw new Error("Input request-interval must be a number");
-        }
-        else {
-            return { ...inputs, requestInterval };
-        }
+function ensureNumericValue(value) {
+    if (!value)
+        return undefined;
+    const numericValue = parseInt(value);
+    if (isNaN(numericValue)) {
+        throw new Error("Input request-interval must be a number");
     }
-    else {
-        return { ...inputs, requestInterval: undefined };
-    }
+    return numericValue;
 }
 
 
