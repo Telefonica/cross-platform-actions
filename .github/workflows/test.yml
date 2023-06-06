@@ -69,6 +69,7 @@ jobs:
           repo-name: 'cross-platform-actions'
           token: ${{ secrets.GITHUB_TOKEN }}
           ref: ${{ github.head_ref || github.ref_name }}
+          request-interval: 5000
       - name: Check deployment manifest
         run: |
           echo '${{ steps.deploy.outputs.manifest }}' | jq -r '.registry.server' | grep 'foo-server' || (echo "Manifest is wrong" && exit 1)
