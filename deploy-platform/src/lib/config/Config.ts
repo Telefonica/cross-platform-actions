@@ -4,7 +4,7 @@ import type { Config } from "./Config.types";
 
 export const TIMEOUT_VARS = {
   JOB_COMPLETED: 600000,
-  ARTIFACT_AVAILABLE: 10000,
+  ARTIFACT_AVAILABLE: 60000,
 };
 
 export const DEFAULT_VARS = {

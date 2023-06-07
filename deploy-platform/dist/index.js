@@ -52663,7 +52663,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getConfig = exports.getWorkflowFileName = exports.getRepoName = exports.CONFIG_SECRETS = exports.DEFAULT_VARS = exports.TIMEOUT_VARS = void 0;
 exports.TIMEOUT_VARS = {
     JOB_COMPLETED: 600000,
-    ARTIFACT_AVAILABLE: 10000,
+    ARTIFACT_AVAILABLE: 60000,
 };
 exports.DEFAULT_VARS = {
     GITHUB_OWNER: "Telefonica",
