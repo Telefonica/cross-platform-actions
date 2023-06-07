@@ -21,6 +21,10 @@ Use next sections inside each different action entry to describe changes on each
 
 ### deploy-platform
 
+### Fixed
+
+* fix: Increase ARTIFACT_AVAILABLE timeout to 60 seconds in order to make it compatible with the current request interval default value (CROSS-1093)
+
 ## [2.2.0] - 2023-06-06
 
 ### monorepo
