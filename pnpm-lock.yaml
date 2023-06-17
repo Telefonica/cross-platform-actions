@@ -106,8 +106,8 @@ importers:
         specifier: 19.0.7
         version: 19.0.7
       '@octokit/types':
-        specifier: 9.3.1
-        version: 9.3.1
+        specifier: 10.0.0
+        version: 10.0.0
       '@types/uuid':
         specifier: 9.0.1
         version: 9.0.1
@@ -2395,6 +2395,12 @@ packages:
       '@octokit/plugin-rest-endpoint-methods': 7.0.1(@octokit/core@4.2.0)
     transitivePeerDependencies:
       - encoding
+    dev: true
+
+  /@octokit/types@10.0.0:
+    resolution: {integrity: sha512-Vm8IddVmhCgU1fxC1eyinpwqzXPEYu0NrYzD3YZjlGjyftdLBTeqNblRC0jmJmgxbJIsQlyogVeGnrNaaMVzIg==}
+    dependencies:
+      '@octokit/openapi-types': 18.0.0
     dev: true
 
   /@octokit/types@9.3.1:
