@@ -4,7 +4,7 @@ import "@support/matchers/toHaveEncryptedValue";
 // eslint-disable-next-line import/default
 import sodium from "libsodium-wrappers";
 
-import { getLogger } from "@support/mocks/Logger";
+import { logger } from "@support/mocks/Logger";
 import { octokit } from "@support/mocks/Octokit";
 
 import { sync } from "@src/lib/Sync";
@@ -24,8 +24,6 @@ describe("sync", () => {
         key: publicKey,
       },
     });
-    const logger = getLogger();
-    logger.error = jest.fn().mockImplementation(console.error);
     const inputs = {
       manifest: "{}",
       project: {

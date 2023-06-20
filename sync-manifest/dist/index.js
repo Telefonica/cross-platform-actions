@@ -13974,12 +13974,14 @@ exports.getInputs = void 0;
 const core = __importStar(__nccwpck_require__(3610));
 const zod_1 = __nccwpck_require__(3805);
 const projectSchema = zod_1.z.object({
-    project: zod_1.z.string(),
-    repositories: zod_1.z.array(zod_1.z.string()),
+    project: zod_1.z.string().nonempty(),
+    repositories: zod_1.z.array(zod_1.z.string().nonempty()),
 });
 function getInputs() {
     const manifest = core.getInput("manifest", { required: true });
-    const project = projectSchema.safeParse(core.getInput("project", { required: true }));
+    const projectString = core.getInput("project", { required: true });
+    const projectRaw = JSON.parse(projectString);
+    const project = projectSchema.safeParse(projectRaw);
     if (!project.success) {
         throw new Error("Input project must be a valid JSON string", { cause: project.error });
     }
@@ -14179,6 +14181,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Secret = void 0;
+/* eslint-disable import/no-named-as-default-member */
 // eslint-disable-next-line import/default
 const libsodium_wrappers_1 = __importDefault(__nccwpck_require__(1010));
 const Secret = class Secret {
