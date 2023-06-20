@@ -1,0 +1,21 @@
+name: Sync Manifest
+description: Syncs a manifest with IDP project
+inputs:
+  manifest: 
+    description: Manifest to sync
+    required: true
+  project:
+    description: Project to sync
+    required: true
+  secret:
+    description: Secret to sync
+    required: true
+  token: 
+    description: Github token
+    required: true
+outputs:
+  manifest:
+    description: Manifest downloaded from the sync process
+runs:
+  using: 'node16'
+  main: 'dist/index.js'
