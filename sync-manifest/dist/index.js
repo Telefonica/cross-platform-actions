@@ -14060,15 +14060,16 @@ async function sync(inputs, logger) {
     const secret = new Secret_1.Secret(inputs.secret, inputs.manifest, { logger });
     const createdSecrets = [];
     for (const { name, owner } of config.repositories) {
+        logger.info(`Syncing ${name}...`);
+        const repository = new Repository_1.Repository(name, owner, inputs.token, { logger });
         try {
-            logger.info(`Syncing ${name}...`);
-            const repository = new Repository_1.Repository(name, owner, inputs.token, { logger });
             await repository.addSecret(secret);
-            createdSecrets.push({ repository: { name, owner }, secret: { name: secret.name } });
         }
-        catch (e) {
-            logger.error(`Failed to sync ${name}: ${e.toString()}`);
+        catch (err) {
+            logger.error(`Error syncing ${name}`);
+            throw new Error(`Error syncing ${name}`, { cause: err });
         }
+        createdSecrets.push({ repository: { name, owner }, secret: { name: secret.name } });
     }
     return JSON.stringify({
         github: {
@@ -14147,20 +14148,30 @@ const Repository = class Repository {
         const publicKey = await this._publicKey();
         const encryptedValue = await secret.encryptedValue(publicKey);
         this._logger?.debug(`Encrypted value: ${encryptedValue}`);
-        const resp = await this._octokit.rest.actions.createOrUpdateRepoSecret({
+        const resp = await this._octokit.rest.actions
+            .createOrUpdateRepoSecret({
             owner: this._owner,
             repo: this._name,
             secret_name: secret.name,
             encrypted_value: encryptedValue,
+        })
+            .catch((err) => {
+            throw new Error(`Error adding secret ${secret.name} to repository ${this._name}`, {
+                cause: err,
+            });
         });
         this._logger?.debug(`Response from GitHub: ${JSON.stringify(resp)}`);
         this._logger?.info(`Secret ${secret.name} added to repository ${this._name}`);
     }
     async _publicKey() {
         this._logger?.debug(`Getting public key from repository ${this._name}`);
-        const publicKey = await this._octokit.rest.actions.getRepoPublicKey({
+        const publicKey = await this._octokit.rest.actions
+            .getRepoPublicKey({
             owner: this._owner,
             repo: this._name,
+        })
+            .catch((err) => {
+            throw new Error(`Error getting public key from repository ${this._name}`, { cause: err });
         });
         this._logger?.debug(`Public key from repository ${this._name} retrieved: ${publicKey.data.key}`);
         return publicKey.data.key;
