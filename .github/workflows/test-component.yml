@@ -36,7 +36,7 @@ jobs:
             {"example": "manifest"}
           repositories: |
             [ "Telefonica/cross-platform-actions" ]
-          env: dev
+          environment: dev
           token: ${{ secrets.GITHUB_TOKEN }}
       - name: Check write-env-secret manifest
         run: |
