@@ -5,6 +5,8 @@ import {
   getEnvironmentPublicKey,
   getEnvironment,
   getRepository,
+  getRepoPublicKey,
+  createOrUpdateRepoSecret,
 } from "@support/fixtures/Octokit";
 
 import * as octokitLibrary from "@src/lib/github/Octokit";
@@ -16,6 +18,8 @@ export const octokit = {
       getEnvironment: jest.fn().mockImplementation(getEnvironment),
     },
     actions: {
+      getRepoPublicKey: jest.fn().mockImplementation(getRepoPublicKey),
+      createOrUpdateRepoSecret: jest.fn().mockImplementation(createOrUpdateRepoSecret),
       getEnvironmentPublicKey: jest.fn().mockImplementation(getEnvironmentPublicKey),
       createOrUpdateEnvironmentSecret: jest
         .fn()

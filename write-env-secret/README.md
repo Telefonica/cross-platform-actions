@@ -22,26 +22,28 @@
 
 # Usage
 
-This action receives a deploy manifest, IDP project information and target Github Secret name, and sync manifest content as a Github Secret for each of the repositories of given project information. Finally, it returns a manifest with the Github Secret names for each repository.
+This action receives a secret name, secret value, a list of repositories and an optional environment, and updates the secret at repository or environment scope (if present) with given value.
 
-__So, you can use this action in the project's platform instances to update deploy manifest in project's repositories.__
+__So, you can use this action in the a project's repository to update secrets in a list of repositories or environments. Such as deploy manifest information.__
 
-1. TBD
+1. The project's deploy workflow launches this write env secret action.
+2. This action updates the secret in the given repositories or environments.
+3. The secret is available in the repositories or environments.
 
 ## Assumptions
 
-- The deploy manifest is a JSON string.
 - The project information is a JSON string with following schema:
-  - `project`: Project name.
-  - `repositories`: Array of repository names.
-- Target repositories are in the same organization as the project repository.
+  - `repositories`: Array of repository name (including owner).
+- If present, a environment exists with given name in all the repositories.
+- The given token has access to repositories, environments and secrets scopes. For more information, read the [Github documentation](https://docs.github.com/en/rest/reference/actions#secrets).
 - The output manifest contains the Github Secret names for each repository, in the same order as the input repositories. It contains following schema
   ```jsonc
   {
     "secrets": [
       {
-        "repository": "<repository name>",
-        "secret": "<secret name>"
+        "repository": "<repository including owner>",
+        "secret": "<secret name>",
+        "environment": "<environment name>" // if present
       },
       // ...
     ]

@@ -1,10 +1,10 @@
 import { Logger } from "../support/Logger.types";
+import { PublicKeyInterface } from "../support/Support.types";
 
 import {
   EnvironmentConstructor,
   EnvironmentConstructorOptions,
   EnvironmentInterface,
-  PublicKeyInterface,
 } from "./Environment.types";
 import { OctokitInterface } from "./Octokit.types";
 import { SecretInterface } from "./Secret.types";
@@ -27,7 +27,7 @@ export const Environment: EnvironmentConstructor = class environment
   public async addSecret(secret: SecretInterface): Promise<void> {
     this._logger?.info(`Adding secret ${secret.name} to environment ${this._name}`);
     try {
-      const publicKey = await this._publicKey();
+      const publicKey = await this._getPublicKey();
       const encryptedValue = await secret.encryptedValue(publicKey.key);
       this._logger?.debug(`Encrypted value: ${encryptedValue}`);
       const resp = await this._octokit.rest.actions.createOrUpdateEnvironmentSecret({
@@ -53,7 +53,7 @@ export const Environment: EnvironmentConstructor = class environment
     }
   }
 
-  private async _publicKey(): Promise<PublicKeyInterface> {
+  private async _getPublicKey(): Promise<PublicKeyInterface> {
     this._logger?.debug(
       `[repo=${this._repositoryId}, env=${this._name}] Getting public key from environment ${this._name}`
     );

@@ -12,7 +12,7 @@ inputs:
     required: true
   environment:
     description: Environment to sync
-    required: true
+    required: false
   token: 
     description: Github token
     required: true

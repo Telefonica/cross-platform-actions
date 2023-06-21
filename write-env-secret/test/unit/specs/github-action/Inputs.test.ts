@@ -37,6 +37,45 @@ describe("Input", () => {
       expect(result.token).toBe(inputs.token);
     });
 
+    it("should set environment as undefined if missing", () => {
+      // Arrange
+      const inputs: Record<string, string> = {
+        secret: "test",
+        value: "test",
+        repositories: '["test/test"]',
+        token: "test",
+      };
+      actionsCore.getInput.mockImplementation((name: string) => {
+        return inputs[name] as string;
+      });
+
+      // Act
+      const result = getInputs();
+
+      // Assert
+      expect(result.environment).toBeUndefined();
+    });
+
+    it("should set environment as undefined if empty", () => {
+      // Arrange
+      const inputs: Record<string, string> = {
+        secret: "test",
+        value: "test",
+        repositories: '["test/test"]',
+        environment: "",
+        token: "test",
+      };
+      actionsCore.getInput.mockImplementation((name: string) => {
+        return inputs[name] as string;
+      });
+
+      // Act
+      const result = getInputs();
+
+      // Assert
+      expect(result.environment).toBeUndefined();
+    });
+
     it("should throw an error if the project input is not a valid JSON string", () => {
       // Arrange
       const inputs: Record<string, string> = {

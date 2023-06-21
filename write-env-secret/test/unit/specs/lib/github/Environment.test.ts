@@ -1,5 +1,6 @@
 /* eslint-disable import/no-named-as-default-member */
 import "@support/matchers/toHaveEncryptedValue";
+
 // eslint-disable-next-line import/default
 import sodium from "libsodium-wrappers";
 
@@ -11,6 +12,10 @@ import { getOctokit } from "@src/lib/github/Octokit";
 import { Secret } from "@src/lib/github/Secret";
 
 describe("Environment", () => {
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   it("should be defined", () => {
     expect(Environment).toBeDefined();
   });

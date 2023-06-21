@@ -36,8 +36,7 @@ jobs:
             {"example": "manifest"}
           repositories: |
             [ "Telefonica/cross-platform-actions" ]
-          environment: dev
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.PAT_SYNC_MANIFEST_CROSS_1455 }}
       - name: Check write-env-secret manifest
         run: |
           [[ -z "${{ secrets.EXAMPLE_SECRET_NAME }}" ]] && (echo "::error::Secret is not set" && exit 1)

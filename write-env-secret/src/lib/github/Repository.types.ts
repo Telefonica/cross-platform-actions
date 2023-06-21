@@ -2,6 +2,7 @@ import { Logger } from "../support/Logger.types";
 
 import { EnvironmentInterface } from "./Environment.types";
 import { OctokitInterface } from "./Octokit.types";
+import { SecretInterface } from "./Secret.types";
 
 /** Represents repositoryConstructor extra options */
 export interface RepositoryConstructorOptions {
@@ -29,4 +30,6 @@ export interface RepositoryConstructor {
 export interface RepositoryInterface {
   /** Get environment */
   getEnvironment(name: string): Promise<EnvironmentInterface>;
+  /** Add secret */
+  addSecret(secret: SecretInterface): Promise<void>;
 }

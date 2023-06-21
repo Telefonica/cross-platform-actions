@@ -1,4 +1,5 @@
 import { Logger } from "../support/Logger.types";
+import { PublicKeyInterface } from "../support/Support.types";
 
 import { Environment } from "./Environment";
 import { EnvironmentInterface } from "./Environment.types";
@@ -8,6 +9,7 @@ import {
   RepositoryConstructorOptions,
   RepositoryInterface,
 } from "./Repository.types";
+import { SecretInterface } from "./Secret.types";
 
 export const Repository: RepositoryConstructor = class repository implements RepositoryInterface {
   private _name: string;
@@ -66,6 +68,54 @@ export const Repository: RepositoryConstructor = class repository implements Rep
         `[repo=${this._owner}/${this._name}] Error getting self id from repository ${this._name}: ${err}`
       );
       throw new Error(`Error getting self id from repository ${this._name}`, { cause: err });
+    }
+  }
+
+  public async addSecret(secret: SecretInterface): Promise<void> {
+    this._logger?.debug(
+      `[repo=${this._owner}/${this._name}] Adding secret ${secret.name} to repository`
+    );
+    try {
+      const publicKey = await this._getPublicKey();
+      const encryptedValue = await secret.encryptedValue(publicKey.key);
+      await this._octokit.rest.actions.createOrUpdateRepoSecret({
+        key_id: publicKey.key_id,
+        owner: this._owner,
+        repo: this._name,
+        secret_name: secret.name,
+        encrypted_value: encryptedValue,
+      });
+    } catch (err) {
+      this._logger?.error(
+        `[repo=${this._owner}/${this._name}] Error adding secret ${secret.name} to repository: ${err}`
+      );
+      throw new Error(
+        `Error adding secret ${secret.name} to repository ${this._owner}/${this._name}`,
+        { cause: err }
+      );
+    }
+  }
+
+  private async _getPublicKey(): Promise<PublicKeyInterface> {
+    this._logger?.debug(
+      `[repo=${this._owner}/${this._name}] Getting public key from repository ${this._name}`
+    );
+    try {
+      const publicKey = await this._octokit.rest.actions.getRepoPublicKey({
+        owner: this._owner,
+        repo: this._name,
+      });
+      return {
+        key_id: publicKey.data.key_id,
+        key: publicKey.data.key,
+      };
+    } catch (error) {
+      this._logger?.error(
+        `[repo=${this._owner}/${this._name}] Error getting public key from repository ${this._name}: ${error}`
+      );
+      throw new Error(`Error getting public key from repository ${this._owner}/${this._name}`, {
+        cause: error,
+      });
     }
   }
 };

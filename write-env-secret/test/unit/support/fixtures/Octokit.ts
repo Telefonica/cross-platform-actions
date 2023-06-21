@@ -16,6 +16,22 @@ export async function getEnvironment() {
   };
 }
 
+export async function getRepoPublicKey() {
+  await sodium.ready;
+  const keyPair = sodium.crypto_box_keypair();
+  const key = sodium.to_base64(keyPair.publicKey, sodium.base64_variants.ORIGINAL);
+  return {
+    data: {
+      key_id: "test",
+      key,
+    },
+  };
+}
+
+export async function createOrUpdateRepoSecret() {
+  return {};
+}
+
 export async function getEnvironmentPublicKey() {
   await sodium.ready;
   const keyPair = sodium.crypto_box_keypair();

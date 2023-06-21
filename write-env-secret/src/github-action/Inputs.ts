@@ -10,8 +10,8 @@ const environmentIdSchema = z
 const repositoriesSchema = z.array(environmentIdSchema);
 
 export function getInputs(): SyncInputs {
-  const value = core.getInput("value", { required: true });
   const secret = core.getInput("secret", { required: true });
+  const value = core.getInput("value", { required: true });
   const repositoriesString = core.getInput("repositories", { required: true });
   const repositoriesRaw = JSON.parse(repositoriesString);
   const repositories = repositoriesSchema.safeParse(repositoriesRaw);
@@ -20,13 +20,13 @@ export function getInputs(): SyncInputs {
       cause: repositories.error,
     });
   }
-  const environment = core.getInput("environment", { required: true });
+  const environment = core.getInput("environment") || undefined;
   const token = core.getInput("token", { required: true });
   return {
+    secret,
     value,
     repositories: repositories.data,
-    secret,
-    token,
     environment,
+    token,
   };
 }

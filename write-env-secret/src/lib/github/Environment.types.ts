@@ -50,10 +50,3 @@ export interface EnvironmentInterface {
    */
   addSecret(secret: SecretInterface): Promise<void>;
 }
-
-export interface PublicKeyInterface {
-  /** Public key id */
-  key_id: string;
-  /** Public key Base64 value*/
-  key: string;
-}

@@ -15,12 +15,16 @@ export async function sync(inputs: SyncInputs, logger: Logger): Promise<string> 
     logger.info(`Syncing ${name}...`);
     try {
       const repository = new Repository(name, owner, { octokit, logger });
-      const environment = await repository.getEnvironment(inputs.environment);
-      await environment.addSecret(secret);
+      if (inputs.environment) {
+        const environment = await repository.getEnvironment(inputs.environment);
+        await environment.addSecret(secret);
+      } else {
+        await repository.addSecret(secret);
+      }
       createdSecrets.push({
-        repository: { owner, name },
-        environment: inputs.environment,
         secret: secret.name,
+        repository: `${owner}/${name}`,
+        environment: inputs.environment,
       });
     } catch (err) {
       logger.error(`Error syncing ${name}: ${err}`);
