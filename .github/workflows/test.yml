@@ -61,21 +61,9 @@ jobs:
             exit 1
           fi
   test-component:
-    runs-on: ${{ vars.JOBS_RUNNER }}
     needs: [build]
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - id: deploy
-        name: Launch deploy action
-        uses: ./deploy-platform
-        with:
-          environment: 'test'
-          project: 'cross-platform-actions'
-          repo-name: 'cross-platform-actions'
-          token: ${{ secrets.GITHUB_TOKEN }}
-          ref: ${{ github.head_ref || github.ref_name }}
-          request-interval: 5000
-      - name: Check deployment manifest
-        run: |
-          echo '${{ steps.deploy.outputs.manifest }}' | jq -r '.registry.server' | grep 'foo-server' || (echo "Manifest is wrong" && exit 1)
+    uses: ./.github/actions/test-component.yml
+    with:
+      ref: ${{ github.event.inputs.ref }}
+    secrets:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
