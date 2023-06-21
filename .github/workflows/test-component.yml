@@ -3,7 +3,7 @@ name: Test Component
 on:
   workflow_call:
 
-jobs: 
+jobs:
   test-component-deploy:
     runs-on: ${{ vars.JOBS_RUNNER }}
     steps:
@@ -13,9 +13,9 @@ jobs:
         name: Launch deploy action
         uses: ./deploy-platform
         with:
-          environment: 'test'
-          project: 'cross-platform-actions'
-          repo-name: 'cross-platform-actions'
+          environment: "test"
+          project: "cross-platform-actions"
+          repo-name: "cross-platform-actions"
           token: ${{ secrets.GITHUB_TOKEN }}
           ref: ${{ github.head_ref || github.ref_name }}
           request-interval: 5000
@@ -31,19 +31,13 @@ jobs:
         name: Launch write-env-secret action
         uses: ./write-env-secret
         with:
-          manifest: |
-            {"example": "manifest"}
-          project: |
-            {
-              "project": "project",
-              "repositories":  [
-                "cross-platform-actions"
-              ]
-            }
           secret: EXAMPLE_SECRET_NAME
+          value: |
+            {"example": "manifest"}
+          repositories: |
+            [ "Telefonica/cross-platform-actions" ]
+          env: dev
           token: ${{ secrets.GITHUB_TOKEN }}
       - name: Check write-env-secret manifest
         run: |
           [[ -z "${{ secrets.EXAMPLE_SECRET_NAME }}" ]] && (echo "::error::Secret is not set" && exit 1)
-      
-      

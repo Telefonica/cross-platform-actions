@@ -69,17 +69,15 @@ steps:
     name: Write environment secret
     uses: Telefonica/cross-platform-actions/write-env-secret@{BRANCH_NAME|VERSION}
     with:
-      manifest: ${{ steps.deploy-platform.outputs.manifest }}
-      project: |
-        {
-          "project": $PROJECT_NAME,
-          "repositories": [
-            "repository-1",
-            "repository-2"
-          ]
-        }
-      secret-name: $SECRET_NAME
-      token: $TOKEN
+      secret: IDP_DEPLOY_MANIFEST
+      value: ${{ steps.deploy-platform.outputs.manifest }}
+      repositories: |
+        [
+          "Telefonica/repository-1",
+          "Telefonica/repository-2"
+        ]
+      env: int
+      token: ${{ secrets.GITHUB_TOKEN }}
 ```
 
 ## Inputs
