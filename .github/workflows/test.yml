@@ -51,9 +51,9 @@ jobs:
             git diff
             exit 1
           fi
-      - name: Check dist (sync-manifest)
-        id: diff-sync-manifest
-        working-directory: sync-manifest
+      - name: Check dist (write-env-secret)
+        id: diff-write-env-secret
+        working-directory: write-env-secret
         run: |
           if [ "$(git diff --ignore-space-at-eol dist/ | wc -l)" -gt "0" ]; then
             echo "Detected uncommitted changes after build.  See status below:"

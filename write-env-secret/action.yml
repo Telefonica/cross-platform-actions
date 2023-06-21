@@ -1,0 +1,24 @@
+name: Sync Manifest
+description: Syncs a manifest with IDP project
+inputs:
+  value:
+    description: Value to write to secret
+    required: true
+  secret:
+    description: Secret name
+    required: true
+  repositories:
+    description: Repositories to sync represented as JSON Array
+    required: true
+  environment:
+    description: Environment to sync
+    required: true
+  token: 
+    description: Github token
+    required: true
+outputs:
+  manifest:
+    description: Manifest with information about written secrets
+runs:
+  using: 'node16'
+  main: 'dist/index.js'

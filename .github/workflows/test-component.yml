@@ -22,14 +22,14 @@ jobs:
       - name: Check deployment manifest
         run: |
           echo '${{ steps.deploy.outputs.manifest }}' | jq -r '.registry.server' | grep 'foo-server' || (echo "Manifest is wrong" && exit 1)
-  test-component-sync-manifest:
+  test-component-write-env-secret:
     runs-on: ${{ vars.JOBS_RUNNER }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - id: sync-manifest
-        name: Launch sync-manifest action
-        uses: ./sync-manifest
+      - id: write-env-secret
+        name: Launch write-env-secret action
+        uses: ./write-env-secret
         with:
           manifest: |
             {"example": "manifest"}
@@ -42,8 +42,8 @@ jobs:
             }
           secret: EXAMPLE_SECRET_NAME
           token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Check sync-manifest manifest
+      - name: Check write-env-secret manifest
         run: |
-          [[ -z "${{ secrets.EXAMPLE_SECRET_NAME }}" ]] && (echo "Secret is not set" && exit 1) || (echo "Secret is set" && exit 0)
+          [[ -z "${{ secrets.EXAMPLE_SECRET_NAME }}" ]] && (echo "::error::Secret is not set" && exit 1)
       
       
