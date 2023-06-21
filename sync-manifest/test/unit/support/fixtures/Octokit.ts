@@ -7,6 +7,7 @@ export const CREATE_OR_UPDATE_REPOSITORY_SECRET =
   "PUT /repos/{owner}/{repo}/actions/secrets/{secret_name}";
 
 export async function getRepoPublicKey() {
+  await sodium.ready;
   const keyPair = sodium.crypto_box_keypair();
   const key = sodium.to_base64(keyPair.publicKey, sodium.base64_variants.ORIGINAL);
   return {

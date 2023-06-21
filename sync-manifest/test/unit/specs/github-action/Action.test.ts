@@ -1,4 +1,5 @@
 import { actionsCore } from "@support/mocks/ActionsCore";
+import "@support/mocks/Octokit";
 import "@support/mocks/Logger";
 
 import { runDeployAndGetArtifactAction } from "@src/github-action/Action";
@@ -9,8 +10,11 @@ describe("Action", () => {
     let spySync: jest.SpyInstance;
 
     beforeEach(() => {
-      jest.clearAllMocks();
       spySync = jest.spyOn(sync, "sync");
+    });
+
+    afterEach(() => {
+      jest.clearAllMocks();
     });
 
     it("should be defined", () => {

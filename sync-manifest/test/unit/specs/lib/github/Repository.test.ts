@@ -62,5 +62,23 @@ describe("Repository", () => {
         encrypted_value: expect.toHaveEncryptedValue("test", keyPair),
       });
     });
+
+    it("should fail if the repository public key cannot be retrieved", async () => {
+      // Arrange
+      octokit.rest.actions.getRepoPublicKey.mockRejectedValueOnce(new Error("test"));
+      const secret = new Secret("test", "test");
+
+      // Act & Assert
+      await expect(repository.addSecret(secret)).rejects.toThrow();
+    });
+
+    it("should fail if cannot create or update secret", async () => {
+      // Arrange
+      octokit.rest.actions.createOrUpdateRepoSecret.mockRejectedValueOnce(new Error("test"));
+      const secret = new Secret("test", "test");
+
+      // Act & Assert
+      await expect(repository.addSecret(secret)).rejects.toThrow();
+    });
   });
 });

@@ -12,9 +12,13 @@ export async function sync(inputs: SyncInputs, logger: Logger): Promise<string> 
   for (const { name, owner } of config.repositories) {
     logger.info(`Syncing ${name}...`);
     const repository = new Repository(name, owner, inputs.token, { logger });
-    await repository.addSecret(secret);
+    try {
+      await repository.addSecret(secret);
+    } catch (err) {
+      logger.error(`Error syncing ${name}`);
+      throw new Error(`Error syncing ${name}`, { cause: err });
+    }
     createdSecrets.push({ repository: { name, owner }, secret: { name: secret.name } });
-    logger.error(`Failed to sync ${name}: ${(e as Error).toString()}`);
   }
   return JSON.stringify({
     github: {
