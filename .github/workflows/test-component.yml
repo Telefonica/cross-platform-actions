@@ -2,14 +2,6 @@ name: Test Component
 
 on:
   workflow_call:
-    inputs:
-      ref:
-        required: true
-        type: string
-        description: 'The branch or tag ref to deploy'
-    secrets:
-      GITHUB_TOKEN:
-        required: true
 
 jobs: 
   test-component-deploy:
@@ -25,7 +17,7 @@ jobs:
           project: 'cross-platform-actions'
           repo-name: 'cross-platform-actions'
           token: ${{ secrets.GITHUB_TOKEN }}
-          ref: ${{ inputs.ref }}
+          ref: ${{ github.head_ref || github.ref_name }}
           request-interval: 5000
       - name: Check deployment manifest
         run: |

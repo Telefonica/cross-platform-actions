@@ -61,9 +61,5 @@ jobs:
             exit 1
           fi
   test-component:
-    needs: [build]
-    uses: ./.github/actions/test-component.yml
-    with:
-      ref: ${{ github.head_ref || github.ref_name }}
-    secrets:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    needs: build
+    uses: ./.github/workflows/test-component.yml
