@@ -6,7 +6,7 @@ export interface SyncInputs {
     /** Repositories */
     repositories: string[];
     /** Environment */
-    environment: string;
+    environment?: string;
     /** GitHub token */
     token: string;
 }

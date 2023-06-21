@@ -13979,8 +13979,8 @@ const environmentIdSchema = zod_1.z
     .regex(/^([^/]*)\/(.*)$/, "Input project must be in the format owner/repo");
 const repositoriesSchema = zod_1.z.array(environmentIdSchema);
 function getInputs() {
-    const value = core.getInput("value", { required: true });
     const secret = core.getInput("secret", { required: true });
+    const value = core.getInput("value", { required: true });
     const repositoriesString = core.getInput("repositories", { required: true });
     const repositoriesRaw = JSON.parse(repositoriesString);
     const repositories = repositoriesSchema.safeParse(repositoriesRaw);
@@ -13989,14 +13989,14 @@ function getInputs() {
             cause: repositories.error,
         });
     }
-    const environment = core.getInput("environment", { required: true });
+    const environment = core.getInput("environment") || undefined;
     const token = core.getInput("token", { required: true });
     return {
+        secret,
         value,
         repositories: repositories.data,
-        secret,
-        token,
         environment,
+        token,
     };
 }
 exports.getInputs = getInputs;
@@ -14070,12 +14070,17 @@ async function sync(inputs, logger) {
         logger.info(`Syncing ${name}...`);
         try {
             const repository = new Repository_1.Repository(name, owner, { octokit, logger });
-            const environment = await repository.getEnvironment(inputs.environment);
-            await environment.addSecret(secret);
+            if (inputs.environment) {
+                const environment = await repository.getEnvironment(inputs.environment);
+                await environment.addSecret(secret);
+            }
+            else {
+                await repository.addSecret(secret);
+            }
             createdSecrets.push({
-                repository: { owner, name },
-                environment: inputs.environment,
                 secret: secret.name,
+                repository: `${owner}/${name}`,
+                environment: inputs.environment,
             });
         }
         catch (err) {
@@ -14139,7 +14144,7 @@ const Environment = class environment {
     async addSecret(secret) {
         this._logger?.info(`Adding secret ${secret.name} to environment ${this._name}`);
         try {
-            const publicKey = await this._publicKey();
+            const publicKey = await this._getPublicKey();
             const encryptedValue = await secret.encryptedValue(publicKey.key);
             this._logger?.debug(`Encrypted value: ${encryptedValue}`);
             const resp = await this._octokit.rest.actions.createOrUpdateEnvironmentSecret({
@@ -14159,7 +14164,7 @@ const Environment = class environment {
             });
         }
     }
-    async _publicKey() {
+    async _getPublicKey() {
         this._logger?.debug(`[repo=${this._repositoryId}, env=${this._name}] Getting public key from environment ${this._name}`);
         try {
             const publicKey = await this._octokit.rest.actions.getEnvironmentPublicKey({
@@ -14256,6 +14261,43 @@ const Repository = class repository {
         catch (err) {
             this._logger?.error(`[repo=${this._owner}/${this._name}] Error getting self id from repository ${this._name}: ${err}`);
             throw new Error(`Error getting self id from repository ${this._name}`, { cause: err });
+        }
+    }
+    async addSecret(secret) {
+        this._logger?.debug(`[repo=${this._owner}/${this._name}] Adding secret ${secret.name} to repository`);
+        try {
+            const publicKey = await this._getPublicKey();
+            const encryptedValue = await secret.encryptedValue(publicKey.key);
+            await this._octokit.rest.actions.createOrUpdateRepoSecret({
+                key_id: publicKey.key_id,
+                owner: this._owner,
+                repo: this._name,
+                secret_name: secret.name,
+                encrypted_value: encryptedValue,
+            });
+        }
+        catch (err) {
+            this._logger?.error(`[repo=${this._owner}/${this._name}] Error adding secret ${secret.name} to repository: ${err}`);
+            throw new Error(`Error adding secret ${secret.name} to repository ${this._owner}/${this._name}`, { cause: err });
+        }
+    }
+    async _getPublicKey() {
+        this._logger?.debug(`[repo=${this._owner}/${this._name}] Getting public key from repository ${this._name}`);
+        try {
+            const publicKey = await this._octokit.rest.actions.getRepoPublicKey({
+                owner: this._owner,
+                repo: this._name,
+            });
+            return {
+                key_id: publicKey.data.key_id,
+                key: publicKey.data.key,
+            };
+        }
+        catch (error) {
+            this._logger?.error(`[repo=${this._owner}/${this._name}] Error getting public key from repository ${this._name}: ${error}`);
+            throw new Error(`Error getting public key from repository ${this._owner}/${this._name}`, {
+                cause: error,
+            });
         }
     }
 };
