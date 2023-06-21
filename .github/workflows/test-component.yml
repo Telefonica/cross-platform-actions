@@ -23,8 +23,6 @@ jobs:
         run: |
           echo '${{ steps.deploy.outputs.manifest }}' | jq -r '.registry.server' | grep 'foo-server' || (echo "Manifest is wrong" && exit 1)
   test-component-sync-manifest:
-    permissions:
-      actions: read
     runs-on: ${{ vars.JOBS_RUNNER }}
     steps:
       - name: Checkout
