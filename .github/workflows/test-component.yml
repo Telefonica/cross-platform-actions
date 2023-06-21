@@ -2,6 +2,10 @@ name: Test Component
 
 on:
   workflow_call:
+    secrets:
+      TOKEN:
+        description: 'Token to access the repository'
+        required: true
 
 jobs:
   test-component-deploy:
@@ -36,7 +40,7 @@ jobs:
             {"example": "manifest"}
           repositories: |
             [ "Telefonica/cross-platform-actions" ]
-          token: ${{ secrets.PAT_SYNC_MANIFEST_CROSS_1455 }}
+          token: ${{ secrets.TOKEN }}
       - name: Check write-env-secret manifest
         run: |
           [[ -z "${{ secrets.EXAMPLE_SECRET_NAME }}" ]] && (echo "::error::Secret is not set" && exit 1)

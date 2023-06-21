@@ -63,3 +63,5 @@ jobs:
   test-component:
     needs: build
     uses: ./.github/workflows/test-component.yml
+    secrets:
+      TOKEN: ${{ secrets.PAT_SYNC_MANIFEST_CROSS_1455 }}
