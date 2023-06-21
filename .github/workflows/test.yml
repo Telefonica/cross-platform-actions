@@ -60,8 +60,40 @@ jobs:
             git diff
             exit 1
           fi
-  test-component:
-    needs: build
-    uses: ./.github/workflows/test-component.yml
-    secrets:
-      TOKEN: ${{ secrets.PAT_SYNC_MANIFEST_CROSS_1455 }}
+  test-component-deploy:
+    runs-on: ${{ vars.JOBS_RUNNER }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - id: deploy
+        name: Launch deploy action
+        uses: ./deploy-platform
+        with:
+          environment: "test"
+          project: "cross-platform-actions"
+          repo-name: "cross-platform-actions"
+          token: ${{ secrets.GITHUB_TOKEN }}
+          ref: ${{ github.head_ref || github.ref_name }}
+          request-interval: 5000
+      - name: Check deployment manifest
+        run: |
+          echo '${{ steps.deploy.outputs.manifest }}' | jq -r '.registry.server' | grep 'foo-server' || (echo "Manifest is wrong" && exit 1)
+  test-component-write-env-secret:
+    runs-on: ${{ vars.JOBS_RUNNER }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - id: write-env-secret
+        name: Launch write-env-secret action
+        uses: ./write-env-secret
+        with:
+          secret: EXAMPLE_SECRET_NAME
+          value: |
+            {"example": "${{ github.sha }}"}
+          repositories: |
+            [ "Telefonica/cross-platform-actions" ]
+          token: ${{ secrets.PAT_SYNC_MANIFEST_CROSS_1455 }}
+      - name: Check write-env-secret manifest
+        run: |
+          [[ -z "${{ secrets.EXAMPLE_SECRET_NAME }}" ]] && (echo "::error::Secret is not set" && exit 1)
+          [[ "${{ secrets.EXAMPLE_SECRET_NAME }}" == '{"example": "${{ github.sha }}"}' ]] || (echo "::error::Secret has invalid value" && exit 1)
