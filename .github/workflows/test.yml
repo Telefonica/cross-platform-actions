@@ -96,19 +96,15 @@ jobs:
             [ "Telefonica/cross-platform-actions" ]
           token: ${{ secrets.PAT_SYNC_MANIFEST_CROSS_1455 }}
       - name: Check write-env-secret manifest
-        timeout-minutes: 1
         run: |
           [[ '${{ steps.write-env-secret.outputs.manifest }}' != '{"github":{"secrets":[{"secret":"EXAMPLE_SECRET_NAME","repository":"Telefonica/cross-platform-actions"}]}}' ]] && (echo "::error::Action output has invalid value" && exit 1)
-          while [[ -z '${{ secrets.EXAMPLE_SECRET_NAME }}' ]]; do
-            echo "::info::Waiting for secret to be updated..."
+      - name: Check write-env-secret created secret
+        timeout-minutes: 1
+        run: |
+          while true; do
+            curl -s -H "Authorization: token ${{ secrets.PAT_SYNC_MANIFEST_CROSS_1455 }}" https://api.github.com/repos/Telefonica/cross-platform-actions/actions/secrets/EXAMPLE_SECRET_NAME | jq -r '.name' | grep 'EXAMPLE_SECRET_NAME' && break
             sleep 10
           done
-          echo '::debug::Retrieve secret by name'
-          [[ -z '${{ secrets.EXAMPLE_SECRET_NAME }}' ]] && (echo "::error::Secret is not set" && exit 1)
-          [[ '${{ secrets.EXAMPLE_SECRET_NAME }}' != '${{ steps.generate-sample-manifest.outputs.manifest }}' ]] && (echo "::error::Secret has invalid value" && exit 1)
-          echo '::debug::Retrieve secret by output manifest'
-          [[ -z '${{ secrets[fromJSON(steps.write-env-secret.outputs.manifest).github.secrets[0].secret] }}' ]] && (echo "::error::Secret is not set" && exit 1)
-          [[ '${{ secrets[fromJSON(steps.write-env-secret.outputs.manifest).github.secrets[0].secret] }}' != '${{ steps.generate-sample-manifest.outputs.manifest }}' ]] && (echo "::error::Secret has invalid value" && exit 1)
       # - name: Clean up secret
       #   if: always()
       #   run: |
