@@ -13932,7 +13932,7 @@ async function runDeployAndGetArtifactAction() {
         core.setOutput("manifest", artifactJson);
     }
     catch (error) {
-        core.setFailed(error.message);
+        core.setFailed(error);
         throw error;
     }
 }
@@ -14066,7 +14066,7 @@ async function sync(inputs, logger) {
             await repository.addSecret(secret);
         }
         catch (err) {
-            logger.error(`Error syncing ${name}`);
+            logger.error(`Error syncing ${name}: ${err}`);
             throw new Error(`Error syncing ${name}`, { cause: err });
         }
         createdSecrets.push({ repository: { name, owner }, secret: { name: secret.name } });

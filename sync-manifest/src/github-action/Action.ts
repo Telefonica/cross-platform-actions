@@ -13,7 +13,7 @@ export async function runDeployAndGetArtifactAction(): Promise<void> {
 
     core.setOutput("manifest", artifactJson);
   } catch (error) {
-    core.setFailed((error as Error).message);
+    core.setFailed(error as Error);
     throw error;
   }
 }
