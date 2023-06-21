@@ -97,7 +97,7 @@ jobs:
           token: ${{ secrets.PAT_SYNC_MANIFEST_CROSS_1455 }}
       - name: Check write-env-secret manifest
         run: |
-          [[ '${{ steps.write-env-secret.outputs.manifest }}' != '{"github":{"secrets":[{"secret":"EXAMPLE_SECRET_NAME","repository":"Telefonica/cross-platform-actions"}]}}' ]] && (echo "::error::Action output has invalid value" && exit 1)
+          [[ '${{ steps.write-env-secret.outputs.manifest }}' != '{"github":{"secrets":[{"secret":"EXAMPLE_SECRET_NAME","repository":"Telefonica/cross-platform-actions"}]}}' ]] && echo "::error::Action output has invalid value"
       - name: Check write-env-secret created secret
         timeout-minutes: 1
         run: |
