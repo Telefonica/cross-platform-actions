@@ -105,7 +105,7 @@ jobs:
             curl -s -H "Authorization: token ${{ secrets.PAT_SYNC_MANIFEST_CROSS_1455 }}" https://api.github.com/repos/Telefonica/cross-platform-actions/actions/secrets/EXAMPLE_SECRET_NAME | jq -r '.name' | grep 'EXAMPLE_SECRET_NAME' && break
             sleep 10
           done
-      # - name: Clean up secret
-      #   if: always()
-      #   run: |
-      #     curl -X DELETE -H "Authorization: token ${{ secrets.PAT_SYNC_MANIFEST_CROSS_1455 }}" https://api.github.com/repos/Telefonica/cross-platform-actions/actions/secrets/EXAMPLE_SECRET_NAME || true
+      - name: Clean up secret
+        if: always()
+        run: |
+          curl -X DELETE -H "Authorization: token ${{ secrets.PAT_SYNC_MANIFEST_CROSS_1455 }}" https://api.github.com/repos/Telefonica/cross-platform-actions/actions/secrets/EXAMPLE_SECRET_NAME || true
