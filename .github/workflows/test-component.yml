@@ -45,6 +45,6 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
       - name: Check sync-manifest manifest
         run: |
-          [ -z "${{ secrets.EXAMPLE_SECRET_NAME }}" ] && (echo "Secret is not set" && exit 1) || (echo "Secret is set" && exit 0)
+          [[ -z "${{ secrets.EXAMPLE_SECRET_NAME }}" ]] && (echo "Secret is not set" && exit 1) || (echo "Secret is set" && exit 0)
       
       
