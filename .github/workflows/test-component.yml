@@ -22,6 +22,28 @@ jobs:
       - name: Check deployment manifest
         run: |
           echo '${{ steps.deploy.outputs.manifest }}' | jq -r '.registry.server' | grep 'foo-server' || (echo "Manifest is wrong" && exit 1)
-
+  test-component-sync-manifest:
+    runs-on: ${{ vars.JOBS_RUNNER }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - id: sync-manifest
+        name: Launch sync-manifest action
+        uses: ./sync-manifest
+        with:
+          manifest: |
+            {"example": "manifest"}
+          project: |
+            {
+              "project": "project"
+              "repositories":  [
+                "cross-platform-actions"
+              ]
+            }
+          secret: EXAMPLE_SECRET_NAME
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Check sync-manifest manifest
+        run: |
+          [[ -z ${{ secrets.EXAMPLE_SECRET_NAME }} ]] && (echo "Secret is not set" && exit 1) || (echo "Secret is set" && exit 0)
       
       
