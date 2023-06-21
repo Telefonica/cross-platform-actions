@@ -64,6 +64,6 @@ jobs:
     needs: [build]
     uses: ./.github/actions/test-component.yml
     with:
-      ref: ${{ github.event.inputs.ref }}
+      ref: ${{ github.head_ref || github.ref_name }}
     secrets:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
