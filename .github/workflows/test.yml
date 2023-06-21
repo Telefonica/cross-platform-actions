@@ -83,17 +83,19 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+      - id: generate-sample-manifest
+        run: |
+          echo '::set-output name=manifest::{"example": "${{ github.sha }}"}'
       - id: write-env-secret
         name: Launch write-env-secret action
         uses: ./write-env-secret
         with:
           secret: EXAMPLE_SECRET_NAME
-          value: |
-            {"example": "${{ github.sha }}"}
+          value: ${{ steps.generate-sample-manifest.outputs.manifest }}
           repositories: |
             [ "Telefonica/cross-platform-actions" ]
           token: ${{ secrets.PAT_SYNC_MANIFEST_CROSS_1455 }}
       - name: Check write-env-secret manifest
         run: |
           [[ -z "${{ secrets.EXAMPLE_SECRET_NAME }}" ]] && (echo "::error::Secret is not set" && exit 1)
-          [[ "${{ secrets.EXAMPLE_SECRET_NAME }}" == '{"example": "${{ github.sha }}"}' ]] || (echo "::error::Secret has invalid value" && exit 1)
+          [[ "${{ secrets.EXAMPLE_SECRET_NAME }}" == "${{ steps.generate-sample-manifest.outputs.manifest }}" ]] || (echo "::error::Secret has invalid value" && exit 1)
