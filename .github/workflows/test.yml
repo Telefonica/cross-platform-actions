@@ -62,6 +62,7 @@ jobs:
           fi
   test-component-deploy:
     runs-on: ${{ vars.JOBS_RUNNER }}
+    needs: build
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -80,6 +81,7 @@ jobs:
           echo '${{ steps.deploy.outputs.manifest }}' | jq -r '.registry.server' | grep 'foo-server' || (echo "Manifest is wrong" && exit 1)
   test-component-write-env-secret:
     runs-on: ${{ vars.JOBS_RUNNER }}
+    needs: build
     steps:
       - name: Checkout
         uses: actions/checkout@v3
