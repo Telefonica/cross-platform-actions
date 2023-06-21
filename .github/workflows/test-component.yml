@@ -35,7 +35,7 @@ jobs:
             {"example": "manifest"}
           project: |
             {
-              "project": "project"
+              "project": "project",
               "repositories":  [
                 "cross-platform-actions"
               ]
