@@ -16,7 +16,7 @@ describe("getConfig", () => {
     expect(config.repositories).toEqual([
       {
         owner: "test",
-        name: "test",
+        repo: "test",
       },
     ]);
   });

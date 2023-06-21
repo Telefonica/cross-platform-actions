@@ -11,10 +11,10 @@ export async function sync(inputs: SyncInputs, logger: Logger): Promise<string> 
   const octokit = getOctokit(inputs.token);
   const secret = new Secret(inputs.secret, inputs.value, { logger });
   const createdSecrets = [];
-  for (const { name, owner } of config.repositories) {
-    logger.info(`Syncing ${name}...`);
+  for (const { owner, repo } of config.repositories) {
+    logger.info(`Syncing ${owner}/${repo}...`);
     try {
-      const repository = new Repository(name, owner, { octokit, logger });
+      const repository = new Repository(owner, repo, { octokit, logger });
       if (inputs.environment) {
         const environment = await repository.getEnvironment(inputs.environment);
         await environment.addSecret(secret);
@@ -23,12 +23,12 @@ export async function sync(inputs: SyncInputs, logger: Logger): Promise<string> 
       }
       createdSecrets.push({
         secret: secret.name,
-        repository: `${owner}/${name}`,
+        repository: `${owner}/${repo}`,
         environment: inputs.environment,
       });
     } catch (err) {
-      logger.error(`Error syncing ${name}: ${err}`);
-      throw new Error(`Error syncing ${name}`, { cause: err });
+      logger.error(`Error syncing ${owner}/${repo}: ${err}`);
+      throw new Error(`Error syncing ${owner}/${repo}`, { cause: err });
     }
   }
   return JSON.stringify({

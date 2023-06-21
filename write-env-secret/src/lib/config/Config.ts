@@ -3,10 +3,10 @@ import { Config, ConfigInputs } from "./Config.types";
 export function getConfig(inputs: ConfigInputs): Config {
   const config = {
     repositories: inputs.repositories.map((environment) => {
-      const [owner, name] = environment.split("/");
+      const [owner, repo] = environment.split("/");
       return {
         owner,
-        name,
+        repo,
       };
     }),
   };

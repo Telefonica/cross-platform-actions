@@ -12,27 +12,27 @@ import {
 import { SecretInterface } from "./Secret.types";
 
 export const Repository: RepositoryConstructor = class repository implements RepositoryInterface {
-  private _name: string;
   private _owner: string;
+  private _repo: string;
   private _octokit: OctokitInterface;
   private _logger: Logger | undefined;
 
-  constructor(name: string, owner: string, options: RepositoryConstructorOptions) {
-    this._name = name;
+  constructor(owner: string, repo: string, options: RepositoryConstructorOptions) {
     this._owner = owner;
+    this._repo = repo;
     this._octokit = options.octokit;
     this._logger = options?.logger;
   }
 
   public async getEnvironment(name: string): Promise<EnvironmentInterface> {
     this._logger?.debug(
-      `[repo=${this._owner}/${this._name}] Getting environment ${name} from repository`
+      `[repo=${this._owner}/${this._repo}] Getting environment ${name} from repository`
     );
     try {
       const repositoryId = await this._getSelfId();
       await this._octokit.rest.repos.getEnvironment({
         owner: this._owner,
-        repo: this._name,
+        repo: this._repo,
         environment_name: name,
       });
       return new Environment(repositoryId, this._owner, {
@@ -41,10 +41,10 @@ export const Repository: RepositoryConstructor = class repository implements Rep
       });
     } catch (err) {
       this._logger?.error(
-        `[repo=${this._owner}/${this._name}] Error getting environment ${name} from repository: ${err}`
+        `[repo=${this._owner}/${this._repo}] Error getting environment ${name} from repository: ${err}`
       );
       throw new Error(
-        `Error getting environment ${name} from repository from ${this._owner}/${this._name}`,
+        `Error getting environment ${name} from repository from ${this._owner}/${this._repo}`,
         { cause: err }
       );
     }
@@ -52,28 +52,28 @@ export const Repository: RepositoryConstructor = class repository implements Rep
 
   private async _getSelfId(): Promise<number> {
     this._logger?.debug(
-      `[repo=${this._owner}/${this._name}] Getting self id from repository ${this._name}`
+      `[repo=${this._owner}/${this._repo}] Getting self id from repository ${this._repo}`
     );
     try {
       const resp = await this._octokit.rest.repos.get({
         owner: this._owner,
-        repo: this._name,
+        repo: this._repo,
       });
       this._logger?.debug(
-        `[repo=${this._owner}/${this._name}] Response from GitHub: ${JSON.stringify(resp)}`
+        `[repo=${this._owner}/${this._repo}] Response from GitHub: ${JSON.stringify(resp)}`
       );
       return resp.data.id;
     } catch (err) {
       this._logger?.error(
-        `[repo=${this._owner}/${this._name}] Error getting self id from repository ${this._name}: ${err}`
+        `[repo=${this._owner}/${this._repo}] Error getting self id from repository ${this._repo}: ${err}`
       );
-      throw new Error(`Error getting self id from repository ${this._name}`, { cause: err });
+      throw new Error(`Error getting self id from repository ${this._repo}`, { cause: err });
     }
   }
 
   public async addSecret(secret: SecretInterface): Promise<void> {
     this._logger?.debug(
-      `[repo=${this._owner}/${this._name}] Adding secret ${secret.name} to repository`
+      `[repo=${this._owner}/${this._repo}] Adding secret ${secret.name} to repository`
     );
     try {
       const publicKey = await this._getPublicKey();
@@ -81,16 +81,17 @@ export const Repository: RepositoryConstructor = class repository implements Rep
       await this._octokit.rest.actions.createOrUpdateRepoSecret({
         key_id: publicKey.key_id,
         owner: this._owner,
-        repo: this._name,
+        repo: this._repo,
         secret_name: secret.name,
         encrypted_value: encryptedValue,
       });
+      this._logger?.info(`[repo=${this._owner}/${this._repo}] Secret ${secret.name} added`);
     } catch (err) {
       this._logger?.error(
-        `[repo=${this._owner}/${this._name}] Error adding secret ${secret.name} to repository: ${err}`
+        `[repo=${this._owner}/${this._repo}] Error adding secret ${secret.name} to repository: ${err}`
       );
       throw new Error(
-        `Error adding secret ${secret.name} to repository ${this._owner}/${this._name}`,
+        `Error adding secret ${secret.name} to repository ${this._owner}/${this._repo}`,
         { cause: err }
       );
     }
@@ -98,22 +99,25 @@ export const Repository: RepositoryConstructor = class repository implements Rep
 
   private async _getPublicKey(): Promise<PublicKeyInterface> {
     this._logger?.debug(
-      `[repo=${this._owner}/${this._name}] Getting public key from repository ${this._name}`
+      `[repo=${this._owner}/${this._repo}] Getting public key from repository ${this._repo}`
     );
     try {
       const publicKey = await this._octokit.rest.actions.getRepoPublicKey({
         owner: this._owner,
-        repo: this._name,
+        repo: this._repo,
       });
+      this._logger?.debug(
+        `[repo=${this._owner}/${this._repo}] Public key from repo retrieved ${publicKey.data.key}`
+      );
       return {
         key_id: publicKey.data.key_id,
         key: publicKey.data.key,
       };
     } catch (error) {
       this._logger?.error(
-        `[repo=${this._owner}/${this._name}] Error getting public key from repository ${this._name}: ${error}`
+        `[repo=${this._owner}/${this._repo}] Error getting public key from repository ${this._repo}: ${error}`
       );
-      throw new Error(`Error getting public key from repository ${this._owner}/${this._name}`, {
+      throw new Error(`Error getting public key from repository ${this._owner}/${this._repo}`, {
         cause: error,
       });
     }

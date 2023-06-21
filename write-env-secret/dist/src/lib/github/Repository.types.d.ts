@@ -12,12 +12,12 @@ export interface RepositoryConstructorOptions {
 export interface RepositoryConstructor {
     /**
      * Creates a new instance of repositoryInterface
-     * @param {string} name - repository name
      * @param {string} owner - repository owner
+     * @param {string} repo - repository repo
      * @param {RepositoryConstructorOptions} options - repositoryConstructor options
      * @returns A new instance of repositoryInterface
      */
-    new (name: string, owner: string, options: RepositoryConstructorOptions): RepositoryInterface;
+    new (owner: string, repo: string, options: RepositoryConstructorOptions): RepositoryInterface;
 }
 /**
  * Represents a GitHub repository

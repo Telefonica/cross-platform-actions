@@ -14066,10 +14066,10 @@ async function sync(inputs, logger) {
     const octokit = (0, Octokit_1.getOctokit)(inputs.token);
     const secret = new Secret_1.Secret(inputs.secret, inputs.value, { logger });
     const createdSecrets = [];
-    for (const { name, owner } of config.repositories) {
-        logger.info(`Syncing ${name}...`);
+    for (const { owner, repo } of config.repositories) {
+        logger.info(`Syncing ${owner}/${repo}...`);
         try {
-            const repository = new Repository_1.Repository(name, owner, { octokit, logger });
+            const repository = new Repository_1.Repository(owner, repo, { octokit, logger });
             if (inputs.environment) {
                 const environment = await repository.getEnvironment(inputs.environment);
                 await environment.addSecret(secret);
@@ -14079,13 +14079,13 @@ async function sync(inputs, logger) {
             }
             createdSecrets.push({
                 secret: secret.name,
-                repository: `${owner}/${name}`,
+                repository: `${owner}/${repo}`,
                 environment: inputs.environment,
             });
         }
         catch (err) {
-            logger.error(`Error syncing ${name}: ${err}`);
-            throw new Error(`Error syncing ${name}`, { cause: err });
+            logger.error(`Error syncing ${owner}/${repo}: ${err}`);
+            throw new Error(`Error syncing ${owner}/${repo}`, { cause: err });
         }
     }
     return JSON.stringify({
@@ -14109,10 +14109,10 @@ exports.getConfig = void 0;
 function getConfig(inputs) {
     const config = {
         repositories: inputs.repositories.map((environment) => {
-            const [owner, name] = environment.split("/");
+            const [owner, repo] = environment.split("/");
             return {
                 owner,
-                name,
+                repo,
             };
         }),
     };
@@ -14219,23 +14219,23 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Repository = void 0;
 const Environment_1 = __nccwpck_require__(5088);
 const Repository = class repository {
-    _name;
     _owner;
+    _repo;
     _octokit;
     _logger;
-    constructor(name, owner, options) {
-        this._name = name;
+    constructor(owner, repo, options) {
         this._owner = owner;
+        this._repo = repo;
         this._octokit = options.octokit;
         this._logger = options?.logger;
     }
     async getEnvironment(name) {
-        this._logger?.debug(`[repo=${this._owner}/${this._name}] Getting environment ${name} from repository`);
+        this._logger?.debug(`[repo=${this._owner}/${this._repo}] Getting environment ${name} from repository`);
         try {
             const repositoryId = await this._getSelfId();
             await this._octokit.rest.repos.getEnvironment({
                 owner: this._owner,
-                repo: this._name,
+                repo: this._repo,
                 environment_name: name,
             });
             return new Environment_1.Environment(repositoryId, this._owner, {
@@ -14244,58 +14244,60 @@ const Repository = class repository {
             });
         }
         catch (err) {
-            this._logger?.error(`[repo=${this._owner}/${this._name}] Error getting environment ${name} from repository: ${err}`);
-            throw new Error(`Error getting environment ${name} from repository from ${this._owner}/${this._name}`, { cause: err });
+            this._logger?.error(`[repo=${this._owner}/${this._repo}] Error getting environment ${name} from repository: ${err}`);
+            throw new Error(`Error getting environment ${name} from repository from ${this._owner}/${this._repo}`, { cause: err });
         }
     }
     async _getSelfId() {
-        this._logger?.debug(`[repo=${this._owner}/${this._name}] Getting self id from repository ${this._name}`);
+        this._logger?.debug(`[repo=${this._owner}/${this._repo}] Getting self id from repository ${this._repo}`);
         try {
             const resp = await this._octokit.rest.repos.get({
                 owner: this._owner,
-                repo: this._name,
+                repo: this._repo,
             });
-            this._logger?.debug(`[repo=${this._owner}/${this._name}] Response from GitHub: ${JSON.stringify(resp)}`);
+            this._logger?.debug(`[repo=${this._owner}/${this._repo}] Response from GitHub: ${JSON.stringify(resp)}`);
             return resp.data.id;
         }
         catch (err) {
-            this._logger?.error(`[repo=${this._owner}/${this._name}] Error getting self id from repository ${this._name}: ${err}`);
-            throw new Error(`Error getting self id from repository ${this._name}`, { cause: err });
+            this._logger?.error(`[repo=${this._owner}/${this._repo}] Error getting self id from repository ${this._repo}: ${err}`);
+            throw new Error(`Error getting self id from repository ${this._repo}`, { cause: err });
         }
     }
     async addSecret(secret) {
-        this._logger?.debug(`[repo=${this._owner}/${this._name}] Adding secret ${secret.name} to repository`);
+        this._logger?.debug(`[repo=${this._owner}/${this._repo}] Adding secret ${secret.name} to repository`);
         try {
             const publicKey = await this._getPublicKey();
             const encryptedValue = await secret.encryptedValue(publicKey.key);
             await this._octokit.rest.actions.createOrUpdateRepoSecret({
                 key_id: publicKey.key_id,
                 owner: this._owner,
-                repo: this._name,
+                repo: this._repo,
                 secret_name: secret.name,
                 encrypted_value: encryptedValue,
             });
+            this._logger?.info(`[repo=${this._owner}/${this._repo}] Secret ${secret.name} added`);
         }
         catch (err) {
-            this._logger?.error(`[repo=${this._owner}/${this._name}] Error adding secret ${secret.name} to repository: ${err}`);
-            throw new Error(`Error adding secret ${secret.name} to repository ${this._owner}/${this._name}`, { cause: err });
+            this._logger?.error(`[repo=${this._owner}/${this._repo}] Error adding secret ${secret.name} to repository: ${err}`);
+            throw new Error(`Error adding secret ${secret.name} to repository ${this._owner}/${this._repo}`, { cause: err });
         }
     }
     async _getPublicKey() {
-        this._logger?.debug(`[repo=${this._owner}/${this._name}] Getting public key from repository ${this._name}`);
+        this._logger?.debug(`[repo=${this._owner}/${this._repo}] Getting public key from repository ${this._repo}`);
         try {
             const publicKey = await this._octokit.rest.actions.getRepoPublicKey({
                 owner: this._owner,
-                repo: this._name,
+                repo: this._repo,
             });
+            this._logger?.debug(`[repo=${this._owner}/${this._repo}] Public key from repo retrieved ${publicKey.data.key}`);
             return {
                 key_id: publicKey.data.key_id,
                 key: publicKey.data.key,
             };
         }
         catch (error) {
-            this._logger?.error(`[repo=${this._owner}/${this._name}] Error getting public key from repository ${this._name}: ${error}`);
-            throw new Error(`Error getting public key from repository ${this._owner}/${this._name}`, {
+            this._logger?.error(`[repo=${this._owner}/${this._repo}] Error getting public key from repository ${this._repo}: ${error}`);
+            throw new Error(`Error getting public key from repository ${this._owner}/${this._repo}`, {
                 cause: error,
             });
         }
