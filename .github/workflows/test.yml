@@ -98,8 +98,8 @@ jobs:
       - name: Check write-env-secret manifest
         run: |
           [[ '${{ steps.write-env-secret.outputs.manifest }}' != '{"github":{"secrets":[{"secret":"EXAMPLE_SECRET_NAME","repository":"Telefonica/cross-platform-actions"}]}}' ]] && (echo "::error::Action output has invalid value" && exit 1)
-          [[ -z '${{ secrets.EXAMPLE_SECRET_NAME }}' ]] && (echo "::error::Secret is not set" && exit 1)
-          [[ '${{ secrets.EXAMPLE_SECRET_NAME }}' != '${{ steps.generate-sample-manifest.outputs.manifest }}' ]] && (echo "::error::Secret has invalid value" && exit 1)
+          [[ -z '${{ secrets[fromJSON(steps.write-env-secret.outputs.manifest.github.secrets[0].secret)] }}' ]] && (echo "::error::Secret is not set" && exit 1)
+          [[ '${{ secrets[fromJSON(steps.write-env-secret.outputs.manifest.github.secrets[0].secret)] }}' != '${{ steps.generate-sample-manifest.outputs.manifest }}' ]] && (echo "::error::Secret has invalid value" && exit 1)
       # - name: Clean up secret
       #   if: always()
       #   run: |
