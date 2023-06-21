@@ -98,4 +98,7 @@ jobs:
       - name: Check write-env-secret manifest
         run: |
           [[ -z "${{ secrets.EXAMPLE_SECRET_NAME }}" ]] && (echo "::error::Secret is not set" && exit 1)
-          [[ "${{ secrets.EXAMPLE_SECRET_NAME }}" == "${{ steps.generate-sample-manifest.outputs.manifest }}" ]] || (echo "::error::Secret has invalid value" && exit 1)
+          [[ "${{ steps.write-env-secret.outputs.manifest }}" == '{"github":{"secrets":[{"secret":"EXAMPLE_SECRET_NAME","repository":"Telefonica/cross-platform-actions"}]}}' ]] || (echo "::error::Action output has invalid value" && exit 1)
+      - name: Clean up secret
+        run: |
+          curl -X DELETE -H "Authorization: token ${{ secrets.PAT_SYNC_MANIFEST_CROSS_1455 }}" https://api.github.com/repos/Telefonica/cross-platform-actions/actions/secrets/EXAMPLE_SECRET_NAME || true
