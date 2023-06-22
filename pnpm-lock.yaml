@@ -7,6 +7,13 @@ settings:
 importers:
 
   .:
+    dependencies:
+      '@actions/core':
+        specifier: 1.10.0
+        version: 1.10.0
+      '@octokit/core':
+        specifier: 4.2.0
+        version: 4.2.0
     devDependencies:
       '@babel/core':
         specifier: 7.22.1
@@ -17,6 +24,12 @@ importers:
       '@babel/preset-typescript':
         specifier: 7.22.5
         version: 7.22.5(@babel/core@7.22.1)
+      '@jest/globals':
+        specifier: 29.5.0
+        version: 29.5.0
+      '@octokit/types':
+        specifier: 9.3.1
+        version: 9.3.1
       '@types/jest':
         specifier: 29.5.2
         version: 29.5.2
@@ -89,9 +102,6 @@ importers:
 
   deploy-platform:
     dependencies:
-      '@actions/core':
-        specifier: 1.10.0
-        version: 1.10.0
       jszip:
         specifier: 3.10.1
         version: 3.10.1
@@ -102,49 +112,25 @@ importers:
         specifier: 9.0.0
         version: 9.0.0
     devDependencies:
-      '@octokit/core':
-        specifier: 4.2.0
-        version: 4.2.0
       '@octokit/rest':
         specifier: 19.0.7
         version: 19.0.7
-      '@octokit/types':
-        specifier: 9.3.1
-        version: 9.3.1
       '@types/uuid':
         specifier: 9.0.1
         version: 9.0.1
 
   write-secret:
     dependencies:
-      '@actions/core':
-        specifier: 1.10.0
-        version: 1.10.0
-      '@octokit/core':
-        specifier: 4.2.0
-        version: 4.2.0
       '@octokit/plugin-rest-endpoint-methods':
         specifier: 7.2.3
         version: 7.2.3(@octokit/core@4.2.0)
       libsodium-wrappers:
         specifier: 0.7.11
         version: 0.7.11
-      octokit:
-        specifier: 2.0.14
-        version: 2.0.14
       zod:
         specifier: 3.21.4
         version: 3.21.4
     devDependencies:
-      '@jest/globals':
-        specifier: 29.5.0
-        version: 29.5.0
-      '@octokit/types':
-        specifier: 9.3.1
-        version: 9.3.1
-      '@types/jest':
-        specifier: 29.5.2
-        version: 29.5.2
       '@types/libsodium-wrappers':
         specifier: 0.7.10
         version: 0.7.10

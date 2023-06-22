@@ -97,6 +97,7 @@ export const Repository: RepositoryConstructor = class repository implements Rep
     }
   }
 
+  // TODO: Cache this method to avoid reaching rate limits <@ismtabo 2023-06-22>
   private async _getPublicKey(): Promise<PublicKeyInterface> {
     this._logger?.debug(
       `[repo=${this._owner}/${this._repo}] Getting public key from repository ${this._repo}`

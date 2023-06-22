@@ -1,1 +1,1 @@
-export declare function runDeployAndGetArtifactAction(): Promise<void>;
+export declare function runWriteSecretAndGetArtifactAction(): Promise<void>;

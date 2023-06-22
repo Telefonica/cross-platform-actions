@@ -26,7 +26,7 @@ describe("Environment", () => {
     const token = "test";
 
     // Act
-    const environment = new Environment(NaN, name, { octokit: getOctokit(token) });
+    const environment = new Environment(1, name, { octokit: getOctokit(token) });
 
     // Assert
     expect(environment).toBeInstanceOf(Environment);
@@ -36,7 +36,7 @@ describe("Environment", () => {
     let environment: EnvironmentInterface;
 
     beforeEach(async () => {
-      environment = new Environment(NaN, "test", { octokit: getOctokit("test") });
+      environment = new Environment(1, "test", { octokit: getOctokit("test") });
     });
 
     it("should add a secret to the environment", async () => {
@@ -57,12 +57,12 @@ describe("Environment", () => {
 
       // Assert
       expect(octokit.rest.actions.getEnvironmentPublicKey).toHaveBeenCalledWith({
-        repository_id: NaN,
+        repository_id: 1,
         environment_name: "test",
       });
       expect(octokit.rest.actions.createOrUpdateEnvironmentSecret).toHaveBeenCalledWith({
         key_id: "test",
-        repository_id: NaN,
+        repository_id: 1,
         environment_name: "test",
         secret_name: "test",
         encrypted_value: expect.toHaveEncryptedValue("test", keyPair),

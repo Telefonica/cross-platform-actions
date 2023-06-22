@@ -22,21 +22,24 @@
 
 # Usage
 
-This action receives a secret name, secret value, a list of repositories and an optional environment, and updates the secret at repository or environment scope (if present) with given value.
+This action receives a secret name, secret value, a list of repositories and an optional environment, and updates the secret at repository or environment scope (if present environment input) with given value.
 
-__So, you can use this action in the a project's repository to update secrets in a list of repositories or environments. Such as deploy manifest information.__
+__So, you can use this action in a project's repository to update secrets in a list of repositories or environments.__
 
 1. The project's deploy workflow launches this write env secret action.
-2. This action updates the secret in the given repositories or environments.
+2. This action updates a secret with given value at:
+  * Each repository's environment named as given input, if environment input is present.
+  * Otherwise, the secret is added to each repository.
 3. The secret is available in the repositories or environments.
+4. The action returns a manifest with the information of written secrets.
 
 ## Assumptions
 
 - The project information is a JSON string with following schema:
   - `repositories`: Array of repository name (including owner).
 - :warning: Both repositories and environments (if environment input is present) **MUST** exist before this action is called. If not, the action will fail.
-- :warning: The given token **MUST** has access to repositories, environments and secrets scopes. For more information, read the [Github documentation](https://docs.github.com/en/rest/reference/actions#secrets).
-- The output manifest contains the Github Secret names for each repository, in the same order as the input repositories. It contains following schema
+- :warning: The given token **MUST** has access to repositories, environments and secrets scopes. For more information, read the [GitHub documentation](https://docs.github.com/en/rest/reference/actions#secrets).
+- The output manifest contains the GitHub Secret names for each repository, in the same order as the input repositories. It contains following schema:
   ```jsonc
   {
     "github": {
@@ -86,11 +89,11 @@ steps:
 
 ## Inputs
 
-- `secret` - Name of the Github Secret to sync the secret to.
-- `value` - Value of the Github Secret to sync the secret to.
+- `secret` - Name of the GitHub Secret to sync the secret to.
+- `value` - Value of the GitHub Secret to sync the secret to.
 - `repositories` - List of repositories as a JSON string.
-- `token` - Github token to get access to the repository workflows
 - `environment` - Environment name to be used in the deploy secret.
+- `token` - GitHub token to get access to the GitHub API.
 
 ## Outputs
 

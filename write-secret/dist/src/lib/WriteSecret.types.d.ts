@@ -1,3 +1,5 @@
+import { OctokitInterface } from "./github/Octokit.types";
+import { Logger } from "./support/Logger.types";
 export interface SyncInputs {
     /** Secret name */
     secret: string;
@@ -9,4 +11,10 @@ export interface SyncInputs {
     environment?: string;
     /** GitHub token */
     token: string;
+}
+export interface Context {
+    /** Octokit */
+    octokit: OctokitInterface;
+    /** Logger */
+    logger: Logger;
 }

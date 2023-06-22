@@ -11,7 +11,7 @@ inputs:
     description: Repositories to sync represented as JSON Array
     required: true
   environment:
-    description: Environment to sync
+    description: Name of the environment contain in the repositories to sync
     required: false
   token: 
     description: Github token

@@ -1,3 +1,3 @@
-import { runDeployAndGetArtifactAction } from "./github-action/Action";
+import { runWriteSecretAndGetArtifactAction } from "./github-action/Action";
 
-runDeployAndGetArtifactAction();
+runWriteSecretAndGetArtifactAction();

@@ -2,11 +2,11 @@ import { actionsCore } from "@support/mocks/ActionsCore";
 import "@support/mocks/Logger";
 import "@support/mocks/Octokit";
 
-import { runDeployAndGetArtifactAction } from "@src/github-action/Action";
+import { runWriteSecretAndGetArtifactAction } from "@src/github-action/Action";
 import * as writeSecretLib from "@src/lib/WriteSecret";
 
 describe("Action", () => {
-  describe("runDeployAndGetArtifactAction", () => {
+  describe("runWriteSecretAndGetArtifactAction", () => {
     let spyWriteSecret: jest.SpyInstance;
 
     beforeEach(() => {
@@ -18,7 +18,7 @@ describe("Action", () => {
     });
 
     it("should be defined", () => {
-      expect(runDeployAndGetArtifactAction).toBeDefined();
+      expect(runWriteSecretAndGetArtifactAction).toBeDefined();
     });
 
     it("should return a void promise", async () => {
@@ -42,7 +42,7 @@ describe("Action", () => {
       };
 
       // Act
-      const result = await runDeployAndGetArtifactAction();
+      const result = await runWriteSecretAndGetArtifactAction();
 
       // Assert
       expect(result).toBeUndefined();
@@ -64,7 +64,7 @@ describe("Action", () => {
       });
 
       // Act & Assert
-      await expect(runDeployAndGetArtifactAction()).rejects.toThrow();
+      await expect(runWriteSecretAndGetArtifactAction()).rejects.toThrow();
       expect(actionsCore.setFailed).toHaveBeenCalled();
     });
 
@@ -83,7 +83,7 @@ describe("Action", () => {
       spyWriteSecret.mockRejectedValueOnce(new Error("test"));
 
       // Act & Assert
-      await expect(runDeployAndGetArtifactAction()).rejects.toThrow();
+      await expect(runWriteSecretAndGetArtifactAction()).rejects.toThrow();
       expect(actionsCore.setFailed).toHaveBeenCalled();
     });
   });

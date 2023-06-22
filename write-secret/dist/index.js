@@ -13919,26 +13919,24 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.runDeployAndGetArtifactAction = void 0;
+exports.runWriteSecretAndGetArtifactAction = void 0;
 const core = __importStar(__nccwpck_require__(3610));
 const WriteSecret_1 = __nccwpck_require__(8551);
 const Inputs_1 = __nccwpck_require__(1038);
 const Logger_1 = __nccwpck_require__(7080);
-// FIXME: cleanup
-const manifestOutput = "manifest";
-async function runDeployAndGetArtifactAction() {
+async function runWriteSecretAndGetArtifactAction() {
     const logger = (0, Logger_1.getLogger)();
     try {
         const inputs = (0, Inputs_1.getInputs)();
         const artifactJson = await (0, WriteSecret_1.writeSecret)(inputs, logger);
-        core.setOutput(manifestOutput, artifactJson);
+        core.setOutput("manifest", artifactJson);
     }
     catch (error) {
         core.setFailed(error);
         throw error;
     }
 }
-exports.runDeployAndGetArtifactAction = runDeployAndGetArtifactAction;
+exports.runWriteSecretAndGetArtifactAction = runWriteSecretAndGetArtifactAction;
 
 
 /***/ }),
@@ -14067,29 +14065,10 @@ async function writeSecret(inputs, logger) {
     const config = (0, Config_1.getConfig)(inputs);
     const octokit = (0, Octokit_1.getOctokit)(inputs.token);
     const secret = new Secret_1.Secret(inputs.secret, inputs.value, { logger });
-    const createdSecrets = [];
-    for (const { owner, repo } of config.repositories) {
-        logger.info(`Syncing ${owner}/${repo}...`);
-        try {
-            const repository = new Repository_1.Repository(owner, repo, { octokit, logger });
-            if (inputs.environment) {
-                const environment = await repository.getEnvironment(inputs.environment);
-                await environment.addSecret(secret);
-            }
-            else {
-                await repository.addSecret(secret);
-            }
-            createdSecrets.push({
-                secret: secret.name,
-                repository: `${owner}/${repo}`,
-                environment: inputs.environment,
-            });
-        }
-        catch (err) {
-            logger.error(`Error syncing ${owner}/${repo}: ${err}`);
-            throw new Error(`Error syncing ${owner}/${repo}`, { cause: err });
-        }
-    }
+    const createdSecrets = await _createSecrets(config.repositories, inputs.environment, secret, {
+        octokit,
+        logger,
+    });
     return JSON.stringify({
         github: {
             secrets: createdSecrets,
@@ -14097,6 +14076,33 @@ async function writeSecret(inputs, logger) {
     });
 }
 exports.writeSecret = writeSecret;
+async function _createSecrets(repositories, environment, secret, context) {
+    if (typeof environment === "string")
+        return _createEnvironmentSecrets(repositories, environment, secret, context);
+    return _createRepoSecrets(repositories, secret, context);
+}
+async function _createEnvironmentSecrets(repositories, environmentName, secret, context) {
+    return Promise.all(repositories.map(async ({ owner, repo }) => {
+        const repository = new Repository_1.Repository(owner, repo, context);
+        const environment = await repository.getEnvironment(environmentName);
+        await environment.addSecret(secret);
+        return {
+            secret: secret.name,
+            repository: `${owner}/${repo}`,
+            environment: environmentName,
+        };
+    }));
+}
+async function _createRepoSecrets(repositories, secret, context) {
+    return Promise.all(repositories.map(async ({ owner, repo }) => {
+        const repository = new Repository_1.Repository(owner, repo, context);
+        await repository.addSecret(secret);
+        return {
+            secret: secret.name,
+            repository: `${owner}/${repo}`,
+        };
+    }));
+}
 
 
 /***/ }),
@@ -14284,6 +14290,7 @@ const Repository = class repository {
             throw new Error(`Error adding secret ${secret.name} to repository ${this._owner}/${this._repo}`, { cause: err });
         }
     }
+    // TODO: Cache this method to avoid reaching rate limits <@ismtabo 2023-06-22>
     async _getPublicKey() {
         this._logger?.debug(`[repo=${this._owner}/${this._repo}] Getting public key from repository ${this._repo}`);
         try {
@@ -14533,7 +14540,7 @@ var exports = __webpack_exports__;
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const Action_1 = __nccwpck_require__(2301);
-(0, Action_1.runDeployAndGetArtifactAction)();
+(0, Action_1.runWriteSecretAndGetArtifactAction)();
 
 })();
 

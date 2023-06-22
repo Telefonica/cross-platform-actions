@@ -4,6 +4,7 @@ function componentPath() {
   return path.resolve.apply(null, [__dirname, ...arguments]);
 }
 
+// TODO: Move common eslint configuration to parent .eslint.js file <@ismtabo 2023-06-22>
 module.exports = {
   ignorePatterns: ["node_modules", "dist/**/*", "coverage/**/*"],
   overrides: [
