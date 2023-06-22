@@ -66,7 +66,7 @@ jobs:
       - name: Check deployment manifest
         run: |
           echo '${{ steps.deploy.outputs.manifest }}' | jq -r '.registry.server' | grep 'foo-server' || (echo "Manifest is wrong" && exit 1)
-  test-component-write-env-secret:
+  test-component-write-secret:
     runs-on: ${{ vars.JOBS_RUNNER }}
     needs: build
     steps:
@@ -75,19 +75,19 @@ jobs:
       - id: generate-sample-manifest
         run: |
           echo '::set-output name=manifest::{"example": "${{ github.sha }}"}'
-      - id: write-env-secret
-        name: Launch write-env-secret action
-        uses: ./write-env-secret
+      - id: write-secret
+        name: Launch write-secret action
+        uses: ./write-secret
         with:
           secret: EXAMPLE_SECRET_NAME
           value: ${{ steps.generate-sample-manifest.outputs.manifest }}
           repositories: |
             [ "Telefonica/cross-platform-actions" ]
           token: ${{ secrets.PAT_SYNC_MANIFEST_CROSS_1455 }}
-      - name: Check write-env-secret manifest
+      - name: Check write-secret manifest
         run: |
-          [[ '${{ steps.write-env-secret.outputs.manifest }}' == '{"github":{"secrets":[{"secret":"EXAMPLE_SECRET_NAME","repository":"Telefonica/cross-platform-actions"}]}}' ]] || echo "::error::Action output has invalid value"
-      - name: Check write-env-secret created secret
+          [[ '${{ steps.write-secret.outputs.manifest }}' == '{"github":{"secrets":[{"secret":"EXAMPLE_SECRET_NAME","repository":"Telefonica/cross-platform-actions"}]}}' ]] || echo "::error::Action output has invalid value"
+      - name: Check write-secret created secret
         timeout-minutes: 1
         run: |
           while true; do
