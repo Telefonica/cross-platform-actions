@@ -48,6 +48,12 @@ pnpm i
 
 Once the installation is completed, you should move to each action's folder and refer to its own documentation to start working on it.
 
+#### Monorepo tool
+
+In order to orchestrate task dependencies between components, we use [Nx](https://nx.dev/) as a monorepo tool. You can find the configuration of the workspace in the `nx.json` file.
+
+This means that you can execute any command of the components from the root folder, and Nx will take care of executing the dependent commands in the right order.
+
 ## Lint
 
 This repository uses [ESLint](https://eslint.org/) to lint the code. To run it, execute:

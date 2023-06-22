@@ -1,4 +1,4 @@
-import { SyncInputs } from "../Sync.types";
+import { SyncInputs } from "../WriteSecret.types";
 export type ConfigInputs = Pick<SyncInputs, "repositories">;
 interface Repository {
     /** Repository owner */

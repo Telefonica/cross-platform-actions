@@ -3,9 +3,9 @@ import { getOctokit } from "./github/Octokit";
 import { Repository } from "./github/Repository";
 import { Secret } from "./github/Secret";
 import { Logger } from "./support/Logger.types";
-import { SyncInputs } from "./Sync.types";
+import { SyncInputs } from "./WriteSecret.types";
 
-export async function sync(inputs: SyncInputs, logger: Logger): Promise<string> {
+export async function writeSecret(inputs: SyncInputs, logger: Logger): Promise<string> {
   logger.info("Syncing manifest...");
   const config = getConfig(inputs);
   const octokit = getOctokit(inputs.token);

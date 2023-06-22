@@ -6,15 +6,15 @@ import sodium from "libsodium-wrappers";
 import { logger } from "@support/mocks/Logger";
 import { octokit } from "@support/mocks/Octokit";
 
-import { sync } from "@src/lib/Sync";
+import { writeSecret } from "@src/lib/WriteSecret";
 
-describe("sync", () => {
+describe("writeSecret", () => {
   it("should be defined", () => {
-    expect(sync).toBeDefined();
+    expect(writeSecret).toBeDefined();
   });
 
   describe("write repository secret", () => {
-    it("should return a sync manifest object", async () => {
+    it("should return a writeSecret manifest object", async () => {
       // Arrange
       await sodium.ready;
       const keyPair = sodium.crypto_box_keypair();
@@ -33,7 +33,7 @@ describe("sync", () => {
       };
 
       // Act
-      const manifest = await sync(inputs, logger);
+      const manifest = await writeSecret(inputs, logger);
 
       // Assert
       expect(manifest).toBe(
@@ -72,12 +72,12 @@ describe("sync", () => {
       };
 
       // Act & Assert
-      await expect(sync(inputs, logger)).rejects.toThrow("test");
+      await expect(writeSecret(inputs, logger)).rejects.toThrow("test");
     });
   });
 
   describe("write env secret", () => {
-    it("should return a sync manifest object", async () => {
+    it("should return a writeSecret manifest object", async () => {
       // Arrange
       await sodium.ready;
       const keyPair = sodium.crypto_box_keypair();
@@ -97,7 +97,7 @@ describe("sync", () => {
       };
 
       // Act
-      const manifest = await sync(inputs, logger);
+      const manifest = await writeSecret(inputs, logger);
 
       // Assert
       expect(manifest).toBe(
@@ -138,7 +138,7 @@ describe("sync", () => {
       };
 
       // Act & Assert
-      await expect(sync(inputs, logger)).rejects.toThrow("test");
+      await expect(writeSecret(inputs, logger)).rejects.toThrow("test");
     });
   });
 });

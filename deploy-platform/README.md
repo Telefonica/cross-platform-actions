@@ -120,7 +120,7 @@ Read the monorepo [README](../README.md#development) to know how to check spelli
 This project uses [TypeScript](https://www.typescriptlang.org/). You can check types with:
 
 ```sh
-pnpm run check:types
+pnpm nx run check:types
 ```
 
 ## Unit tests
@@ -128,7 +128,7 @@ pnpm run check:types
 Unit tests are written with [Jest](https://jestjs.io/). To run them, execute:
 
 ```sh
-pnpm run test
+pnpm nx run test
 ```
 
 The coverage report will be generated in the `coverage` folder.
@@ -140,7 +140,7 @@ The coverage report will be generated in the `coverage` folder.
 To build the project and add the dist folder, execute:
 
 ```sh
-pnpm run build
+pnpm nx run build
 
 # Remember to add the built files!!
 git add dist

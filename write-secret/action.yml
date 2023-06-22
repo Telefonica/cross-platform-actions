@@ -1,5 +1,5 @@
-name: Sync Manifest
-description: Syncs a manifest with IDP project
+name: Write Secret
+description: Write secret to Github repository or environment
 inputs:
   value:
     description: Value to write to secret

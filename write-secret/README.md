@@ -67,9 +67,9 @@ steps:
       project: $PROJECT_NAME
       environment: $ENVIRONMENT_NAME
       token: $TOKEN
-  - id: write-env-secret
+  - id: write-secret
     name: Write environment secret
-    uses: Telefonica/cross-platform-actions/write-env-secret@{BRANCH_NAME|VERSION}
+    uses: Telefonica/cross-platform-actions/write-secret@{BRANCH_NAME|VERSION}
     with:
       secret: IDP_DEPLOY_MANIFEST
       value: ${{ steps.deploy-platform.outputs.manifest }}
@@ -127,7 +127,7 @@ Read the monorepo [README](../README.md#development) to know how to check spelli
 This project uses [TypeScript](https://www.typescriptlang.org/). You can check types with:
 
 ```sh
-pnpm run check:types
+pnpm nx check:types
 ```
 
 ## Unit tests
@@ -135,7 +135,7 @@ pnpm run check:types
 Unit tests are written with [Jest](https://jestjs.io/). To run them, execute:
 
 ```sh
-pnpm run test
+pnpm nx test
 ```
 
 The coverage report will be generated in the `coverage` folder.
@@ -147,7 +147,7 @@ The coverage report will be generated in the `coverage` folder.
 To build the project and add the dist folder, execute:
 
 ```sh
-pnpm run build
+pnpm nx build
 
 # Remember to add the built files!!
 git add dist

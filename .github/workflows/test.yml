@@ -41,25 +41,12 @@ jobs:
       - name: Setup env
         uses: ./.github/actions/pnpm-install
       - name: Build
-        run: pnpm nx run-many -t build
+        run: pnpm nx run-many --skip-nx-cache -t build
       - name: Check dist (deploy-platform)
         id: diff-deploy-platform
         working-directory: deploy-platform
         run: |
-          if [ "$(git diff --ignore-space-at-eol dist/ | wc -l)" -gt "0" ]; then
-            echo "Detected uncommitted changes after build.  See status below:"
-            git diff
-            exit 1
-          fi
-      - name: Check dist (write-env-secret)
-        id: diff-write-env-secret
-        working-directory: write-env-secret
-        run: |
-          if [ "$(git diff --ignore-space-at-eol dist/ | wc -l)" -gt "0" ]; then
-            echo "Detected uncommitted changes after build.  See status below:"
-            git diff
-            exit 1
-          fi
+          pnpm nx run-many -t check:dist
   test-component-deploy:
     runs-on: ${{ vars.JOBS_RUNNER }}
     needs: build

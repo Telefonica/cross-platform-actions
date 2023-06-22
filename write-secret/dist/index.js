@@ -13921,15 +13921,17 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.runDeployAndGetArtifactAction = void 0;
 const core = __importStar(__nccwpck_require__(3610));
-const Sync_1 = __nccwpck_require__(5672);
+const WriteSecret_1 = __nccwpck_require__(8551);
 const Inputs_1 = __nccwpck_require__(1038);
 const Logger_1 = __nccwpck_require__(7080);
+// FIXME: cleanup
+const manifestOutput = "manifest";
 async function runDeployAndGetArtifactAction() {
     const logger = (0, Logger_1.getLogger)();
     try {
         const inputs = (0, Inputs_1.getInputs)();
-        const artifactJson = await (0, Sync_1.sync)(inputs, logger);
-        core.setOutput("manifest", artifactJson);
+        const artifactJson = await (0, WriteSecret_1.writeSecret)(inputs, logger);
+        core.setOutput(manifestOutput, artifactJson);
     }
     catch (error) {
         core.setFailed(error);
@@ -14049,18 +14051,18 @@ exports.getLogger = getLogger;
 
 /***/ }),
 
-/***/ 5672:
+/***/ 8551:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.sync = void 0;
+exports.writeSecret = void 0;
 const Config_1 = __nccwpck_require__(1002);
 const Octokit_1 = __nccwpck_require__(2959);
 const Repository_1 = __nccwpck_require__(1474);
 const Secret_1 = __nccwpck_require__(6277);
-async function sync(inputs, logger) {
+async function writeSecret(inputs, logger) {
     logger.info("Syncing manifest...");
     const config = (0, Config_1.getConfig)(inputs);
     const octokit = (0, Octokit_1.getOctokit)(inputs.token);
@@ -14094,7 +14096,7 @@ async function sync(inputs, logger) {
         },
     });
 }
-exports.sync = sync;
+exports.writeSecret = writeSecret;
 
 
 /***/ }),

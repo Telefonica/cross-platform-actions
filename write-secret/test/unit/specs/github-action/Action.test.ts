@@ -1,16 +1,16 @@
 import { actionsCore } from "@support/mocks/ActionsCore";
-import "@support/mocks/Octokit";
 import "@support/mocks/Logger";
+import "@support/mocks/Octokit";
 
 import { runDeployAndGetArtifactAction } from "@src/github-action/Action";
-import * as sync from "@src/lib/Sync";
+import * as writeSecretLib from "@src/lib/WriteSecret";
 
 describe("Action", () => {
   describe("runDeployAndGetArtifactAction", () => {
-    let spySync: jest.SpyInstance;
+    let spyWriteSecret: jest.SpyInstance;
 
     beforeEach(() => {
-      spySync = jest.spyOn(sync, "sync");
+      spyWriteSecret = jest.spyOn(writeSecretLib, "writeSecret");
     });
 
     afterEach(() => {
@@ -47,7 +47,7 @@ describe("Action", () => {
       // Assert
       expect(result).toBeUndefined();
       expect(actionsCore.setOutput).toHaveBeenCalled();
-      expect(spySync).toHaveBeenCalledWith(expectedInputs, expect.anything());
+      expect(spyWriteSecret).toHaveBeenCalledWith(expectedInputs, expect.anything());
     });
 
     it("should throw an error if the project input is not a valid JSON string", async () => {
@@ -80,7 +80,7 @@ describe("Action", () => {
       actionsCore.getInput.mockImplementation((name: string) => {
         return inputs[name] as string;
       });
-      spySync.mockRejectedValueOnce(new Error("test"));
+      spyWriteSecret.mockRejectedValueOnce(new Error("test"));
 
       // Act & Assert
       await expect(runDeployAndGetArtifactAction()).rejects.toThrow();

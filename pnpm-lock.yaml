@@ -115,7 +115,7 @@ importers:
         specifier: 9.0.1
         version: 9.0.1
 
-  write-env-secret:
+  write-secret:
     dependencies:
       '@actions/core':
         specifier: 1.10.0

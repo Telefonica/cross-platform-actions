@@ -1,7 +1,7 @@
 import * as core from "@actions/core";
 import { z } from "zod";
 
-import { SyncInputs } from "../lib/Sync.types";
+import { SyncInputs } from "../lib/WriteSecret.types";
 
 const environmentIdSchema = z
   .string()

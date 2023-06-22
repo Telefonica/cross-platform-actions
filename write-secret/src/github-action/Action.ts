@@ -1,17 +1,20 @@
 import * as core from "@actions/core";
 
-import { sync } from "../lib/Sync";
+import { writeSecret } from "../lib/WriteSecret";
 
 import { getInputs } from "./Inputs";
 import { getLogger } from "./Logger";
+
+// FIXME: cleanup
+const manifestOutput = "manifest";
 
 export async function runDeployAndGetArtifactAction(): Promise<void> {
   const logger = getLogger();
   try {
     const inputs = getInputs();
-    const artifactJson = await sync(inputs, logger);
+    const artifactJson = await writeSecret(inputs, logger);
 
-    core.setOutput("manifest", artifactJson);
+    core.setOutput(manifestOutput, artifactJson);
   } catch (error) {
     core.setFailed(error as Error);
     throw error;

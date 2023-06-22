@@ -1,5 +1,5 @@
 {
-  "name": "write-env-secret",
+  "name": "write-secret",
   "private": true,
   "description": "Github action to sync a deploy manifest with a project repositories",
   "scripts": {
