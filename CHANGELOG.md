@@ -19,7 +19,19 @@ Use next sections inside each different action entry to describe changes on each
 
 ## [Unreleased]
 
+### monorepo
+
+#### Added
+
+* feat: add NX tool to manage monorepo
+
 ### deploy-platform
+
+### write-secret
+
+#### Added
+
+* feat: Add `write-secret` action (CROSS-1455)
 
 ## [2.2.1] - 2023-06-07
 
