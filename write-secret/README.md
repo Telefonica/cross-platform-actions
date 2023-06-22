@@ -34,19 +34,21 @@ __So, you can use this action in the a project's repository to update secrets in
 
 - The project information is a JSON string with following schema:
   - `repositories`: Array of repository name (including owner).
-- If present, a environment exists with given name in all the repositories.
-- The given token has access to repositories, environments and secrets scopes. For more information, read the [Github documentation](https://docs.github.com/en/rest/reference/actions#secrets).
+- :warning: Both repositories and environments (if environment input is present) **MUST** exist before this action is called. If not, the action will fail.
+- :warning: The given token **MUST** has access to repositories, environments and secrets scopes. For more information, read the [Github documentation](https://docs.github.com/en/rest/reference/actions#secrets).
 - The output manifest contains the Github Secret names for each repository, in the same order as the input repositories. It contains following schema
   ```jsonc
   {
-    "secrets": [
-      {
-        "repository": "<repository including owner>",
-        "secret": "<secret name>",
-        "environment": "<environment name>" // if present
-      },
-      // ...
-    ]
+    "github": {
+      "secrets": [
+        {
+          "repository": "<repository including owner>",
+          "secret": "<secret name>",
+          "environment": "<environment name>" // if present
+        },
+        // ...
+      ]
+    }
   }
   ```
 
