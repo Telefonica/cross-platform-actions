@@ -8,7 +8,7 @@ import type { Repository as RepositoryInfo } from "./support/Support.types";
 import { Context, WriteSecretInputs } from "./WriteSecret.types";
 
 export async function writeSecret(inputs: WriteSecretInputs, logger: Logger): Promise<string> {
-  logger.info("Syncing manifest...");
+  logger.info("Writing secret...");
   const config = getConfig(inputs);
   const octokit = getOctokit(inputs.token);
   const secret = new Secret(inputs.secret, inputs.value, { logger });
