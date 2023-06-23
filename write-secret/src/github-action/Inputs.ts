@@ -6,7 +6,7 @@ import { WriteSecretInputs } from "../lib/WriteSecret.types";
 const environmentIdSchema = z
   .string()
   .nonempty()
-  .regex(/^([^/]+)\/([^/]+)$/, "Input project must be in the format owner/repo");
+  .regex(/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/, "Input project must be in the format owner/repo");
 const repositoriesSchema = z.array(environmentIdSchema);
 
 export function getInputs(): WriteSecretInputs {

@@ -13976,7 +13976,7 @@ const zod_1 = __nccwpck_require__(3805);
 const environmentIdSchema = zod_1.z
     .string()
     .nonempty()
-    .regex(/^([^/]+)\/([^/]+)$/, "Input project must be in the format owner/repo");
+    .regex(/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/, "Input project must be in the format owner/repo");
 const repositoriesSchema = zod_1.z.array(environmentIdSchema);
 function getInputs() {
     const secret = core.getInput("secret", { required: true });
@@ -14116,8 +14116,8 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getConfig = void 0;
 function getConfig(inputs) {
     const config = {
-        repositories: inputs.repositories.map((environment) => {
-            const [owner, repo] = environment.split("/");
+        repositories: inputs.repositories.map((repository) => {
+            const [owner, repo] = repository.split("/");
             return {
                 owner,
                 repo,
