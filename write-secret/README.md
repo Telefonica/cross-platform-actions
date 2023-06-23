@@ -35,8 +35,9 @@ __So, you can use this action in a project's repository to update secrets in a l
 
 ## Assumptions
 
-- The project information is a JSON string with following schema:
-  - `repositories`: Array of repository name (including owner).
+- The repositories input is a new-line or space separated list of repositories.
+  - The repositories must be in the format `owner/repository`.
+- The environment input is the name of the environment to write the secret to in each of the repositories.
 - :warning: Both repositories and environments (if environment input is present) **MUST** exist before this action is called. If not, the action will fail.
 - :warning: The given token **MUST** has access to repositories, environments and secrets scopes. For more information, read the [GitHub documentation](https://docs.github.com/en/rest/reference/actions#secrets).
 - The output manifest contains the GitHub Secret names for each repository, in the same order as the input repositories. It contains following schema:
@@ -90,7 +91,7 @@ steps:
 - `secret` - Name of the GitHub Secret to sync the secret to.
 - `value` - Value of the GitHub Secret to sync the secret to.
 - `repositories` - New-line or space separated repositories.
-- `environment` - Environment name to be used in the deploy secret.
+- `environment` - (_Optional_) Environment name.
 - `token` - GitHub token to get access to the GitHub API.
 
 ## Outputs
