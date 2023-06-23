@@ -2,11 +2,11 @@ name: Write Secret
 description: |
   Write secret to Github repositories or environments with same environment name in multiple repositories
 inputs:
-  value:
-    description: Value to write to secret
-    required: true
   secret:
     description: Secret name
+    required: true
+  value:
+    description: Value to write to secret
     required: true
   repositories:
     description: |

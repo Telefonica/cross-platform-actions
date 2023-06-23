@@ -1,7 +1,7 @@
 import { Repository } from "../support/Support.types";
-import { SyncInputs } from "../WriteSecret.types";
+import { WriteSecretInputs } from "../WriteSecret.types";
 
-export type ConfigInputs = Pick<SyncInputs, "repositories">;
+export type ConfigInputs = Pick<WriteSecretInputs, "repositories">;
 
 export interface Config {
   /** Repositories */

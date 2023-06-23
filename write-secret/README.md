@@ -82,7 +82,7 @@ steps:
       repositories: |
         Telefonica/repository-1
         Telefonica/repository-2
-      env: int
+      environment: int
       token: ${{ secrets.GITHUB_TOKEN }}
 ```
 

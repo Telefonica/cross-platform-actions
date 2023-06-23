@@ -5,9 +5,9 @@ import { Secret } from "./github/Secret";
 import { SecretInterface } from "./github/Secret.types";
 import { Logger } from "./support/Logger.types";
 import type { Repository as RepositoryInfo } from "./support/Support.types";
-import { Context, SyncInputs } from "./WriteSecret.types";
+import { Context, WriteSecretInputs } from "./WriteSecret.types";
 
-export async function writeSecret(inputs: SyncInputs, logger: Logger): Promise<string> {
+export async function writeSecret(inputs: WriteSecretInputs, logger: Logger): Promise<string> {
   logger.info("Syncing manifest...");
   const config = getConfig(inputs);
   const octokit = getOctokit(inputs.token);
