@@ -79,10 +79,8 @@ steps:
       secret: IDP_DEPLOY_MANIFEST
       value: ${{ steps.deploy-platform.outputs.manifest }}
       repositories: |
-        [
-          "Telefonica/repository-1",
-          "Telefonica/repository-2"
-        ]
+        Telefonica/repository-1
+        Telefonica/repository-2
       env: int
       token: ${{ secrets.GITHUB_TOKEN }}
 ```
@@ -91,7 +89,7 @@ steps:
 
 - `secret` - Name of the GitHub Secret to sync the secret to.
 - `value` - Value of the GitHub Secret to sync the secret to.
-- `repositories` - List of repositories as a JSON string.
+- `repositories` - New-line or space separated repositories.
 - `environment` - Environment name to be used in the deploy secret.
 - `token` - GitHub token to get access to the GitHub API.
 
@@ -160,7 +158,7 @@ git add dist
 
 ## Component tests
 
-Component tests are executed in a real environment, using the GitHub Actions Runner. The action is executed in the workflow, and it dispatches the `deploy-test.yml` workflow in this same repository. The `deploy-test.yml` workflow is a simple workflow that just uploads a fake manifest. The component tests check that the manifest is correctly downloaded by the action and passed as an output.
+Component tests are executed in a real environment, using the GitHub Actions Runner. The action is executed in the workflow, and it creates a secret in this repository called `TEST_SECRET`. Then, the test checks that the secret has been created. In addition, the test checks that the action returns the expected manifest.
 
 ## Release
 

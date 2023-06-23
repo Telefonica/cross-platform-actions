@@ -6,17 +6,17 @@ import { SyncInputs } from "../lib/WriteSecret.types";
 const environmentIdSchema = z
   .string()
   .nonempty()
-  .regex(/^([^/]*)\/(.*)$/, "Input project must be in the format owner/repo");
+  .regex(/^([^/]+)\/([^/]+)$/, "Input project must be in the format owner/repo");
 const repositoriesSchema = z.array(environmentIdSchema);
 
 export function getInputs(): SyncInputs {
   const secret = core.getInput("secret", { required: true });
   const value = core.getInput("value", { required: true });
   const repositoriesString = core.getInput("repositories", { required: true });
-  const repositoriesRaw = JSON.parse(repositoriesString);
+  const repositoriesRaw = repositoriesString.split(/\s+/);
   const repositories = repositoriesSchema.safeParse(repositoriesRaw);
   if (!repositories.success) {
-    throw new Error("Input repositories must be a valid JSON string", {
+    throw new Error("Input repositories must be a valid space-separated list of repositories", {
       cause: repositories.error,
     });
   }

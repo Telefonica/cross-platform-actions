@@ -72,29 +72,25 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - id: generate-sample-manifest
-        run: |
-          echo '::set-output name=manifest::{"example": "${{ github.sha }}"}'
       - id: write-secret
         name: Launch write-secret action
         uses: ./write-secret
         with:
-          secret: EXAMPLE_SECRET_NAME
-          value: ${{ steps.generate-sample-manifest.outputs.manifest }}
-          repositories: |
-            [ "Telefonica/cross-platform-actions" ]
+          secret: TEST_EXAMPLE
+          value: value
+          repositories: Telefonica/cross-platform-actions
           token: ${{ secrets.PAT_SYNC_MANIFEST_CROSS_1455 }}
       - name: Check write-secret manifest
         run: |
-          [[ '${{ steps.write-secret.outputs.manifest }}' == '{"github":{"secrets":[{"secret":"EXAMPLE_SECRET_NAME","repository":"Telefonica/cross-platform-actions"}]}}' ]] || echo "::error::Action output has invalid value"
+          [[ '${{ steps.write-secret.outputs.manifest }}' == '{"github":{"secrets":[{"secret":"TEST_SECRET","repository":"Telefonica/cross-platform-actions"}]}}' ]] || echo "::error::Action output has invalid value"
       - name: Check write-secret created secret
         timeout-minutes: 1
         run: |
           while true; do
-            curl -s -H "Authorization: token ${{ secrets.PAT_SYNC_MANIFEST_CROSS_1455 }}" https://api.github.com/repos/Telefonica/cross-platform-actions/actions/secrets/EXAMPLE_SECRET_NAME | jq -r '.name' | grep 'EXAMPLE_SECRET_NAME' && break
+            curl -s -H "Authorization: token ${{ secrets.PAT_SYNC_MANIFEST_CROSS_1455 }}" https://api.github.com/repos/Telefonica/cross-platform-actions/actions/secrets/TEST_SECRET | jq -r '.name' | grep 'TEST_SECRET' && break
             sleep 10
           done
       - name: Clean up secret
         if: always()
         run: |
-          curl -X DELETE -H "Authorization: token ${{ secrets.PAT_SYNC_MANIFEST_CROSS_1455 }}" https://api.github.com/repos/Telefonica/cross-platform-actions/actions/secrets/EXAMPLE_SECRET_NAME || true
+          curl -X DELETE -H "Authorization: token ${{ secrets.PAT_SYNC_MANIFEST_CROSS_1455 }}" https://api.github.com/repos/Telefonica/cross-platform-actions/actions/secrets/TEST_SECRET || true

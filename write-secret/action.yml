@@ -1,5 +1,6 @@
 name: Write Secret
-description: Write secret to Github repository or environment
+description: |
+  Write secret to Github repositories or environments with same environment name in multiple repositories
 inputs:
   value:
     description: Value to write to secret
@@ -8,7 +9,14 @@ inputs:
     description: Secret name
     required: true
   repositories:
-    description: Repositories to sync represented as JSON Array
+    description: |
+      New-line or space separated list of repositories to sync. For example:
+      ```yaml
+      repositories: owner/repo1 owner/repo2
+      repositories: |
+        owner/repo1
+        owner/repo2
+      ```
     required: true
   environment:
     description: Name of the environment contain in the repositories to sync
@@ -18,7 +26,21 @@ inputs:
     required: true
 outputs:
   manifest:
-    description: Manifest with information about written secrets
+    description: |
+      Manifest with information about written secrets. The resultant manifest have following schema:
+      ```json
+      {
+        "github": {
+          "secrets": [
+            {
+              "repository": "owner/repo",
+              "secret":"secret-name",
+              "environment": "environment-name" // only if environment is provided
+            }
+          ]
+        }
+      }
+      ```
 runs:
   using: 'node16'
   main: 'dist/index.js'
