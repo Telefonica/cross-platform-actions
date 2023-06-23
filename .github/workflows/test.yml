@@ -76,13 +76,13 @@ jobs:
         name: Launch write-secret action
         uses: ./write-secret
         with:
-          secret: TEST_EXAMPLE
+          secret: TEST_SECRET
           value: value
           repositories: Telefonica/cross-platform-actions
           token: ${{ secrets.PAT_SYNC_MANIFEST_CROSS_1455 }}
       - name: Check write-secret manifest
         run: |
-          [[ '${{ steps.write-secret.outputs.manifest }}' == '{"github":{"secrets":[{"secret":"TEST_SECRET","repository":"Telefonica/cross-platform-actions"}]}}' ]] || echo "::error::Action output has invalid value"
+          [[ '${{ steps.write-secret.outputs.manifest }}' == '{"github":{"secrets":[{"secret":"TEST_SECRET","repository":"Telefonica/cross-platform-actions"}]}}' ]] || (echo "::error::Action output has invalid value" && exit 1)
       - name: Check write-secret created secret
         timeout-minutes: 1
         run: |
