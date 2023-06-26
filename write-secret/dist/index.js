@@ -1,6 +1,507 @@
 require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
+/***/ 3835:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.createSecrets = void 0;
+const context_1 = __nccwpck_require__(3509);
+const environments_1 = __nccwpck_require__(618);
+const github_1 = __nccwpck_require__(9206);
+const repositories_1 = __nccwpck_require__(3338);
+const secrets_1 = __nccwpck_require__(6102);
+function createSecrets(inputs, logger) {
+    const { repositories, environment, secret, value, token } = inputs;
+    const github = new github_1.GitHub(token);
+    const context = new context_1.Context({
+        secretService: github,
+        logger,
+    });
+    if (environment) {
+        return _createEnvironmentsSecrets(context, repositories, environment, secret, value);
+    }
+    return _createRepositorySecrets(context, repositories, secret, value);
+}
+exports.createSecrets = createSecrets;
+function _createEnvironmentsSecrets(context, repositories, environmentName, secretName, value) {
+    return Promise.all(repositories.map((repositoryName) => _createEnvironmentSecret(context, repositoryName, environmentName, secretName, value)));
+}
+async function _createEnvironmentSecret(context, repositoryName, environmentName, secretName, value) {
+    const repository = new repositories_1.Repository(repositoryName);
+    const environment = new environments_1.Environment(environmentName, repository);
+    const secret = new secrets_1.EnvironmentSecret(secretName, value, environment);
+    await secret.createSecret(context);
+    return {
+        secret: secretName,
+        repository: repositoryName,
+        environment: environmentName,
+    };
+}
+function _createRepositorySecrets(context, repositories, secretName, value) {
+    return Promise.all(repositories.map((repository) => _createRepositorySecret(context, repository, secretName, value)));
+}
+async function _createRepositorySecret(context, repositoryName, secretName, value) {
+    const repository = new repositories_1.Repository(repositoryName);
+    const secret = new secrets_1.RepositorySecret(secretName, value, repository);
+    await secret.createSecret(context);
+    return {
+        secret: secretName,
+        repository: repositoryName,
+    };
+}
+
+
+/***/ }),
+
+/***/ 6539:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __exportStar = (this && this.__exportStar) || function(m, exports) {
+    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+__exportStar(__nccwpck_require__(3835), exports);
+
+
+/***/ }),
+
+/***/ 7424:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.Context = void 0;
+const Context = class Context {
+    _secretService;
+    _logger;
+    constructor({ secretService, logger }) {
+        this._secretService = secretService;
+        this._logger = logger;
+    }
+    get secretService() {
+        return this._secretService;
+    }
+    get logger() {
+        return this._logger;
+    }
+};
+exports.Context = Context;
+
+
+/***/ }),
+
+/***/ 3509:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __exportStar = (this && this.__exportStar) || function(m, exports) {
+    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+__exportStar(__nccwpck_require__(7424), exports);
+
+
+/***/ }),
+
+/***/ 5117:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.Environment = void 0;
+const Environment = class Environment {
+    _name;
+    _repository;
+    constructor(name, repository) {
+        this._name = name;
+        this._repository = repository;
+    }
+    get name() {
+        return this._name;
+    }
+    get repository() {
+        return this._repository;
+    }
+};
+exports.Environment = Environment;
+
+
+/***/ }),
+
+/***/ 618:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __exportStar = (this && this.__exportStar) || function(m, exports) {
+    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+__exportStar(__nccwpck_require__(5117), exports);
+
+
+/***/ }),
+
+/***/ 7234:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.GitHub = void 0;
+const core_1 = __nccwpck_require__(6323);
+const plugin_rest_endpoint_methods_1 = __nccwpck_require__(8889);
+const GitHubSecret_1 = __nccwpck_require__(6694);
+const Octokit = core_1.Octokit.plugin(plugin_rest_endpoint_methods_1.restEndpointMethods);
+const GitHub = class Github {
+    _octokit;
+    constructor(token) {
+        this._octokit = new Octokit({ auth: token });
+    }
+    async createRepositorySecret(context, secret) {
+        const owner = secret.repository.owner;
+        const repo = secret.repository.repo;
+        await this._octokit.rest.repos.get({
+            repo,
+            owner,
+        });
+        const publicKey = await this._octokit.rest.actions.getRepoPublicKey({
+            owner,
+            repo,
+        });
+        const githubSecret = new GitHubSecret_1.GitHubSecret(secret.name, secret.value);
+        const encryptedValue = await githubSecret.encryptedValue(context, publicKey.data.key);
+        await this._octokit.rest.actions.createOrUpdateRepoSecret({
+            owner,
+            repo,
+            secret_name: secret.name,
+            encrypted_value: encryptedValue,
+        });
+    }
+    async createEnvironmentSecret(context, secret) {
+        const owner = secret.environment.repository.owner;
+        const repo = secret.environment.repository.repo;
+        const repository = await this._octokit.rest.repos.get({
+            owner,
+            repo,
+        });
+        const environmentName = secret.environment.name;
+        await this._octokit.rest.repos.getEnvironment({
+            owner,
+            repo,
+            environment_name: environmentName,
+        });
+        const publicKey = await this._octokit.rest.actions.getEnvironmentPublicKey({
+            repository_id: repository.data.id,
+            environment_name: environmentName,
+        });
+        const githubSecret = new GitHubSecret_1.GitHubSecret(secret.name, secret.value);
+        const encryptedValue = await githubSecret.encryptedValue(context, publicKey.data.key);
+        await this._octokit.rest.actions.createOrUpdateEnvironmentSecret({
+            key_id: publicKey.data.key_id,
+            environment_name: environmentName,
+            repository_id: repository.data.id,
+            secret_name: secret.name,
+            encrypted_value: encryptedValue,
+        });
+    }
+};
+exports.GitHub = GitHub;
+
+
+/***/ }),
+
+/***/ 6694:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.GitHubSecret = void 0;
+/* eslint-disable import/no-named-as-default-member */
+// eslint-disable-next-line import/default
+const libsodium_wrappers_1 = __importDefault(__nccwpck_require__(1010));
+const GitHubSecret = class GitHubSecret {
+    _name;
+    _value;
+    constructor(name, value) {
+        this._name = name;
+        this._value = value;
+    }
+    get name() {
+        return this._name;
+    }
+    async encryptedValue(context, publicKey) {
+        context.logger?.debug(`Encrypting secret ${this._name}`);
+        await libsodium_wrappers_1.default.ready;
+        const binKey = libsodium_wrappers_1.default.from_base64(publicKey, libsodium_wrappers_1.default.base64_variants.ORIGINAL);
+        const binSec = libsodium_wrappers_1.default.from_string(this._value);
+        const encBytes = libsodium_wrappers_1.default.crypto_box_seal(binSec, binKey);
+        const encryptedValue = libsodium_wrappers_1.default.to_base64(encBytes, libsodium_wrappers_1.default.base64_variants.ORIGINAL);
+        context.logger?.debug(`Secret ${this._name} encrypted`);
+        return encryptedValue;
+    }
+};
+exports.GitHubSecret = GitHubSecret;
+
+
+/***/ }),
+
+/***/ 9206:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __exportStar = (this && this.__exportStar) || function(m, exports) {
+    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+__exportStar(__nccwpck_require__(7234), exports);
+__exportStar(__nccwpck_require__(6694), exports);
+
+
+/***/ }),
+
+/***/ 8126:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __exportStar = (this && this.__exportStar) || function(m, exports) {
+    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+__exportStar(__nccwpck_require__(6539), exports);
+__exportStar(__nccwpck_require__(2513), exports);
+
+
+/***/ }),
+
+/***/ 2513:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+
+
+/***/ }),
+
+/***/ 801:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.Repository = void 0;
+const Repository = class Repository {
+    _owner;
+    _repo;
+    constructor(repository) {
+        if (!/^[^/]+\/[^/]+$/.test(repository)) {
+            throw new Error(`Invalid repository name: ${repository}`);
+        }
+        const [owner, repo] = repository.split("/");
+        this._owner = owner;
+        this._repo = repo;
+    }
+    get owner() {
+        return this._owner;
+    }
+    get repo() {
+        return this._repo;
+    }
+};
+exports.Repository = Repository;
+
+
+/***/ }),
+
+/***/ 3338:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __exportStar = (this && this.__exportStar) || function(m, exports) {
+    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+__exportStar(__nccwpck_require__(801), exports);
+
+
+/***/ }),
+
+/***/ 9084:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.EnvironmentSecret = void 0;
+const EnvironmentSecret = class EnvironmentSecret {
+    _name;
+    _value;
+    _environment;
+    constructor(name, value, environment) {
+        this._name = name;
+        this._value = value;
+        this._environment = environment;
+    }
+    get name() {
+        return this._name;
+    }
+    get value() {
+        return this._value;
+    }
+    get environment() {
+        return this._environment;
+    }
+    async createSecret(context) {
+        await context.secretService.createEnvironmentSecret(context, this);
+    }
+};
+exports.EnvironmentSecret = EnvironmentSecret;
+
+
+/***/ }),
+
+/***/ 8363:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.RepositorySecret = void 0;
+const RepositorySecret = class RepositorySecret {
+    _name;
+    _value;
+    _repository;
+    constructor(name, value, repository) {
+        this._name = name;
+        this._value = value;
+        this._repository = repository;
+    }
+    get name() {
+        return this._name;
+    }
+    get value() {
+        return this._value;
+    }
+    get repository() {
+        return this._repository;
+    }
+    async createSecret(context) {
+        await context.secretService.createRepositorySecret(context, this);
+    }
+};
+exports.RepositorySecret = RepositorySecret;
+
+
+/***/ }),
+
+/***/ 6102:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __exportStar = (this && this.__exportStar) || function(m, exports) {
+    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+__exportStar(__nccwpck_require__(8363), exports);
+__exportStar(__nccwpck_require__(9084), exports);
+
+
+/***/ }),
+
 /***/ 1692:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -14056,19 +14557,10 @@ exports.getLogger = getLogger;
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.writeSecret = void 0;
-const Config_1 = __nccwpck_require__(1002);
-const Octokit_1 = __nccwpck_require__(2959);
-const Repository_1 = __nccwpck_require__(1474);
-const Secret_1 = __nccwpck_require__(6277);
+const github_actions_core_1 = __nccwpck_require__(8126);
 async function writeSecret(inputs, logger) {
     logger.info("Syncing manifest...");
-    const config = (0, Config_1.getConfig)(inputs);
-    const octokit = (0, Octokit_1.getOctokit)(inputs.token);
-    const secret = new Secret_1.Secret(inputs.secret, inputs.value, { logger });
-    const createdSecrets = await _createSecrets(config.repositories, inputs.environment, secret, {
-        octokit,
-        logger,
-    });
+    const createdSecrets = await (0, github_actions_core_1.createSecrets)(inputs, logger);
     return JSON.stringify({
         github: {
             secrets: createdSecrets,
@@ -14076,284 +14568,6 @@ async function writeSecret(inputs, logger) {
     });
 }
 exports.writeSecret = writeSecret;
-async function _createSecrets(repositories, environment, secret, context) {
-    if (typeof environment === "string")
-        return _createEnvironmentSecrets(repositories, environment, secret, context);
-    return _createRepoSecrets(repositories, secret, context);
-}
-async function _createEnvironmentSecrets(repositories, environmentName, secret, context) {
-    return Promise.all(repositories.map(async ({ owner, repo }) => {
-        const repository = new Repository_1.Repository(owner, repo, context);
-        const environment = await repository.getEnvironment(environmentName);
-        await environment.addSecret(secret);
-        return {
-            secret: secret.name,
-            repository: `${owner}/${repo}`,
-            environment: environmentName,
-        };
-    }));
-}
-async function _createRepoSecrets(repositories, secret, context) {
-    return Promise.all(repositories.map(async ({ owner, repo }) => {
-        const repository = new Repository_1.Repository(owner, repo, context);
-        await repository.addSecret(secret);
-        return {
-            secret: secret.name,
-            repository: `${owner}/${repo}`,
-        };
-    }));
-}
-
-
-/***/ }),
-
-/***/ 1002:
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getConfig = void 0;
-function getConfig(inputs) {
-    const config = {
-        repositories: inputs.repositories.map((environment) => {
-            const [owner, repo] = environment.split("/");
-            return {
-                owner,
-                repo,
-            };
-        }),
-    };
-    return config;
-}
-exports.getConfig = getConfig;
-
-
-/***/ }),
-
-/***/ 5088:
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.Environment = void 0;
-const Environment = class environment {
-    _repositoryId;
-    _name;
-    _octokit;
-    _logger;
-    constructor(repositoryId, name, options) {
-        this._repositoryId = repositoryId;
-        this._name = name;
-        this._octokit = options.octokit;
-        this._logger = options.logger;
-    }
-    async addSecret(secret) {
-        this._logger?.info(`Adding secret ${secret.name} to environment ${this._name}`);
-        try {
-            const publicKey = await this._getPublicKey();
-            const encryptedValue = await secret.encryptedValue(publicKey.key);
-            this._logger?.debug(`Encrypted value: ${encryptedValue}`);
-            const resp = await this._octokit.rest.actions.createOrUpdateEnvironmentSecret({
-                key_id: publicKey.key_id,
-                repository_id: this._repositoryId,
-                environment_name: this._name,
-                secret_name: secret.name,
-                encrypted_value: encryptedValue,
-            });
-            this._logger?.debug(`[repo=${this._repositoryId}, env=${this._name}] Response from GitHub: ${JSON.stringify(resp)}`);
-            this._logger?.info(`Secret ${secret.name} added to environment ${this._name}`);
-        }
-        catch (err) {
-            this._logger?.error(`[repo=${this._repositoryId}, env=${this._name}] Error adding secret ${secret.name} to environment ${this._name}: ${err}`);
-            throw new Error(`Error adding secret ${secret.name} to environment ${this._name}`, {
-                cause: err,
-            });
-        }
-    }
-    async _getPublicKey() {
-        this._logger?.debug(`[repo=${this._repositoryId}, env=${this._name}] Getting public key from environment ${this._name}`);
-        try {
-            const publicKey = await this._octokit.rest.actions.getEnvironmentPublicKey({
-                repository_id: this._repositoryId,
-                environment_name: this._name,
-            });
-            this._logger?.debug(`[repo=${this._repositoryId}, env=${this._name}, key=${publicKey.data.key_id}] Public key from environment retrieved ${publicKey.data.key}`);
-            return publicKey.data;
-        }
-        catch (err) {
-            this._logger?.error(`[repo=${this._repositoryId}, env=${this._name}] Error getting public key from environment ${this._name}: ${err}`);
-            throw new Error(`Error getting public key from environment ${this._repositoryId} ${this._name}`, { cause: err });
-        }
-    }
-};
-exports.Environment = Environment;
-
-
-/***/ }),
-
-/***/ 2959:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getOctokit = void 0;
-const core_1 = __nccwpck_require__(6323);
-const plugin_rest_endpoint_methods_1 = __nccwpck_require__(8889);
-const Octokit = core_1.Octokit.plugin(plugin_rest_endpoint_methods_1.restEndpointMethods);
-let octokit;
-function getOrCreateOctokit(token) {
-    if (!octokit) {
-        octokit = new Octokit({ auth: token });
-    }
-    return octokit;
-}
-function getOctokit(token) {
-    return getOrCreateOctokit(token);
-}
-exports.getOctokit = getOctokit;
-
-
-/***/ }),
-
-/***/ 1474:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.Repository = void 0;
-const Environment_1 = __nccwpck_require__(5088);
-const Repository = class repository {
-    _owner;
-    _repo;
-    _octokit;
-    _logger;
-    constructor(owner, repo, options) {
-        this._owner = owner;
-        this._repo = repo;
-        this._octokit = options.octokit;
-        this._logger = options?.logger;
-    }
-    async getEnvironment(name) {
-        this._logger?.debug(`[repo=${this._owner}/${this._repo}] Getting environment ${name} from repository`);
-        try {
-            const repositoryId = await this._getSelfId();
-            await this._octokit.rest.repos.getEnvironment({
-                owner: this._owner,
-                repo: this._repo,
-                environment_name: name,
-            });
-            return new Environment_1.Environment(repositoryId, this._owner, {
-                octokit: this._octokit,
-                logger: this._logger,
-            });
-        }
-        catch (err) {
-            this._logger?.error(`[repo=${this._owner}/${this._repo}] Error getting environment ${name} from repository: ${err}`);
-            throw new Error(`Error getting environment ${name} from repository from ${this._owner}/${this._repo}`, { cause: err });
-        }
-    }
-    async _getSelfId() {
-        this._logger?.debug(`[repo=${this._owner}/${this._repo}] Getting self id from repository ${this._repo}`);
-        try {
-            const resp = await this._octokit.rest.repos.get({
-                owner: this._owner,
-                repo: this._repo,
-            });
-            this._logger?.debug(`[repo=${this._owner}/${this._repo}] Response from GitHub: ${JSON.stringify(resp)}`);
-            return resp.data.id;
-        }
-        catch (err) {
-            this._logger?.error(`[repo=${this._owner}/${this._repo}] Error getting self id from repository ${this._repo}: ${err}`);
-            throw new Error(`Error getting self id from repository ${this._repo}`, { cause: err });
-        }
-    }
-    async addSecret(secret) {
-        this._logger?.debug(`[repo=${this._owner}/${this._repo}] Adding secret ${secret.name} to repository`);
-        try {
-            const publicKey = await this._getPublicKey();
-            const encryptedValue = await secret.encryptedValue(publicKey.key);
-            await this._octokit.rest.actions.createOrUpdateRepoSecret({
-                key_id: publicKey.key_id,
-                owner: this._owner,
-                repo: this._repo,
-                secret_name: secret.name,
-                encrypted_value: encryptedValue,
-            });
-            this._logger?.info(`[repo=${this._owner}/${this._repo}] Secret ${secret.name} added`);
-        }
-        catch (err) {
-            this._logger?.error(`[repo=${this._owner}/${this._repo}] Error adding secret ${secret.name} to repository: ${err}`);
-            throw new Error(`Error adding secret ${secret.name} to repository ${this._owner}/${this._repo}`, { cause: err });
-        }
-    }
-    // TODO: Cache this method to avoid reaching rate limits <@ismtabo 2023-06-22>
-    async _getPublicKey() {
-        this._logger?.debug(`[repo=${this._owner}/${this._repo}] Getting public key from repository ${this._repo}`);
-        try {
-            const publicKey = await this._octokit.rest.actions.getRepoPublicKey({
-                owner: this._owner,
-                repo: this._repo,
-            });
-            this._logger?.debug(`[repo=${this._owner}/${this._repo}] Public key from repo retrieved ${publicKey.data.key}`);
-            return {
-                key_id: publicKey.data.key_id,
-                key: publicKey.data.key,
-            };
-        }
-        catch (error) {
-            this._logger?.error(`[repo=${this._owner}/${this._repo}] Error getting public key from repository ${this._repo}: ${error}`);
-            throw new Error(`Error getting public key from repository ${this._owner}/${this._repo}`, {
-                cause: error,
-            });
-        }
-    }
-};
-exports.Repository = Repository;
-
-
-/***/ }),
-
-/***/ 6277:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.Secret = void 0;
-/* eslint-disable import/no-named-as-default-member */
-// eslint-disable-next-line import/default
-const libsodium_wrappers_1 = __importDefault(__nccwpck_require__(1010));
-const Secret = class Secret {
-    _name;
-    _value;
-    _logger;
-    constructor(name, value, options) {
-        this._name = name;
-        this._value = value;
-        this._logger = options?.logger;
-    }
-    get name() {
-        return this._name;
-    }
-    async encryptedValue(publicKey) {
-        this._logger?.debug(`Encrypting secret ${this._name}`);
-        await libsodium_wrappers_1.default.ready;
-        const binKey = libsodium_wrappers_1.default.from_base64(publicKey, libsodium_wrappers_1.default.base64_variants.ORIGINAL);
-        const binSec = libsodium_wrappers_1.default.from_string(this._value);
-        const encBytes = libsodium_wrappers_1.default.crypto_box_seal(binSec, binKey);
-        const encryptedValue = libsodium_wrappers_1.default.to_base64(encBytes, libsodium_wrappers_1.default.base64_variants.ORIGINAL);
-        this._logger?.debug(`Secret ${this._name} encrypted`);
-        return encryptedValue;
-    }
-};
-exports.Secret = Secret;
 
 
 /***/ }),

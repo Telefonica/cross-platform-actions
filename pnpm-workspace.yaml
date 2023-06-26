@@ -1,3 +1,4 @@
 packages:
   - 'deploy-platform'
   - 'write-secret'
+  - 'components/*'

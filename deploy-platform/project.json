@@ -1,6 +1,6 @@
 {
-  "name": "deploy-platform",
   "$schema": "https://raw.githubusercontent.com/nrwl/nx/master/packages/nx/schemas/project-schema.json",
+  "name": "deploy-platform",
   "projectType": "application",
   "tags": [
     "type:app"

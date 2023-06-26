@@ -1,7 +1,8 @@
+jest.mock("@src/lib/WriteSecret");
+
 import { buildGetInputs } from "@support/fixtures/Inputs";
 import { actionsCore } from "@support/mocks/ActionsCore";
 import "@support/mocks/Logger";
-import "@support/mocks/Octokit";
 
 import { runWriteSecretAndGetArtifactAction } from "@src/github-action/Action";
 import * as writeSecretLib from "@src/lib/WriteSecret";

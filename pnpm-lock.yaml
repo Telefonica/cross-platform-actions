@@ -100,6 +100,25 @@ importers:
         specifier: 5.1.3
         version: 5.1.3
 
+  components/github-actions-core:
+    dependencies:
+      '@octokit/plugin-rest-endpoint-methods':
+        specifier: 7.2.3
+        version: 7.2.3(@octokit/core@4.2.0)
+      libsodium-wrappers:
+        specifier: 0.7.11
+        version: 0.7.11
+      zod:
+        specifier: 3.21.4
+        version: 3.21.4
+    devDependencies:
+      '@types/libsodium-wrappers':
+        specifier: 0.7.10
+        version: 0.7.10
+      ts-dedent:
+        specifier: 2.2.0
+        version: 2.2.0
+
   deploy-platform:
     dependencies:
       jszip:
@@ -124,6 +143,9 @@ importers:
       '@octokit/plugin-rest-endpoint-methods':
         specifier: 7.2.3
         version: 7.2.3(@octokit/core@4.2.0)
+      github-actions-core:
+        specifier: workspace:*
+        version: link:../components/github-actions-core
       libsodium-wrappers:
         specifier: 0.7.11
         version: 0.7.11
@@ -2374,17 +2396,6 @@ packages:
       '@octokit/core': 4.2.0
     dev: true
 
-  /@octokit/plugin-rest-endpoint-methods@7.0.1(@octokit/core@4.2.0):
-    resolution: {integrity: sha512-pnCaLwZBudK5xCdrR823xHGNgqOzRnJ/mpC/76YPpNP7DybdsJtP7mdOwh+wYZxK5jqeQuhu59ogMI4NRlBUvA==}
-    engines: {node: '>= 14'}
-    peerDependencies:
-      '@octokit/core': '>=3'
-    dependencies:
-      '@octokit/core': 4.2.0
-      '@octokit/types': 9.3.1
-      deprecation: 2.3.1
-    dev: true
-
   /@octokit/plugin-rest-endpoint-methods@7.2.3(@octokit/core@4.2.0):
     resolution: {integrity: sha512-I5Gml6kTAkzVlN7KCtjOM+Ruwe/rQppp0QU372K1GP7kNOYEKe8Xn5BW4sE62JAHdwpq95OQK/qGNyKQMUzVgA==}
     engines: {node: '>= 14'}
@@ -2393,7 +2404,6 @@ packages:
     dependencies:
       '@octokit/core': 4.2.0
       '@octokit/types': 10.0.0
-    dev: false
 
   /@octokit/plugin-retry@4.1.3(@octokit/core@4.2.0):
     resolution: {integrity: sha512-3YKBj7d0J/4mpEc4xzMociWsMNl5lZqrpAnYcW6mqiSGF3wFjU+c6GHih6GLClk31JNvKDr0x9jc5cfm7evkZg==}
@@ -2445,7 +2455,7 @@ packages:
       '@octokit/core': 4.2.0
       '@octokit/plugin-paginate-rest': 6.0.0(@octokit/core@4.2.0)
       '@octokit/plugin-request-log': 1.0.4(@octokit/core@4.2.0)
-      '@octokit/plugin-rest-endpoint-methods': 7.0.1(@octokit/core@4.2.0)
+      '@octokit/plugin-rest-endpoint-methods': 7.2.3(@octokit/core@4.2.0)
     transitivePeerDependencies:
       - encoding
     dev: true
@@ -2454,7 +2464,6 @@ packages:
     resolution: {integrity: sha512-Vm8IddVmhCgU1fxC1eyinpwqzXPEYu0NrYzD3YZjlGjyftdLBTeqNblRC0jmJmgxbJIsQlyogVeGnrNaaMVzIg==}
     dependencies:
       '@octokit/openapi-types': 18.0.0
-    dev: false
 
   /@octokit/types@9.3.1:
     resolution: {integrity: sha512-zfJzyXLHC42sWcn2kS+oZ/DRvFZBYCCbfInZtwp1Uopl1qh6pRg4NSP/wFX1xCOpXvEkctiG1sxlSlkZmzvxdw==}

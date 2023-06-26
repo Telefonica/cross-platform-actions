@@ -1,3 +1,3 @@
-import { Logger } from "./support/Logger.types";
+import type { LoggerInterface } from "github-actions-core";
 import { SyncInputs } from "./WriteSecret.types";
-export declare function writeSecret(inputs: SyncInputs, logger: Logger): Promise<string>;
+export declare function writeSecret(inputs: SyncInputs, logger: LoggerInterface): Promise<string>;
