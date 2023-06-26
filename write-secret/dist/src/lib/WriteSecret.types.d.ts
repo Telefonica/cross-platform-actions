@@ -1,4 +1,4 @@
-export interface SyncInputs {
+export interface WriteSecretInputs {
     /** Secret name */
     secret: string;
     /** Value */

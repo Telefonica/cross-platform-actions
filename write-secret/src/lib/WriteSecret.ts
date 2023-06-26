@@ -1,10 +1,13 @@
 import type { LoggerInterface } from "github-actions-core";
 import { createSecrets } from "github-actions-core";
 
-import { SyncInputs } from "./WriteSecret.types";
+import { WriteSecretInputs } from "./WriteSecret.types";
 
-export async function writeSecret(inputs: SyncInputs, logger: LoggerInterface): Promise<string> {
-  logger.info("Syncing manifest...");
+export async function writeSecret(
+  inputs: WriteSecretInputs,
+  logger: LoggerInterface
+): Promise<string> {
+  logger.info("Writing manifest...");
   const createdSecrets = await createSecrets(inputs, logger);
   return JSON.stringify({
     github: {

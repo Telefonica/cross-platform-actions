@@ -26,7 +26,7 @@ This action receives a secret name, secret value, a list of repositories and an 
 
 __So, you can use this action in a project's repository to update secrets in a list of repositories or environments.__
 
-1. The project's deploy workflow launches this write env secret action.
+1. A project's workflow launches this write secret action.
 2. This action updates a secret with given value at:
   * Each repository's environment named as given input, if environment input is present.
   * Otherwise, the secret is added to each repository.
@@ -82,8 +82,8 @@ steps:
       repositories: |
         Telefonica/repository-1
         Telefonica/repository-2
-      env: int
-      token: ${{ secrets.GITHUB_TOKEN }}
+      environment: $ENVIRONMENT_NAME
+      token: $TOKEN
 ```
 
 ## Inputs
