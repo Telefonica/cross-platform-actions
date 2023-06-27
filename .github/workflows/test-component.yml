@@ -1,0 +1,54 @@
+name: Test Component
+
+on:
+  workflow_call:
+    secrets:
+      WRITE_SECRET_PAT:
+        required: true
+
+jobs:
+  test-component-deploy:
+    runs-on: ${{ vars.JOBS_RUNNER }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - id: deploy
+        name: Launch deploy action
+        uses: ./deploy-platform
+        with:
+          environment: "test"
+          project: "cross-platform-actions"
+          repo-name: "cross-platform-actions"
+          token: ${{ secrets.GITHUB_TOKEN }}WRITE_SECRET_PAT
+          ref: ${{ github.head_ref || github.ref_name }}
+          request-interval: 5000
+      - name: Check deployment manifest
+        run: |
+          echo '${{ steps.deploy.outputs.manifest }}' | jq -r '.registry.server' | grep 'foo-server' || (echo "Manifest is wrong" && exit 1)
+  test-component-write-secret:
+    runs-on: ${{ vars.JOBS_RUNNER }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - id: write-secret
+        name: Launch write-secret action
+        uses: ./write-secret
+        with:
+          secret: TEST_SECRET
+          value: value
+          repositories: Telefonica/cross-platform-actions
+          token: ${{ secrets.WRITE_SECRET_PAT }}
+      - name: Check write-secret manifest
+        run: |
+          [[ '${{ steps.write-secret.outputs.manifest }}' == '{"github":{"secrets":[{"secret":"TEST_SECRET","repository":"Telefonica/cross-platform-actions"}]}}' ]] || (echo "::error::Action output has invalid value" && exit 1)
+      - name: Check write-secret created secret
+        timeout-minutes: 1
+        run: |
+          while true; do
+            curl -s -H "Authorization: token ${{ secrets.WRITE_SECRET_PAT }}" https://api.github.com/repos/Telefonica/cross-platform-actions/actions/secrets/TEST_SECRET | jq -r '.name' | grep 'TEST_SECRET' && break
+            sleep 10
+          done
+      - name: Clean up secret
+        if: always()
+        run: |
+          curl -X DELETE -H "Authorization: token ${{ secrets.WRITE_SECRET_PAT }}" https://api.github.com/repos/Telefonica/cross-platform-actions/actions/secrets/TEST_SECRET || true
