@@ -4,6 +4,7 @@ export interface RepositoryConstructor {
    * @param {string} repository - repository
    * @param {RepositoryConstructorOptions} options - repositoryConstructor options
    * @returns A new instance of repositoryInterface
+   * @throws {Error} If the repository name is invalid.
    */
   new (repository: string): RepositoryInterface;
 }

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import "@support/matchers/toHaveEncryptedValue";
 
 /* eslint-disable import/no-named-as-default-member */

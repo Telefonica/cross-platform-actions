@@ -10,6 +10,11 @@ import { GitHubSecret } from "./GitHubSecret";
 
 const Octokit = BaseOctokit.plugin(restEndpointMethods);
 
+/**
+ * Create a new GitHub instance.
+ *
+ * @param token The GitHub token to use for authentication.
+ */
 export const GitHub: GitHubConstructor = class Github implements GitHubInterface {
   private _octokit: BaseOctokit & Api;
 
@@ -17,6 +22,15 @@ export const GitHub: GitHubConstructor = class Github implements GitHubInterface
     this._octokit = new Octokit({ auth: token });
   }
 
+  /**
+   * Create a new repository secret.
+   * @param {ContextInterface} context - The context of the current run.
+   * @param {RepositorySecretInterface} secret - The repository secret to create.
+   *
+   * @throws {Error} - If the repository does not exist.
+   * @throws {Error} - If the repository's public key can not be obtain.
+   * @throws {Error} - If the secret can not be created.
+   */
   async createRepositorySecret(
     context: ContextInterface,
     secret: RepositorySecretInterface
@@ -41,6 +55,16 @@ export const GitHub: GitHubConstructor = class Github implements GitHubInterface
     });
   }
 
+  /**
+   * Create a new environment secret.
+   *
+   * @param {ContextInterface} context - The context of the current run.
+   * @param {EnvironmentSecretInterface} secret - The environment secret to create.
+   * @throws {Error} - If the repository does not exist.
+   * @throws {Error} - If the environment does not exist.
+   * @throws {Error} - If the environment's public key can not be obtain.
+   * @throws {Error} - If the secret can not be created.
+   */
   async createEnvironmentSecret(
     context: ContextInterface,
     secret: EnvironmentSecretInterface

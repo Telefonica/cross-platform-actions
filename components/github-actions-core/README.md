@@ -22,85 +22,77 @@
 
 # Usage
 
-This action receives a secret name, secret value, a list of repositories and an optional environment, and updates the secret at repository or environment scope (if present environment input) with given value.
+This package contains shared domain commands to used in actions.
 
-__So, you can use this action in a project's repository to update secrets in a list of repositories or environments.__
+__So, you can use this library to move shared features between actions.__
 
-1. The project's deploy workflow launches this write env secret action.
-2. This action updates a secret with given value at:
-  * Each repository's environment named as given input, if environment input is present.
-  * Otherwise, the secret is added to each repository.
-3. The secret is available in the repositories or environments.
-4. The action returns a manifest with the information of written secrets.
-
+<!-- 
 ## Assumptions
 
-- The repositories input is a new-line or space separated list of repositories.
-  - The repositories must be in the format `owner/repository`.
-- The environment input is the name of the environment to write the secret to in each of the repositories.
-- :warning: Both repositories and environments (if environment input is present) **MUST** exist before this action is called. If not, the action will fail.
-- :warning: The given token **MUST** has access to repositories, environments and secrets scopes. For more information, read the [GitHub documentation](https://docs.github.com/en/rest/reference/actions#secrets).
-- The output manifest contains the GitHub Secret names for each repository, in the same order as the input repositories. It contains following schema:
-  ```jsonc
-  {
-    "github": {
-      "secrets": [
-        {
-          "repository": "<repository including owner>",
-          "secret": "<secret name>",
-          "environment": "<environment name>" // if present
-        },
-        // ...
-      ]
-    }
-  }
-  ```
+- TBD 
+-->
 
 ## Versions
 
 To know more about how this action is versioned, read the monorepo [README](../README.md#versions).
 
+<!-- 
 ## Example
 
-Example of usage in a component repository:
+Example of usage in a action:
+-->
 
-```yaml
-steps:
-  - id: deploy-platform
-    name: Deploy execution platform
-    uses: Telefonica/cross-platform-actions/deploy-platform@{BRANCH_NAME|VERSION}
-    with:
-      project: $PROJECT_NAME
-      environment: $ENVIRONMENT_NAME
-      token: $TOKEN
-  - id: write-secret
-    name: Write environment secret
-    uses: Telefonica/cross-platform-actions/write-secret@{BRANCH_NAME|VERSION}
-    with:
-      secret: IDP_DEPLOY_MANIFEST
-      value: ${{ steps.deploy-platform.outputs.manifest }}
-      repositories: |
-        Telefonica/repository-1
-        Telefonica/repository-2
-      env: int
-      token: ${{ secrets.GITHUB_TOKEN }}
+
+### Create Secrets command
+
+
+```typescript
+import { createSecrets } from 'github-actions-core';
+
+const repoSecrets = await createSecrets({
+  secret: 'secret-name',
+  value: 'some-secret-value',
+  repositories: ['owner/repo'],
+  token: '<github-token>',
+});
+
+// repoSecrets
+// [
+//   {
+//     secret: 'secret-name',
+//     repository: 'owner/repo',
+//   }
+// ]
+
+const envSecrets = await createSecrets({
+  secret: 'secret-name',
+  value: 'some-secret-value',
+  repositories: ['owner/repo'],
+  environment: 'production',
+  token: '<github-token>',
+})
+
+// envSecrets
+// [
+//   {
+//     secret: 'secret-name',
+//     repository: 'owner/repo',
+//     environment: 'production',
+//   }
+// ]
 ```
 
 ## Inputs
 
 - `secret` - Name of the GitHub Secret to sync the secret to.
 - `value` - Value of the GitHub Secret to sync the secret to.
-- `repositories` - New-line or space separated repositories.
+- `repositories` - List of repositories.
 - `environment` - (_Optional_) Environment name.
 - `token` - GitHub token to get access to the GitHub API.
 
 ## Outputs
 
-- `manifest` - Manifest with information of the updated secrets by repository, as a JSON string.
-
-## Debug mode
-
-To enable the debug mode add a repository variable named `ACTIONS_STEP_DEBUG` and set its value to `true`. Debug mode is more verbose and it shows the response of the requests done to the github API.
+- List of created secrets with repository (and environment) information.
 
 # Development
 
@@ -156,10 +148,6 @@ pnpm nx build
 # Remember to add the built files!!
 git add dist
 ```
-
-## Component tests
-
-Component tests are executed in a real environment, using the GitHub Actions Runner. The action is executed in the workflow, and it creates a secret in this repository called `TEST_SECRET`. Then, the test checks that the secret has been created. In addition, the test checks that the action returns the expected manifest.
 
 ## Release
 

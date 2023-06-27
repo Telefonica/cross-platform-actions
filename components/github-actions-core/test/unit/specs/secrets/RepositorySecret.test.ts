@@ -46,7 +46,8 @@ describe("RepositorySecret", () => {
       };
 
       // Act
-      await secret.createSecret(context as any);
+      // @ts-ignore
+      await secret.createSecret(context);
 
       // Assert
       expect(context.secretService.createRepositorySecret).toHaveBeenCalledWith(context, secret);
@@ -68,7 +69,8 @@ describe("RepositorySecret", () => {
       };
 
       // Act & Assert
-      await expect(secret.createSecret(context as any)).rejects.toThrow();
+      // @ts-ignore
+      await expect(secret.createSecret(context)).rejects.toThrow();
     });
   });
 });

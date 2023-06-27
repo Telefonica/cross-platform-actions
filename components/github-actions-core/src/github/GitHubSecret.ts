@@ -6,6 +6,14 @@ import { ContextInterface } from "../context";
 
 import { GitHubSecretConstructor, GitHubSecretInterface } from "./GitHubSecret.types";
 
+/**
+ * Create a new GitHub secret.
+ *
+ * @param {string} name - The name of the secret.
+ * @param {string} value - The value of the secret.
+ *
+ * @see {@link https://docs.github.com/en/actions/reference/encrypted-secrets#creating-encrypted-secrets-for-a-repository|Creating encrypted secrets for a repository}
+ */
 export const GitHubSecret: GitHubSecretConstructor = class GitHubSecret
   implements GitHubSecretInterface
 {
@@ -21,6 +29,15 @@ export const GitHubSecret: GitHubSecretConstructor = class GitHubSecret
     return this._name;
   }
 
+  /**
+   * Get the encrypted value of the secret.
+   *
+   * @param {ContextInterface} context - The context of the current run.
+   * @param {string} publicKey - The base64 public key to encrypt the secret with.
+   * @returns {string} The encrypted value of the secret.
+   *
+   * @see {@link https://docs.github.com/en/actions/reference/encrypted-secrets#creating-encrypted-secrets-for-a-repository|Creating encrypted secrets for a repository}
+   */
   async encryptedValue(context: ContextInterface, publicKey: string): Promise<string> {
     context.logger?.debug(`Encrypting secret ${this._name}`);
     await sodium.ready;

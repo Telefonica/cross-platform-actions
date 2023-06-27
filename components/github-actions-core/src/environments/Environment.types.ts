@@ -11,7 +11,7 @@ export interface EnvironmentConstructor {
 }
 
 /**
- * Represents a GitHub environment
+ * Represents an environment
  * @interface
  */
 export interface EnvironmentInterface {

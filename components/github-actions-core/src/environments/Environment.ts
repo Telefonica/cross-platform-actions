@@ -2,6 +2,19 @@ import { RepositoryInterface } from "../repositories";
 
 import { EnvironmentConstructor, EnvironmentInterface } from "./Environment.types";
 
+/**
+ * Implementation of EnvironmentInterface.
+ *
+ * @param {string} name - environment name
+ * @param {string} repository - repository
+ * @returns {EnvironmentInterface} - environment
+ * @example
+ * import { Repository } from "github-actions-core";
+ * import { Environment } from "github-actions-core";
+ *
+ * const repository = new Repository("owner/repo");
+ * const environment = new Environment("production", repository);
+ */
 export const Environment: EnvironmentConstructor = class Environment
   implements EnvironmentInterface
 {

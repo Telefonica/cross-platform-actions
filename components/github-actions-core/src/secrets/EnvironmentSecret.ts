@@ -4,6 +4,13 @@ import { EnvironmentInterface } from "../environments";
 import { EnvironmentSecretConstructor } from "./EnvironmentSecret.types";
 import { SecretInterface } from "./Secret.types";
 
+/**
+ * Create a new environment secret.
+ *
+ * @param {string} name - The name of the secret.
+ * @param {string} value - The value of the secret.
+ * @param {EnvironmentInterface} environment - The environment to create the secret in.
+ */
 export const EnvironmentSecret: EnvironmentSecretConstructor = class EnvironmentSecret
   implements SecretInterface
 {
@@ -29,6 +36,12 @@ export const EnvironmentSecret: EnvironmentSecretConstructor = class Environment
     return this._environment;
   }
 
+  /**
+   * Create the secret.
+   *
+   * @param {ContextInterface} context - The context of the current run.
+   * @throws {Error} - If the secret could not be created.
+   */
   public async createSecret(context: ContextInterface): Promise<void> {
     await context.secretService.createEnvironmentSecret(context, this);
   }

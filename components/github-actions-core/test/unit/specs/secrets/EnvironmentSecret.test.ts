@@ -52,7 +52,8 @@ describe("EnvironmentSecret", () => {
       };
 
       // Act
-      await secret.createSecret(context as any);
+      // @ts-ignore
+      await secret.createSecret(context);
 
       // Assert
       expect(context.secretService.createEnvironmentSecret).toHaveBeenCalledWith(context, secret);
@@ -77,7 +78,8 @@ describe("EnvironmentSecret", () => {
       };
 
       // Act & Assert
-      await expect(secret.createSecret(context as any)).rejects.toThrow();
+      // @ts-ignore
+      await expect(secret.createSecret(context)).rejects.toThrow();
     });
   });
 });

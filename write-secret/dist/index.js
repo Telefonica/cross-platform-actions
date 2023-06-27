@@ -13,6 +13,18 @@ const environments_1 = __nccwpck_require__(618);
 const github_1 = __nccwpck_require__(9206);
 const repositories_1 = __nccwpck_require__(3338);
 const secrets_1 = __nccwpck_require__(6102);
+/**
+ * Create secrets in the given repositories or environments.
+ *
+ * If `environment` is provided, the secret will be created in the given environment in each repository.
+ * Otherwise, the secret will be created in each repository.
+ *
+ * @param {CreateSecretsInputs} inputs
+ * @param {LoggerInterface} logger
+ * @returns {Promise<CreateSecretsOutputs>} created secrets
+ *
+ * @throws {Error} if any repository or environment does not exist
+ */
 function createSecrets(inputs, logger) {
     const { repositories, environment, secret, value, token } = inputs;
     const github = new github_1.GitHub(token);
@@ -88,6 +100,21 @@ __exportStar(__nccwpck_require__(3835), exports);
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Context = void 0;
+/**
+ * A Context is a collection of services that can be used by entities.
+ *
+ * @param {ContextConstructorOptions} options - Options to construct a Context
+ * @param {SecretServiceInterface} options.secretService - The SecretService to use
+ * @param {LoggerInterface} [options.logger] - The Logger to use
+ * @returns {ContextInterface} A Context
+ * @example
+ * import { Context } from "github-actions-core";
+ *
+ * const context = new Context({
+ *  secretService: new SecretService(),
+ *  logger: new Logger(),
+ * });
+ */
 const Context = class Context {
     _secretService;
     _logger;
@@ -139,6 +166,19 @@ __exportStar(__nccwpck_require__(7424), exports);
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Environment = void 0;
+/**
+ * Implementation of EnvironmentInterface.
+ *
+ * @param {string} name - environment name
+ * @param {string} repository - repository
+ * @returns {EnvironmentInterface} - environment
+ * @example
+ * import { Repository } from "github-actions-core";
+ * import { Environment } from "github-actions-core";
+ *
+ * const repository = new Repository("owner/repo");
+ * const environment = new Environment("production", repository);
+ */
 const Environment = class Environment {
     _name;
     _repository;
@@ -194,11 +234,25 @@ const core_1 = __nccwpck_require__(6323);
 const plugin_rest_endpoint_methods_1 = __nccwpck_require__(8889);
 const GitHubSecret_1 = __nccwpck_require__(6694);
 const Octokit = core_1.Octokit.plugin(plugin_rest_endpoint_methods_1.restEndpointMethods);
+/**
+ * Create a new GitHub instance.
+ *
+ * @param token The GitHub token to use for authentication.
+ */
 const GitHub = class Github {
     _octokit;
     constructor(token) {
         this._octokit = new Octokit({ auth: token });
     }
+    /**
+     * Create a new repository secret.
+     * @param {ContextInterface} context - The context of the current run.
+     * @param {RepositorySecretInterface} secret - The repository secret to create.
+     *
+     * @throws {Error} - If the repository does not exist.
+     * @throws {Error} - If the repository's public key can not be obtain.
+     * @throws {Error} - If the secret can not be created.
+     */
     async createRepositorySecret(context, secret) {
         const owner = secret.repository.owner;
         const repo = secret.repository.repo;
@@ -219,6 +273,16 @@ const GitHub = class Github {
             encrypted_value: encryptedValue,
         });
     }
+    /**
+     * Create a new environment secret.
+     *
+     * @param {ContextInterface} context - The context of the current run.
+     * @param {EnvironmentSecretInterface} secret - The environment secret to create.
+     * @throws {Error} - If the repository does not exist.
+     * @throws {Error} - If the environment does not exist.
+     * @throws {Error} - If the environment's public key can not be obtain.
+     * @throws {Error} - If the secret can not be created.
+     */
     async createEnvironmentSecret(context, secret) {
         const owner = secret.environment.repository.owner;
         const repo = secret.environment.repository.repo;
@@ -265,6 +329,14 @@ exports.GitHubSecret = void 0;
 /* eslint-disable import/no-named-as-default-member */
 // eslint-disable-next-line import/default
 const libsodium_wrappers_1 = __importDefault(__nccwpck_require__(1010));
+/**
+ * Create a new GitHub secret.
+ *
+ * @param {string} name - The name of the secret.
+ * @param {string} value - The value of the secret.
+ *
+ * @see {@link https://docs.github.com/en/actions/reference/encrypted-secrets#creating-encrypted-secrets-for-a-repository|Creating encrypted secrets for a repository}
+ */
 const GitHubSecret = class GitHubSecret {
     _name;
     _value;
@@ -275,6 +347,15 @@ const GitHubSecret = class GitHubSecret {
     get name() {
         return this._name;
     }
+    /**
+     * Get the encrypted value of the secret.
+     *
+     * @param {ContextInterface} context - The context of the current run.
+     * @param {string} publicKey - The base64 public key to encrypt the secret with.
+     * @returns {string} The encrypted value of the secret.
+     *
+     * @see {@link https://docs.github.com/en/actions/reference/encrypted-secrets#creating-encrypted-secrets-for-a-repository|Creating encrypted secrets for a repository}
+     */
     async encryptedValue(context, publicKey) {
         context.logger?.debug(`Encrypting secret ${this._name}`);
         await libsodium_wrappers_1.default.ready;
@@ -322,6 +403,9 @@ __exportStar(__nccwpck_require__(6694), exports);
 
 "use strict";
 
+/**
+ * @module github-actions-core
+ */
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -360,6 +444,12 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Repository = void 0;
+/**
+ * Create a new repository.
+ *
+ * @param {string} repository - The name of the repository (should have format "owner/repo").
+ * @throws {Error} If the repository name is invalid.
+ */
 const Repository = class Repository {
     _owner;
     _repo;
@@ -415,6 +505,13 @@ __exportStar(__nccwpck_require__(801), exports);
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.EnvironmentSecret = void 0;
+/**
+ * Create a new environment secret.
+ *
+ * @param {string} name - The name of the secret.
+ * @param {string} value - The value of the secret.
+ * @param {EnvironmentInterface} environment - The environment to create the secret in.
+ */
 const EnvironmentSecret = class EnvironmentSecret {
     _name;
     _value;
@@ -433,6 +530,12 @@ const EnvironmentSecret = class EnvironmentSecret {
     get environment() {
         return this._environment;
     }
+    /**
+     * Create the secret.
+     *
+     * @param {ContextInterface} context - The context of the current run.
+     * @throws {Error} - If the secret could not be created.
+     */
     async createSecret(context) {
         await context.secretService.createEnvironmentSecret(context, this);
     }
@@ -449,6 +552,14 @@ exports.EnvironmentSecret = EnvironmentSecret;
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.RepositorySecret = void 0;
+/**
+ * Create a new repository secret.
+ *
+ * @param {string} name - The name of the secret.
+ * @param {string} value - The value of the secret.
+ * @param {RepositoryInterface} repository - The repository to create the secret in.
+ * @returns {RepositorySecretInterface} A new repository secret.
+ */
 const RepositorySecret = class RepositorySecret {
     _name;
     _value;
@@ -467,6 +578,11 @@ const RepositorySecret = class RepositorySecret {
     get repository() {
         return this._repository;
     }
+    /**
+     * Create the secret.
+     * @param {ContextInterface} context - The context of the current run.
+     * @throws {Error} - If the secret could not be created.
+     */
     async createSecret(context) {
         await context.secretService.createRepositorySecret(context, this);
     }

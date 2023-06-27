@@ -1,9 +1,9 @@
 {
   "$schema": "https://raw.githubusercontent.com/nrwl/nx/master/packages/nx/schemas/project-schema.json",
   "name": "github-actions-core",
-  "projectType": "application",
+  "projectType": "library",
   "tags": [
-    "type:app"
+    "type:lib"
   ],
   "targets": {
     "check:dist": {
