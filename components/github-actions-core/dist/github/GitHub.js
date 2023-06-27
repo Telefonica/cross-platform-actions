@@ -38,6 +38,7 @@ const GitHub = class Github {
         const githubSecret = new GitHubSecret_1.GitHubSecret(secret.name, secret.value);
         const encryptedValue = await githubSecret.encryptedValue(context, publicKey.data.key);
         await this._octokit.rest.actions.createOrUpdateRepoSecret({
+            key_id: publicKey.data.key_id,
             owner,
             repo,
             secret_name: secret.name,

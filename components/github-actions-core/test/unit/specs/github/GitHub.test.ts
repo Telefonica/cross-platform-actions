@@ -46,7 +46,9 @@ describe("GitHub", () => {
       octokit.rest.repos.get.mockResolvedValueOnce({ data: {} });
       const keypair = sodium.crypto_box_keypair();
       const publicKey = sodium.to_base64(keypair.publicKey, sodium.base64_variants.ORIGINAL);
-      octokit.rest.actions.getRepoPublicKey.mockResolvedValueOnce({ data: { key: publicKey } });
+      octokit.rest.actions.getRepoPublicKey.mockResolvedValueOnce({
+        data: { key_id: "keyId", key: publicKey },
+      });
       octokit.rest.actions.createOrUpdateRepoSecret.mockResolvedValueOnce({});
       const github = new GitHub("token");
 
@@ -63,6 +65,7 @@ describe("GitHub", () => {
         repo: "repo",
       });
       expect(octokit.rest.actions.createOrUpdateRepoSecret).toHaveBeenCalledWith({
+        key_id: "keyId",
         owner: "owner",
         repo: "repo",
         secret_name: "secret",
