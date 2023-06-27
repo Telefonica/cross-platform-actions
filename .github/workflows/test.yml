@@ -48,6 +48,7 @@ jobs:
         run: |
           pnpm nx run-many -t check:dist
   test-component:
+    name: Test component
     uses: ./.github/workflows/test-component.yml
     needs: build
     secrets:
