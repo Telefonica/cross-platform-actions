@@ -14061,7 +14061,7 @@ const Octokit_1 = __nccwpck_require__(2959);
 const Repository_1 = __nccwpck_require__(1474);
 const Secret_1 = __nccwpck_require__(6277);
 async function writeSecret(inputs, logger) {
-    logger.info("Syncing manifest...");
+    logger.info("Writing secret...");
     const config = (0, Config_1.getConfig)(inputs);
     const octokit = (0, Octokit_1.getOctokit)(inputs.token);
     const secret = new Secret_1.Secret(inputs.secret, inputs.value, { logger });
