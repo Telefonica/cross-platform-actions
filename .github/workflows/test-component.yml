@@ -19,7 +19,7 @@ jobs:
           environment: "test"
           project: "cross-platform-actions"
           repo-name: "cross-platform-actions"
-          token: ${{ secrets.GITHUB_TOKEN }}WRITE_SECRET_PAT
+          token: ${{ secrets.GITHUB_TOKEN }}
           ref: ${{ github.head_ref || github.ref_name }}
           request-interval: 5000
       - name: Check deployment manifest
