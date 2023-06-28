@@ -1,1 +1,6 @@
 acr
+TBD
+zod
+libsodium
+keypair
+env

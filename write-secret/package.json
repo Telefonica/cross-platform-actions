@@ -1,0 +1,25 @@
+{
+  "name": "write-secret",
+  "private": true,
+  "description": "Github action to write secrets to repositories or environments",
+  "scripts": {
+    "test": "jest --config jest.config.js",
+    "check:types:test": "tsc --noEmit --project ./test/unit/tsconfig.json",
+    "check:types:lib": "tsc --noEmit",
+    "check:types": "npm run check:types:test && npm run check:types:lib",
+    "build": "ncc build src/index.ts -o dist --source-map",
+    "prepare": "cd ../ && husky install"
+  },
+  "keywords": [],
+  "author": "Telefónica",
+  "license": "MIT",
+  "dependencies": {
+    "@octokit/plugin-rest-endpoint-methods": "7.2.3",
+    "libsodium-wrappers": "0.7.11",
+    "zod": "3.21.4"
+  },
+  "devDependencies": {
+    "@types/libsodium-wrappers": "0.7.10",
+    "ts-dedent": "2.2.0"
+  }
+}

@@ -21,11 +21,12 @@ module.exports = {
   // language - current active spelling language
   language: "en",
   // Dictionaries to be used
-  dictionaries: ["softwareTerms", "companyTerms", "techTerms", "missingTerms"],
+  dictionaries: ["softwareTerms", "companyTerms", "techTerms", "missingTerms", "people"],
   dictionaryDefinitions: [
     { name: "companyTerms", path: `${DICTIONARIES_BASE_PATH}/company-terms.txt` },
     { name: "techTerms", path: `${DICTIONARIES_BASE_PATH}/tech-terms.txt` },
     { name: "missingTerms", path: `${DICTIONARIES_BASE_PATH}/missing-terms.txt` },
+    { name: "people", path: `${DICTIONARIES_BASE_PATH}/people.txt` },
   ],
   // the minimum length of a word before it is checked.
   minWordLength: 3,

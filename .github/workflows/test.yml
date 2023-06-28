@@ -20,20 +20,16 @@ jobs:
       - name: Check spelling
         run: pnpm run check:spelling
       - name: Check Types
-        working-directory: deploy-platform
-        run: pnpm run check:types
+        run: pnpm nx run-many -t check:types
   test-unit:
     runs-on: ${{ vars.JOBS_RUNNER }}
-    defaults:
-      run:
-        working-directory: deploy-platform
     steps:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Setup env
         uses: ./.github/actions/pnpm-install
       - name: Test
-        run: pnpm run test
+        run: pnpm nx run-many -t test
   build:
     runs-on: ${{ vars.JOBS_RUNNER }}
     defaults:
@@ -45,31 +41,14 @@ jobs:
       - name: Setup env
         uses: ./.github/actions/pnpm-install
       - name: Build
-        run: pnpm run build
-      - name: Check dist
+        run: pnpm nx run-many --skip-nx-cache -t build
+      - name: Check dist (deploy-platform)
+        id: diff-deploy-platform
+        working-directory: deploy-platform
         run: |
-          if [ "$(git diff --ignore-space-at-eol dist/ | wc -l)" -gt "0" ]; then
-            echo "Detected uncommitted changes after build.  See status below:"
-            git diff
-            exit 1
-          fi
-        id: diff
+          pnpm nx run-many -t check:dist
   test-component:
-    runs-on: ${{ vars.JOBS_RUNNER }}
-    needs: [build]
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - id: deploy
-        name: Launch deploy action
-        uses: ./deploy-platform
-        with:
-          environment: 'test'
-          project: 'cross-platform-actions'
-          repo-name: 'cross-platform-actions'
-          token: ${{ secrets.GITHUB_TOKEN }}
-          ref: ${{ github.head_ref || github.ref_name }}
-          request-interval: 5000
-      - name: Check deployment manifest
-        run: |
-          echo '${{ steps.deploy.outputs.manifest }}' | jq -r '.registry.server' | grep 'foo-server' || (echo "Manifest is wrong" && exit 1)
+    uses: ./.github/workflows/test-component.yml
+    needs: build
+    secrets:
+      WRITE_SECRET_PAT: ${{ secrets.PAT_SYNC_MANIFEST_CROSS_1455 }}

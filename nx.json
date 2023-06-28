@@ -1,0 +1,41 @@
+{
+  "$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "affected": {
+    "defaultBase": "main"
+  },
+  "tasksRunnerOptions": {
+    "default": {
+      "runner": "nx/tasks-runners/default",
+      "options": {
+        "cacheableOperations": []
+      }
+    }
+  },
+  "targetDefaults": {
+    "check:dist": {
+      "dependsOn": ["build"],
+      "options": {
+        "cwd": "{projectRoot}"
+      }
+    },
+    "check:types": {
+      "dependsOn": ["build"]
+    }
+  },
+  "namedInputs": {
+    "default": [
+      "{projectRoot}/**/*",
+      "sharedGlobals"
+    ],
+    "sharedGlobals": [
+      "{workspaceRoot}/.github/workflows/*.*",
+      "{workspaceRoot}/.npmrc",
+      "{workspaceRoot}/nx.json",
+      "{workspaceRoot}/pnpm-workspace.yaml",
+      "{workspaceRoot}/tsconfig.base.json"
+    ],
+    "production": [
+      "default"
+    ]
+  }
+}
