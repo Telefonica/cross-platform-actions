@@ -22,8 +22,8 @@ describe("Environment", () => {
 
   it("should return a environment object", () => {
     // Arrange
-    const name = "test";
-    const token = "test";
+    const name = "environment-name";
+    const token = "token";
 
     // Act
     const environment = new Environment(1, name, { octokit: getOctokit(token) });
@@ -36,7 +36,7 @@ describe("Environment", () => {
     let environment: EnvironmentInterface;
 
     beforeEach(async () => {
-      environment = new Environment(1, "test", { octokit: getOctokit("test") });
+      environment = new Environment(1, "environment-name", { octokit: getOctokit("token") });
     });
 
     it("should add a secret to the environment", async () => {
@@ -46,11 +46,11 @@ describe("Environment", () => {
       const publicKey = sodium.to_base64(keyPair.publicKey, sodium.base64_variants.ORIGINAL);
       octokit.rest.actions.getEnvironmentPublicKey.mockResolvedValueOnce({
         data: {
-          key_id: "test",
+          key_id: "key-id",
           key: publicKey,
         },
       });
-      const secret = new Secret("test", "test");
+      const secret = new Secret("secret-name", "secret-value");
 
       // Act
       await environment.addSecret(secret);
@@ -58,21 +58,21 @@ describe("Environment", () => {
       // Assert
       expect(octokit.rest.actions.getEnvironmentPublicKey).toHaveBeenCalledWith({
         repository_id: 1,
-        environment_name: "test",
+        environment_name: "environment-name",
       });
       expect(octokit.rest.actions.createOrUpdateEnvironmentSecret).toHaveBeenCalledWith({
-        key_id: "test",
+        key_id: "key-id",
         repository_id: 1,
-        environment_name: "test",
-        secret_name: "test",
-        encrypted_value: expect.toHaveEncryptedValue("test", keyPair),
+        environment_name: "environment-name",
+        secret_name: "secret-name",
+        encrypted_value: expect.toHaveEncryptedValue("secret-value", keyPair),
       });
     });
 
     it("should fail if the environment public key cannot be retrieved", async () => {
       // Arrange
-      octokit.rest.actions.getEnvironmentPublicKey.mockRejectedValueOnce(new Error("test"));
-      const secret = new Secret("test", "test");
+      octokit.rest.actions.getEnvironmentPublicKey.mockRejectedValueOnce(new Error("error"));
+      const secret = new Secret("secret-name", "secret-value");
 
       // Act & Assert
       await expect(environment.addSecret(secret)).rejects.toThrow();
@@ -81,9 +81,9 @@ describe("Environment", () => {
     it("should fail if cannot create or update secret", async () => {
       // Arrange
       octokit.rest.actions.createOrUpdateEnvironmentSecret.mockRejectedValueOnce(
-        new Error("test")
+        new Error("error")
       );
-      const secret = new Secret("test", "test");
+      const secret = new Secret("secret-name", "secret-value");
 
       // Act & Assert
       await expect(environment.addSecret(secret)).rejects.toThrow();

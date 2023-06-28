@@ -21,15 +21,15 @@ describe("writeSecret", () => {
       const publicKey = sodium.to_base64(keyPair.publicKey, sodium.base64_variants.ORIGINAL);
       octokit.rest.actions.getRepoPublicKey.mockResolvedValueOnce({
         data: {
-          key_id: "test",
+          key_id: "key-id",
           key: publicKey,
         },
       });
       const inputs = {
-        value: "test",
-        secret: "test",
-        repositories: ["test/test"],
-        token: "test",
+        value: "secret-value",
+        secret: "secret-name",
+        repositories: ["repository-owner/repository-repo"],
+        token: "token",
       };
 
       // Act
@@ -41,38 +41,38 @@ describe("writeSecret", () => {
           github: {
             secrets: [
               {
-                secret: "test",
-                repository: "test/test",
+                secret: "secret-name",
+                repository: "repository-owner/repository-repo",
               },
             ],
           },
         })
       );
       expect(octokit.rest.actions.getRepoPublicKey).toHaveBeenCalledWith({
-        owner: "test",
-        repo: "test",
+        owner: "repository-owner",
+        repo: "repository-repo",
       });
       expect(octokit.rest.actions.createOrUpdateRepoSecret).toHaveBeenCalledWith({
-        key_id: "test",
-        owner: "test",
-        repo: "test",
-        secret_name: "test",
-        encrypted_value: expect.toHaveEncryptedValue("test", keyPair),
+        key_id: "key-id",
+        owner: "repository-owner",
+        repo: "repository-repo",
+        secret_name: "secret-name",
+        encrypted_value: expect.toHaveEncryptedValue("secret-value", keyPair),
       });
     });
 
     it("should throw an error if the repository fails adding secret", async () => {
       // Arrange
-      octokit.rest.actions.getRepoPublicKey.mockRejectedValueOnce(new Error("test"));
+      octokit.rest.actions.getRepoPublicKey.mockRejectedValueOnce(new Error("error"));
       const inputs = {
-        value: "test",
-        secret: "test",
-        repositories: ["test/test"],
-        token: "test",
+        value: "secret-value",
+        secret: "secret-name",
+        repositories: ["repository-owner/repository-repo"],
+        token: "token",
       };
 
       // Act & Assert
-      await expect(writeSecret(inputs, logger)).rejects.toThrow("test");
+      await expect(writeSecret(inputs, logger)).rejects.toThrow();
     });
   });
 
@@ -84,16 +84,16 @@ describe("writeSecret", () => {
       const publicKey = sodium.to_base64(keyPair.publicKey, sodium.base64_variants.ORIGINAL);
       octokit.rest.actions.getEnvironmentPublicKey.mockResolvedValueOnce({
         data: {
-          key_id: "test",
+          key_id: "key-id",
           key: publicKey,
         },
       });
       const inputs = {
-        value: "test",
-        secret: "test",
-        repositories: ["test/test"],
-        environment: "test",
-        token: "test",
+        value: "secret-value",
+        secret: "secret-name",
+        repositories: ["repository-owner/repository-repo"],
+        environment: "environment-name",
+        token: "token",
       };
 
       // Act
@@ -105,40 +105,49 @@ describe("writeSecret", () => {
           github: {
             secrets: [
               {
-                secret: "test",
-                repository: "test/test",
-                environment: "test",
+                secret: "secret-name",
+                repository: "repository-owner/repository-repo",
+                environment: "environment-name",
               },
             ],
           },
         })
       );
+      expect(octokit.rest.repos.get).toHaveBeenCalledWith({
+        owner: "repository-owner",
+        repo: "repository-repo",
+      });
+      expect(octokit.rest.repos.getEnvironment).toHaveBeenCalledWith({
+        owner: "repository-owner",
+        repo: "repository-repo",
+        environment_name: "environment-name",
+      });
       expect(octokit.rest.actions.getEnvironmentPublicKey).toHaveBeenCalledWith({
         repository_id: 1,
-        environment_name: "test",
+        environment_name: "environment-name",
       });
       expect(octokit.rest.actions.createOrUpdateEnvironmentSecret).toHaveBeenCalledWith({
-        key_id: "test",
+        key_id: "key-id",
         repository_id: 1,
-        environment_name: "test",
-        secret_name: "test",
-        encrypted_value: expect.toHaveEncryptedValue("test", keyPair),
+        environment_name: "environment-name",
+        secret_name: "secret-name",
+        encrypted_value: expect.toHaveEncryptedValue("secret-value", keyPair),
       });
     });
 
     it("should throw an error if the repository fails adding secret", async () => {
       // Arrange
-      octokit.rest.repos.getEnvironment.mockRejectedValueOnce(new Error("test"));
+      octokit.rest.repos.getEnvironment.mockRejectedValueOnce(new Error("error"));
       const inputs = {
-        value: "test",
-        secret: "test",
-        repositories: ["test/test"],
-        environment: "test",
-        token: "test",
+        value: "secret-value",
+        secret: "secret-name",
+        repositories: ["repository-owner/repository-repo"],
+        environment: "environment-name",
+        token: "token",
       };
 
       // Act & Assert
-      await expect(writeSecret(inputs, logger)).rejects.toThrow("test");
+      await expect(writeSecret(inputs, logger)).rejects.toThrow();
     });
   });
 });

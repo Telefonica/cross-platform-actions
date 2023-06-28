@@ -35,7 +35,7 @@ export const Repository: RepositoryConstructor = class repository implements Rep
         repo: this._repo,
         environment_name: name,
       });
-      return new Environment(repositoryId, this._owner, {
+      return new Environment(repositoryId, name, {
         octokit: this._octokit,
         logger: this._logger,
       });
