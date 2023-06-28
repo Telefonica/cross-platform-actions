@@ -8,15 +8,15 @@ describe("getConfig", () => {
   it("should return a config object", () => {
     // Arrange & Act
     const config = getConfig({
-      repositories: ["test/test"],
+      repositories: ["owner/repo"],
     });
 
     // Assert
     expect(config).toBeDefined();
     expect(config.repositories).toEqual([
       {
-        owner: "test",
-        repo: "test",
+        owner: "owner",
+        repo: "repo",
       },
     ]);
   });

@@ -52,3 +52,31 @@ jobs:
         if: always()
         run: |
           curl -X DELETE -H "Authorization: token ${{ secrets.WRITE_SECRET_PAT }}" https://api.github.com/repos/Telefonica/cross-platform-actions/actions/secrets/TEST_SECRET || true
+  test-component-write-secret-environment:
+    runs-on: ${{ vars.JOBS_RUNNER }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - id: write-secret
+        name: Launch write-secret action
+        uses: ./write-secret
+        with:
+          secret: TEST_SECRET
+          value: value
+          repositories: Telefonica/cross-platform-actions
+          environment: test
+          token: ${{ secrets.WRITE_SECRET_PAT }}
+      - name: Check write-secret manifest
+        run: |
+          [[ '${{ steps.write-secret.outputs.manifest }}' == '{"github":{"secrets":[{"secret":"TEST_SECRET","repository":"Telefonica/cross-platform-actions","environment":"test"}]}}' ]] || (echo "::error::Action output has invalid value" && exit 1)
+      - name: Check write-secret created secret
+        timeout-minutes: 1
+        run: |
+          while true; do
+            curl -s -H "Authorization: token ${{ secrets.WRITE_SECRET_PAT }}" https://api.github.com/repositories/617426279/environments/test/secrets/TEST_SECRET | jq -r '.name' | grep 'TEST_SECRET' && break
+            sleep 10
+          done
+      - name: Clean up secret
+        if: false
+        run: |
+          curl -X DELETE -H "Authorization: token ${{ secrets.WRITE_SECRET_PAT }}" https://api.github.com/repositories/617426279/environments/test/secrets/TEST_SECRET || true

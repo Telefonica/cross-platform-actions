@@ -13,16 +13,15 @@ describe("Secret", () => {
 
   it("should return a secret object", async () => {
     // Arrange
-    const value = "test";
     await sodium.ready;
     const keyPair = sodium.crypto_box_keypair();
     const publicKey = sodium.to_base64(keyPair.publicKey, sodium.base64_variants.ORIGINAL);
-    const secret = new Secret("test", value);
+    const secret = new Secret("secret-name", "secret-value");
 
     // Act
     const encryptedValueBase64 = await secret.encryptedValue(publicKey);
 
     // Assert
-    expect(encryptedValueBase64).toHaveEncryptedValue(value, keyPair);
+    expect(encryptedValueBase64).toHaveEncryptedValue("secret-value", keyPair);
   });
 });

@@ -159,7 +159,9 @@ git add dist
 
 ## Component tests
 
-Component tests are executed in a real environment, using the GitHub Actions Runner. The action is executed in the workflow, and it creates a secret in this repository called `TEST_SECRET`. Then, the test checks that the secret has been created. In addition, the test checks that the action returns the expected manifest.
+Component tests are executed in a real environment, using the GitHub Actions Runner. The action is executed in the workflow, and it:
+- Creates a secret in this repository called `TEST_SECRET`. Then, the test checks that the secret has been created. In addition, the test checks that the action returns the expected manifest.
+- Creates a secret in the environment `test` of this repository called `TEST_SECRET`. Then, the test checks that the secret has been created. In addition, the test checks that the action returns the expected manifest.
 
 ## Release
 
