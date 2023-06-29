@@ -19,6 +19,12 @@ Use next sections inside each different action entry to describe changes on each
 
 ## [Unreleased]
 
+### deploy-platform
+
+### write-secret
+
+## [v3.0.0] - 2023-07-29
+
 ### monorepo
 
 #### Added
