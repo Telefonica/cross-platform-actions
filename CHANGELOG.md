@@ -23,7 +23,7 @@ Use next sections inside each different action entry to describe changes on each
 
 ### write-secret
 
-## [v2.3.0] - 2023-07-29
+## [v2.3.0] - 2023-06-29
 
 ### monorepo
 
