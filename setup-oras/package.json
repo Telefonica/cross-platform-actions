@@ -1,0 +1,14 @@
+{
+  "name": "write-secret",
+  "private": true,
+  "description": "Github action to write secrets to repositories or environments",
+  "scripts": {
+    "check:types:lib": "tsc --noEmit",
+    "check:types": "npm run check:types:lib",
+    "build": "ncc build src/index.ts -o dist --source-map",
+    "prepare": "cd ../ && husky install"
+  },
+  "keywords": [],
+  "author": "Telefónica",
+  "license": "MIT"
+}

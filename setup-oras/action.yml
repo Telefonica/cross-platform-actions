@@ -1,0 +1,14 @@
+name: 'setup-oras'
+description: 'Install a specific version of oras cli'
+author: 'Telefonica'
+inputs:
+  version:
+    description: "Version of oras cli to install"
+    required: true
+    default: '1.0.0'
+outputs:
+   oras-path:
+      description: 'Path to the cached oras binary'
+runs:
+  using: 'node16'
+  main: 'dist/index.js'

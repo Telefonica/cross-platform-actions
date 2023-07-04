@@ -80,3 +80,13 @@ jobs:
         if: false
         run: |
           curl -X DELETE -H "Authorization: token ${{ secrets.WRITE_SECRET_PAT }}" https://api.github.com/repositories/617426279/environments/test/secrets/TEST_SECRET || true
+  test-component-setup-oras:
+    runs-on: ${{ vars.JOBS_RUNNER }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - id: setup-oras
+        name: Launch setup-oras action
+        uses: ./setup-oras
+        with:
+          version: '1.0.0'

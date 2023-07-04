@@ -4,3 +4,5 @@ zod
 libsodium
 keypair
 env
+oras
+cli
