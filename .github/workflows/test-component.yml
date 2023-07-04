@@ -90,3 +90,54 @@ jobs:
         uses: ./setup-oras
         with:
           version: '1.0.0'
+  test-component-manifest-write:
+    runs-on: ${{ vars.JOBS_RUNNER }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - id: write1
+        name: "write json 1"
+        uses: ./manifest-write
+        with:
+          id: 'w1'
+          json: '{"foo": "bar1"}'
+          group: 'test-manifest'
+      - id: write2
+        name: "Write json 2"
+        uses: ./manifest-write
+        with:
+          id: 'w2'
+          json: '{"foo": "bar2"}'
+          group: 'test-manifest'
+      - id: write3
+        name: "Overwrite json 2"
+        uses: ./manifest-write
+        with:
+          id: 'w2'
+          json: '{"foo": "bar2"}'
+          group: 'test-manifest'
+      - id: write-standalone
+        name: "Launch write-secret action"
+        uses: ./manifest-write
+        with:
+          id: 'w1'
+          json: '{"foo": "bar"}'
+  test-component-manifest-read:
+    runs-on: ${{ vars.JOBS_RUNNER }}
+    needs:
+      - test-component-manifest-write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - id: read-test-manifest
+        name: Read test manifest
+        uses: ./manifest-read
+        with:
+          group: 'test-manifest'
+
+      - id: read-stanalone
+        name: Read standalone manifest
+        uses: ./manifest-read
+
+      ## TODO: Add assertions

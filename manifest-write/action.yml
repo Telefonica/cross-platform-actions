@@ -1,0 +1,87 @@
+name: Save a manifest
+description: Saves a manifest in the artifacts for later retrieval
+inputs:
+  id:
+    required: true
+    description: Artifact id
+  json:
+    required: true
+    description: JSON for the artifact as a string
+  group:
+    required: false
+    description: The group of manifests. Consolidated as the artifact name in GitHub
+    default: manifests
+
+outputs:
+  manifests:
+    description: "manifests indexed by id"
+    value: ${{ steps.manifest.outputs.manifests }}
+  matrix:
+    description: "manifests ready to be used in a matrix"
+    value: ${{ steps.manifest.outputs.matrix }}
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/github-script@v6
+      id: manifest
+      env:
+        TEMP_DIR: ${{ runner.temp }}
+      with:
+        script: |
+          const { writeFile } = require('fs/promises');
+          const path = require('path');
+
+          const id = `${{ inputs.id }}`;
+          const json = `${{ inputs.json }}`;
+          const group = `${{ inputs.group }}` || 'manifests';
+
+          if (isEmpty(id)) {
+            core.setFailed(`'id' is mandatory`);
+            return;
+          }
+          if (isEmpty(json)) {
+            core.setFailed(`'json' is mandatory`);
+            return;
+          }
+
+          let manifest;
+          try {
+            manifest = JSON.parse(json);
+          } catch (error) {
+            core.setFailed(`'json' should be valid JSON`);
+            return;
+          }
+
+          const tempPath = path.join(process.env.TEMP_DIR, group);
+          await io.mkdirP(tempPath);
+          await writeFile(path.join(tempPath, `${id}.json`), JSON.stringify(manifest));
+
+          const manifests = new Map();
+          manifests.set(id, manifest);
+
+          const result = {
+            matrix: {
+              include: Array.from(manifests.values()),
+            },
+            manifests: Object.fromEntries(manifests),
+          };
+
+          core.setOutput('matrix', result.matrix);
+          core.startGroup('matrix');
+          console.log(JSON.stringify(result.matrix, null, 2));
+          core.endGroup();
+
+          core.setOutput('manifests', result.manifests);
+          core.startGroup('manifests');
+          console.log(JSON.stringify(result.manifests, null, 2));
+          core.endGroup();
+
+          function isEmpty(value) {
+            return value == null || value.trim() === '';
+          }
+
+    - uses: actions/upload-artifact@v3
+      with:
+        name: ${{ inputs.group }}
+        path: ${{ runner.temp }}/${{ inputs.group }}/*.json
