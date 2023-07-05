@@ -23,18 +23,27 @@ outputs:
 runs:
   using: composite
   steps:
-    - uses: actions/github-script@v6
+    - name: Generate UUID
+      id: generate-uuid
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const crypto = require('crypto');
+          core.setOutput('uuid', crypto.randomUUID());
+
+    - name: Write Manifest
+      uses: actions/github-script@v6
       id: manifest
       env:
-        TEMP_DIR: ${{ runner.temp }}
+        TEMP_DIR: ${{ runner.temp }}/${{ steps.generate-uuid.outputs.uuid }}
       with:
         script: |
           const { writeFile } = require('fs/promises');
           const path = require('path');
+          const crypto = require('crypto');
 
           const id = `${{ inputs.id }}`;
           const json = `${{ inputs.json }}`;
-          const group = `${{ inputs.group }}` || 'manifests';
 
           if (isEmpty(id)) {
             core.setFailed(`'id' is mandatory`);
@@ -53,9 +62,8 @@ runs:
             return;
           }
 
-          const tempPath = path.join(process.env.TEMP_DIR, group);
-          await io.mkdirP(tempPath);
-          await writeFile(path.join(tempPath, `${id}.json`), JSON.stringify(manifest));
+          await io.mkdirP(process.env.TEMP_DIR);
+          await writeFile(path.join(process.env.TEMP_DIR, `${id}.json`), JSON.stringify(manifest));
 
           const manifests = new Map();
           manifests.set(id, manifest);
@@ -67,14 +75,14 @@ runs:
             manifests: Object.fromEntries(manifests),
           };
 
-          core.setOutput('matrix', result.matrix);
-          core.startGroup('matrix');
-          console.log(JSON.stringify(result.matrix, null, 2));
-          core.endGroup();
-
           core.setOutput('manifests', result.manifests);
           core.startGroup('manifests');
           console.log(JSON.stringify(result.manifests, null, 2));
+          core.endGroup();
+
+          core.setOutput('matrix', result.matrix);
+          core.startGroup('matrix');
+          console.log(JSON.stringify(result.matrix, null, 2));
           core.endGroup();
 
           function isEmpty(value) {
@@ -84,4 +92,4 @@ runs:
     - uses: actions/upload-artifact@v3
       with:
         name: ${{ inputs.group }}
-        path: ${{ runner.temp }}/${{ inputs.group }}/*.json
+        path: ${{ runner.temp }}/${{ steps.generate-uuid.outputs.uuid }}/*.json

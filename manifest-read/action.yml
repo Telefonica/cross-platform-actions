@@ -49,12 +49,12 @@ runs:
             manifests: Object.fromEntries(manifests),
           };
 
-          core.setOutput('matrix', result.matrix);
-          core.startGroup('matrix');
-          console.log(JSON.stringify(result.matrix, null, 2));
-          core.endGroup();
-
           core.setOutput('manifests', result.manifests);
           core.startGroup('manifests');
           console.log(JSON.stringify(result.manifests, null, 2));
+          core.endGroup();
+
+          core.setOutput('matrix', result.matrix);
+          core.startGroup('matrix');
+          console.log(JSON.stringify(result.matrix, null, 2));
           core.endGroup();
