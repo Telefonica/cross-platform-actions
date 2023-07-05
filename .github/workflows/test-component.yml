@@ -90,3 +90,90 @@ jobs:
         uses: ./setup-oras
         with:
           version: '1.0.0'
+  test-component-manifest-write:
+    runs-on: ${{ vars.JOBS_RUNNER }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - id: write1
+        name: "write json 1"
+        uses: ./manifest-write
+        with:
+          id: 'w1'
+          group: 'test-manifest'
+          json: '{"foo":"bar1"}'
+
+      - uses: nick-fields/assert-action@v1
+        with:
+          expected: '{"w1":{"foo":"bar1"}}'
+          actual: ${{ steps.write1.outputs.manifests }}
+
+      - uses: nick-fields/assert-action@v1
+        with:
+          expected: '{"include":[{"foo":"bar1"}]}'
+          actual: ${{ steps.write1.outputs.matrix }}
+
+      - id: write2
+        name: "write json 2"
+        uses: ./manifest-write
+        with:
+          id: 'w2'
+          group: 'test-manifest'
+          json: |
+            {
+              "foo": "bar2"
+            }
+
+      - id: write3
+        name: "Overwrite json 2"
+        uses: ./manifest-write
+        with:
+          id: 'w2'
+          group: 'test-manifest'
+          json: '{"foo": "bar-overwrite-2"}'
+
+      - id: write-standalone
+        name: "standalone manifest-write"
+        uses: ./manifest-write
+        with:
+          id: 's1'
+          json: '{"standalone": true}'
+
+  test-component-manifest-read:
+    runs-on: ${{ vars.JOBS_RUNNER }}
+    needs:
+      - test-component-manifest-write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - id: read
+        name: Read test manifest
+        uses: ./manifest-read
+        with:
+          group: 'test-manifest'
+
+      - uses: nick-fields/assert-action@v1
+        with:
+          expected: '{"w1":{"foo":"bar1"},"w2":{"foo":"bar-overwrite-2"}}'
+          actual: ${{ steps.read.outputs.manifests }}
+
+      - uses: nick-fields/assert-action@v1
+        with:
+          expected: '{"include":[{"foo":"bar1"},{"foo":"bar-overwrite-2"}]}'
+          actual: ${{ steps.read.outputs.matrix }}
+
+      - id: read-standalone
+        name: Read standalone manifest
+        uses: ./manifest-read
+
+      - uses: nick-fields/assert-action@v1
+        with:
+          expected: '{"s1":{"standalone":true}}'
+          actual: ${{ steps.read-standalone.outputs.manifests }}
+
+      - uses: nick-fields/assert-action@v1
+        with:
+          expected: '{"include":[{"standalone":true}]}'
+          actual: ${{ steps.read-standalone.outputs.matrix }}

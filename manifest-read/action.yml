@@ -1,0 +1,60 @@
+name: Loads the manifest
+description: Loads the manifests written by manifest-write
+
+inputs:
+  group:
+    required: false
+    description: The group of manifests. Consolidated as the artifact name in GitHub
+    default: manifests
+
+outputs:
+  manifests:
+    description: "manifests indexed by id"
+    value: ${{ steps.manifest.outputs.manifests }}
+  matrix:
+    description: "manifests ready to be used in a matrix"
+    value: ${{ steps.manifest.outputs.matrix }}
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/download-artifact@v3
+      id: download
+      with:
+        name:  ${{ inputs.group }}
+        path: ${{ runner.temp }}/${{ inputs.group }}
+
+    - uses: actions/github-script@v6
+      id: manifest
+      env:
+        DOWNLOAD_PATH: ${{ steps.download.outputs.download-path }}
+      with:
+        script: |
+          const { readFile } = require('fs/promises');
+          const path = require('path');
+
+          const manifests = new Map();
+          const globber = await glob.create(path.join(process.env.DOWNLOAD_PATH, '*.json'));
+
+          for await (const file of globber.globGenerator()) {
+            const manifest = JSON.parse(await readFile(file));
+            const id = path.parse(file).name;
+            manifests.set(id, manifest);
+          }
+
+          const result = {
+            matrix: {
+              include: Array.from(manifests.values()),
+            },
+            manifests: Object.fromEntries(manifests),
+          };
+
+          core.setOutput('manifests', result.manifests);
+          core.startGroup('manifests');
+          console.log(JSON.stringify(result.manifests, null, 2));
+          core.endGroup();
+
+          core.setOutput('matrix', result.matrix);
+          core.startGroup('matrix');
+          console.log(JSON.stringify(result.matrix, null, 2));
+          core.endGroup();
