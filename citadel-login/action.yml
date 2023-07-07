@@ -1,0 +1,25 @@
+name: Citadel Login
+description: Login into Citadel execution platform services
+inputs:
+  citadel-registries:
+    required: false
+    description: Registries manifest. Available as secrets.CITADEL_REGISTRIES
+
+runs:
+  using: composite
+  steps:
+    - name: Login to OCI dev registry
+      uses: docker/login-action@v2
+      if: fromJSON(inputs.citadel-registries).oci.dev
+      with:
+        registry: ${{ fromJSON(inputs.citadel-registries).oci.dev.registry }}
+        username: ${{ fromJSON(inputs.citadel-registries).oci.dev.username }}
+        password: ${{ fromJSON(inputs.citadel-registries).oci.dev.password }}
+
+    - name: Login to OCI pro registry
+      uses: docker/login-action@v2
+      if: fromJSON(inputs.citadel-registries).oci.pro
+      with:
+        registry: ${{ fromJSON(inputs.citadel-registries).oci.pro.registry }}
+        username: ${{ fromJSON(inputs.citadel-registries).oci.pro.username }}
+        password: ${{ fromJSON(inputs.citadel-registries).oci.pro.password }}
