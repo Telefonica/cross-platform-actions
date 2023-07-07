@@ -98,12 +98,10 @@ When declaring a new release, follow the next rules to decide the new version nu
 
 To declare a new release, follow these steps:
 
-* Create a release branch from `main` named `release/vX.Y.Z`, where `X.Y.Z` is the version number of the release.
 * Update the changelog:
   * Move all the changes from the `Unreleased` section to a new section with the version number and the current date.
   * Add a new `Unreleased` section at the top of the file.
 * Commit the changes and push them to the repository.
-* Merge the release branch into `main`.
 * __Create a Github release from the main branch__. The release title must be the version number preceded by the `v` letter (`vX.Y.Z`).
   * The __release description__ must be the corresponding entry in the `CHANGELOG.md file`. It must clearly identify the changes in each different action.
 * Move the major version tag to the new commit. For example, if the new version is `1.2.3`, move the `v1` tag to the new commit.
