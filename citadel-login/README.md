@@ -32,10 +32,25 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Login to Citadel Platform
-        uses: Telefonica/cross-platform-actions/citadel-login@{BRANCH_NAME|VERSION}
+        uses: Telefonica/cross-platform-actions/citadel-login@v2
         with:
           citadel-registries: ${{ secrets.CITADEL_REGISTRIES }} # Optional
           citadel-environment: ${{ secrets.CITADEL_ENVIRONMENT }} # Optional
+
+      # ...
+
+      # When the job is finished, logout from Azure
+      # when citadel-environment was provided in the citadel-login action
+      # https://github.com/azure/login/tree/v1/#az-logout-and-security-hardening
+      - name: Azure Logout
+        if: always()
+        uses: azure/CLI@v1
+        with:
+          inlineScript: |
+            az logout
+            az cache purge
+            az account clear
+
 ```
 
 ## Inputs

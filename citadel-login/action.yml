@@ -32,8 +32,8 @@ runs:
 
           try {
             const environment = JSON.parse(environmentInput);
-            if (kubernetes.credentials?.client_secret){
-              core.setSecret(kubernetes.credentials.client_secret);
+            if (environment.kubernetes?.credentials?.client_secret){
+              core.setSecret(environment.kubernetes.credentials.client_secret);
             }
           } catch(error) {
             core.setFailed(`'citadel-environment' should be valid JSON`);
