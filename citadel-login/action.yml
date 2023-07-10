@@ -4,6 +4,9 @@ inputs:
   citadel-registries:
     required: false
     description: Registries manifest. Available as secrets.CITADEL_REGISTRIES
+  citadel-environment:
+    required: false
+    description: Environment manifest. Available as secrets.CITADEL_ENVIRONMENT
 
 runs:
   using: composite
@@ -13,6 +16,7 @@ runs:
       with:
         script: |
           const registriesInput = core.getInput('citadel-registries') || '{}';
+          const environmentInput = core.getInput('citadel-environment') || '{}';
 
           try {
             const registries = JSON.parse(registriesInput);
@@ -22,20 +26,61 @@ runs:
             if (registries.oci?.pro?.password){
               core.setSecret(registries.oci.pro.password);
             }
+          } catch(error) {
+            core.setFailed(`'citadel-registries' should be valid JSON`);
+          }
+
+          try {
+            const environment = JSON.parse(environmentInput);
+            if (environment.kubernetes?.credentials?.client_secret){
+              core.setSecret(environment.kubernetes.credentials.client_secret);
+            }
+          } catch(error) {
+            core.setFailed(`'citadel-environment' should be valid JSON`);
           }
 
     - name: Login to OCI dev registry
-      uses: docker/login-action@v2
       if: fromJSON(inputs.citadel-registries).oci.dev
+      uses: docker/login-action@v2
       with:
         registry: ${{ fromJSON(inputs.citadel-registries).oci.dev.registry }}
         username: ${{ fromJSON(inputs.citadel-registries).oci.dev.username }}
         password: ${{ fromJSON(inputs.citadel-registries).oci.dev.password }}
 
     - name: Login to OCI pro registry
-      uses: docker/login-action@v2
       if: fromJSON(inputs.citadel-registries).oci.pro
+      uses: docker/login-action@v2
       with:
         registry: ${{ fromJSON(inputs.citadel-registries).oci.pro.registry }}
         username: ${{ fromJSON(inputs.citadel-registries).oci.pro.username }}
         password: ${{ fromJSON(inputs.citadel-registries).oci.pro.password }}
+
+    # Logs in with your Azure credentials
+    - name: Login to Azure
+      if: fromJSON(inputs.citadel-environment).kubernetes
+      uses: azure/login@v1
+      with:
+        creds: |
+          {
+            "clientId": "${{ fromJSON(inputs.citadel-environment).kubernetes.credentials.client_id }}",
+            "clientSecret": "${{ fromJSON(inputs.citadel-environment).kubernetes.credentials.client_secret }}",
+            "subscriptionId": "${{ fromJSON(inputs.citadel-environment).kubernetes.credentials.subscription_id }}",
+            "tenantId":  "${{ fromJSON(inputs.citadel-environment).kubernetes.credentials.tenant_id }}"
+          }
+
+    # Use kubelogin to configure your kubeconfig for Azure auth
+    - name: Set up kubelogin
+      if: fromJSON(inputs.citadel-environment).kubernetes
+      uses: azure/use-kubelogin@v1
+      with:
+        kubelogin-version: "v0.0.28"
+
+    # Retrieves your Azure Kubernetes Service cluster's kubeconfig file
+    - name: Get K8s context
+      if: fromJSON(inputs.citadel-environment).kubernetes
+      uses: azure/aks-set-context@v3
+      with:
+        admin: "false"
+        cluster-name: "${{ fromJSON(inputs.citadel-environment).kubernetes.name }}"
+        resource-group: "${{ fromJSON(inputs.citadel-environment).kubernetes.resource_group }}"
+        use-kubelogin: "true"

@@ -10,3 +10,6 @@ globber
 oci
 OCI
 azurecr
+kubelogin
+kubeconfig
+creds
