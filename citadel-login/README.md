@@ -31,18 +31,19 @@ jobs:
   login:
     runs-on: ubuntu-latest
     steps:
-      - name: Login to Registries
+      - name: Login to Citadel Platform
         uses: Telefonica/cross-platform-actions/citadel-login@{BRANCH_NAME|VERSION}
         with:
-          citadel-registries: ${{ secrets.CITADEL_REGISTRIES }}
+          citadel-registries: ${{ secrets.CITADEL_REGISTRIES }} # Optional
+          citadel-environment: ${{ secrets.CITADEL_ENVIRONMENT }} # Optional
 ```
 
 ## Inputs
 
-- `citadel-registries`: The registries credentials created in Citadel. It is a JSON object with the following shape:
+- `citadel-registries`: The registries credentials created in Citadel. It is a one-line JSON object with the following shape:
 ```json
 {
-  "version": "1.0.0",
+  "version": "1",
   "oci": {
     "dev": {
       "registry": "dev-registry.azurecr.io",
@@ -55,6 +56,28 @@ jobs:
       "password": "my-password"
     }
   }
+}
+```
+- `citadel-environment`: The environment to login to created in Citadel. It is a one-line JSON object with the following shape:
+```json
+{
+  "version": "1",
+  "kubernetes":{
+    "credentials": {
+      "client_id": "0f24a860-37ab-4f90-9d32-baa6c48fa136",
+      "client_secret": "my-password",
+      "subscription_id": "8489660c-9w95-4a0b-a3b1-e2bf7e76612a",
+      "tenant_id": "6b9baf40-22dc-42da-a328-99d79274c8c5"
+    },
+    "name": "c872fa7a6fbc",
+    "resource_group": "1a90f401-f312-437b-ad30-aaf9bba9f0bd",
+    "namespace": "scaffold-dev",
+    "dns": "dev.scaffold.c872fa7a6fbc.d-consumer.com"
+  },
+  "dns": [
+    "dev.scaffold.d-consumer.com",
+    "dev.scaffold.com"
+  ]
 }
 ```
 
