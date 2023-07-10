@@ -8,6 +8,22 @@ inputs:
 runs:
   using: composite
   steps:
+    - name: Mask Secrets
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const registriesInput = core.getInput('citadel-registries') || '{}';
+
+          try {
+            const registries = JSON.parse(registriesInput);
+            if (registries.oci?.dev?.password){
+              core.setSecret(registries.oci.dev.password);
+            }
+            if (registries.oci?.pro?.password){
+              core.setSecret(registries.oci.pro.password);
+            }
+          }
+
     - name: Login to OCI dev registry
       uses: docker/login-action@v2
       if: fromJSON(inputs.citadel-registries).oci.dev
